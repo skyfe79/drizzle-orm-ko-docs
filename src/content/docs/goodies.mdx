@@ -1,12 +1,13 @@
-
 import Tab from '@mdx/Tab.astro';
 import Tabs from '@mdx/Tabs.astro';
 import Callout from '@mdx/Callout.astro';
 import Section from '@mdx/Section.astro';
 import CodeTabs from '@mdx/CodeTabs.astro';
 
-## Type API
-To retrieve a type from your table schema for `select` and `insert` queries, you can make use of our type helpers.
+## 타입 API
+
+
+`select`와 `insert` 쿼리를 위해 테이블 스키마에서 타입을 가져오려면, 타입 헬퍼를 사용할 수 있습니다.
 
 <Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore"]}>
 <Tab>
@@ -21,12 +22,12 @@ const users = pgTable('users', {
 
 type SelectUser = typeof users.$inferSelect;
 type InsertUser = typeof users.$inferInsert;
-// or
+// 또는
 type SelectUser = typeof users._.$inferSelect;
 type InsertUser = typeof users._.$inferInsert;
-// or
-type SelectUser = InferSelectModel<typeof users>;
-type InsertUser = InferInsertModel<typeof users>;
+// 또는
+type SelectUser = InferSelectModel;
+type InsertUser = InferInsertModel;
 ```
 </Tab>
 <Tab>
@@ -41,12 +42,12 @@ const users = mysqlTable('users', {
 
 type SelectUser = typeof users.$inferSelect;
 type InsertUser = typeof users.$inferInsert;
-// or
+// 또는
 type SelectUser = typeof users._.$inferSelect;
 type InsertUser = typeof users._.$inferInsert;
-// or
-type SelectUser = InferSelectModel<typeof users>;
-type InsertUser = InferInsertModel<typeof users>;
+// 또는
+type SelectUser = InferSelectModel;
+type InsertUser = InferInsertModel;
 ```
 </Tab>
 <Tab>
@@ -61,12 +62,12 @@ const users = sqliteTable('users', {
 
 type SelectUser = typeof users.$inferSelect;
 type InsertUser = typeof users.$inferInsert;
-// or
+// 또는
 type SelectUser = typeof users._.$inferSelect;
 type InsertUser = typeof users._.$inferInsert;
-// or
-type SelectUser = InferSelectModel<typeof users>;
-type InsertUser = InferInsertModel<typeof users>;
+// 또는
+type SelectUser = InferSelectModel;
+type InsertUser = InferInsertModel;
 ```
 </Tab>
 <Tab>
@@ -81,33 +82,34 @@ const users = singlestoreTable('users', {
 
 type SelectUser = typeof users.$inferSelect;
 type InsertUser = typeof users.$inferInsert;
-// or
+// 또는
 type SelectUser = typeof users._.$inferSelect;
 type InsertUser = typeof users._.$inferInsert;
-// or
-type SelectUser = InferSelectModel<typeof users>;
-type InsertUser = InferInsertModel<typeof users>;
+// 또는
+type SelectUser = InferSelectModel;
+type InsertUser = InferInsertModel;
 ```
 </Tab>
 </Tabs>
 
 
-## Logging
-To enable default query logging, just pass `{ logger: true }` to the `drizzle` initialization function:
-```typescript copy
-import { drizzle } from 'drizzle-orm/...'; // driver specific
+## 로깅
+
+기본 쿼리 로깅을 활성화하려면 `drizzle` 초기화 함수에 `{ logger: true }`를 전달하면 됩니다:
+```typescript
+import { drizzle } from 'drizzle-orm/...'; // 드라이버에 따라 다름
 
 const db = drizzle({ logger: true });
 ```
 
-You can change the logs destination by creating a `DefaultLogger` instance and providing a custom `writer` to it:
-```typescript copy
+로그 출력 위치를 변경하려면 `DefaultLogger` 인스턴스를 생성하고 커스텀 `writer`를 제공하면 됩니다:
+```typescript
 import { DefaultLogger, LogWriter } from 'drizzle-orm/logger';
-import { drizzle } from 'drizzle-orm/...'; // driver specific
+import { drizzle } from 'drizzle-orm/...'; // 드라이버에 따라 다름
 
 class MyLogWriter implements LogWriter {
   write(message: string) {
-    // Write to file, stdout, etc.
+    // 파일, stdout 등에 로그를 기록
   }
 }
 
@@ -115,10 +117,10 @@ const logger = new DefaultLogger({ writer: new MyLogWriter() });
 const db = drizzle({ logger });
 ```
 
-You can also create a custom logger:
-```typescript copy
+커스텀 로거를 직접 만들 수도 있습니다:
+```typescript
 import { Logger } from 'drizzle-orm/logger';
-import { drizzle } from 'drizzle-orm/...'; // driver specific
+import { drizzle } from 'drizzle-orm/...'; // 드라이버에 따라 다름
 
 class MyLogger implements Logger {
   logQuery(query: string, params: unknown[]): void {
@@ -130,9 +132,10 @@ const db = drizzle({ logger: new MyLogger() });
 ```
 
 
-## Multi-project schema
-**Table creator** API lets you define customise table names.  
-It's very useful when you need to keep schemas of different projects in one database.
+## 다중 프로젝트 스키마
+
+**테이블 생성자** API를 사용하면 커스텀 테이블 이름을 정의할 수 있습니다.  
+이 기능은 여러 프로젝트의 스키마를 하나의 데이터베이스에 유지해야 할 때 매우 유용합니다.
 
 <CodeTabs items={["PostgreSQL","MySQL","SQLite", "SingleStore"]}>
 ```ts {3}
@@ -190,14 +193,16 @@ export default defineConfig({
 });
 ```
 
-You can apply multiple `or` filters:
+여러 개의 `or` 필터를 적용할 수도 있습니다:
 ```ts
 tablesFilter: ["project1_*", "project2_*"]
 ```
 
 
-## Printing SQL query
-You can print SQL queries with `db` instance or by using **[`standalone query builder`](#standalone-query-builder)**.
+## SQL 쿼리 출력하기
+
+SQL 쿼리는 `db` 인스턴스를 사용하거나 **[`독립형 쿼리 빌더`](#standalone-query-builder)**를 통해 출력할 수 있습니다.
+
 ```typescript copy
 const query = db
   .select({ id: users.id, name: users.name })
@@ -211,15 +216,16 @@ const query = db
 }
 ```
 
-## Raw SQL queries execution
-If you have some complex queries to execute and `drizzle-orm` can't handle them yet,
-you can use the `db.execute` method to execute raw `parametrized` queries.
+
+## Raw SQL 쿼리 실행
+
+`drizzle-orm`이 아직 처리할 수 없는 복잡한 쿼리를 실행해야 한다면, `db.execute` 메서드를 사용해 **파라미터화된** Raw SQL 쿼리를 실행할 수 있습니다.
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
     <Tab>
     ```ts
     const statement = sql`select * from ${users} where ${users.id} = ${userId}`;
-    const res: postgres.RowList<Record<string, unknown>[]> = await db.execute(statement)
+    const res: postgres.RowList[]> = await db.execute(statement)
     ```
     </Tab>
     <Tab>
@@ -251,9 +257,10 @@ you can use the `db.execute` method to execute raw `parametrized` queries.
 </Tabs>
 
 
-## Standalone query builder
-Drizzle ORM provides a standalone query builder that allows you to build queries
-without creating a database instance and get generated SQL.
+## 독립 실행형 쿼리 빌더
+
+Drizzle ORM은 데이터베이스 인스턴스를 생성하지 않고도 쿼리를 작성하고 생성된 SQL을 얻을 수 있는 독립 실행형 쿼리 빌더를 제공합니다.
+
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite', "SingleStore"]}>
     <Tab>
         ```typescript copy
@@ -297,9 +304,10 @@ without creating a database instance and get generated SQL.
     </Tab>
 </Tabs>
 
-## Get typed table columns
-You can get a typed table columns map,
-very useful when you need to omit certain columns upon selection.
+
+## 타입이 지정된 테이블 컬럼 가져오기
+
+특정 컬럼을 선택에서 제외해야 할 때 유용하게 사용할 수 있는 타입이 지정된 테이블 컬럼 맵을 가져올 수 있습니다.
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite', "SingleStore"]}>
   <Tab>
@@ -308,19 +316,22 @@ very useful when you need to omit certain columns upon selection.
         import { getTableColumns } from "drizzle-orm";
         import { user } from "./schema";
 
+        // user 테이블의 컬럼을 가져옴
         const { password, role, ...rest } = getTableColumns(user);
 
+        // password와 role을 제외한 나머지 컬럼을 선택
         await db.select({ ...rest }).from(users);
         ```
         ```ts
         import { serial, text, pgTable } from "drizzle-orm/pg-core";
 
+        // user 테이블 스키마 정의
         export const user = pgTable("user", {
           id: serial("id").primaryKey(),
           name: text("name"),
           email: text("email"),
           password: text("password"),
-          role: text("role").$type<"admin" | "customer">(),
+          role: text("role").$type(),
         });
         ```
       </CodeTabs>
@@ -331,19 +342,22 @@ very useful when you need to omit certain columns upon selection.
         import { getTableColumns } from "drizzle-orm";
         import { user } from "./schema";
 
+        // user 테이블의 컬럼을 가져옴
         const { password, role, ...rest } = getTableColumns(user);
 
+        // password와 role을 제외한 나머지 컬럼을 선택
         await db.select({ ...rest }).from(users);
         ```
         ```ts
         import { int, text, mysqlTable } from "drizzle-orm/mysql-core";
 
+        // user 테이블 스키마 정의
         export const user = mysqlTable("user", {
           id: int("id").primaryKey().autoincrement(),
           name: text("name"),
           email: text("email"),
           password: text("password"),
-          role: text("role").$type<"admin" | "customer">(),
+          role: text("role").$type(),
         });
         ```
       </CodeTabs>
@@ -354,19 +368,22 @@ very useful when you need to omit certain columns upon selection.
         import { getTableColumns } from "drizzle-orm";
         import { user } from "./schema";
 
+        // user 테이블의 컬럼을 가져옴
         const { password, role, ...rest } = getTableColumns(user);
 
+        // password와 role을 제외한 나머지 컬럼을 선택
         await db.select({ ...rest }).from(users);
         ```
         ```ts
         import { integer, text, sqliteView } from "drizzle-orm/sqlite-core";
 
+        // user 테이블 스키마 정의
         export const user = pgTable("user", {
           id: integer("id").primaryKey({ autoIncrement: true }),
           name: text("name"),
           email: text("email"),
           password: text("password"),
-          role: text("role").$type<"admin" | "customer">(),
+          role: text("role").$type(),
         });
         ```
       </CodeTabs>
@@ -377,26 +394,31 @@ very useful when you need to omit certain columns upon selection.
         import { getTableColumns } from "drizzle-orm";
         import { user } from "./schema";
 
+        // user 테이블의 컬럼을 가져옴
         const { password, role, ...rest } = getTableColumns(user);
 
+        // password와 role을 제외한 나머지 컬럼을 선택
         await db.select({ ...rest }).from(users);
         ```
         ```ts
         import { int, text, mysqlTable } from "drizzle-orm/singlestore-core";
 
+        // user 테이블 스키마 정의
         export const user = singlestoreTable("user", {
           id: int("id").primaryKey().autoincrement(),
           name: text("name"),
           email: text("email"),
           password: text("password"),
-          role: text("role").$type<"admin" | "customer">(),
+          role: text("role").$type(),
         });
         ```
       </CodeTabs>
   </Tab>
 </Tabs>
 
-## Get table information
+
+## 테이블 정보 가져오기
+
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite', "SingleStore"]}>
   <Tab>
     ```ts copy
@@ -405,13 +427,13 @@ very useful when you need to omit certain columns upon selection.
     export const table = pgTable(...);
 
     const {
-      columns,
-      indexes,
-      foreignKeys,
-      checks,
-      primaryKeys,
-      name,
-      schema,
+      columns,       // 컬럼 정보
+      indexes,       // 인덱스 정보
+      foreignKeys,   // 외래 키 정보
+      checks,        // 체크 제약 조건
+      primaryKeys,   // 기본 키 정보
+      name,          // 테이블 이름
+      schema,        // 스키마 정보
     } = getTableConfig(table);
     ```
   </Tab>
@@ -422,13 +444,13 @@ very useful when you need to omit certain columns upon selection.
   export const table = mysqlTable(...);
 
   const {
-    columns,
-    indexes,
-    foreignKeys,
-    checks,
-    primaryKeys,
-    name,
-    schema,
+    columns,       // 컬럼 정보
+    indexes,       // 인덱스 정보
+    foreignKeys,   // 외래 키 정보
+    checks,        // 체크 제약 조건
+    primaryKeys,   // 기본 키 정보
+    name,          // 테이블 이름
+    schema,        // 스키마 정보
   } = getTableConfig(table);
   ```
   </Tab>
@@ -439,13 +461,13 @@ very useful when you need to omit certain columns upon selection.
   export const table = sqliteTable(...);
 
   const {
-    columns,
-    indexes,
-    foreignKeys,
-    checks,
-    primaryKeys,
-    name,
-    schema,
+    columns,       // 컬럼 정보
+    indexes,       // 인덱스 정보
+    foreignKeys,   // 외래 키 정보
+    checks,        // 체크 제약 조건
+    primaryKeys,   // 기본 키 정보
+    name,          // 테이블 이름
+    schema,        // 스키마 정보
   } = getTableConfig(table);
   ```
   </Tab>
@@ -456,49 +478,53 @@ very useful when you need to omit certain columns upon selection.
   export const table = singlestoreTable(...);
 
   const {
-    columns,
-    indexes,
-    checks,
-    primaryKeys,
-    name,
-    schema,
+    columns,       // 컬럼 정보
+    indexes,       // 인덱스 정보
+    checks,        // 체크 제약 조건
+    primaryKeys,   // 기본 키 정보
+    name,          // 테이블 이름
+    schema,        // 스키마 정보
   } = getTableConfig(table);
   ```
   </Tab>
 </Tabs>
 
-## Compare objects types (instanceof alternative)
 
-You can check if an object is of a specific Drizzle type using the `is()` function. 
-You can use it with any available type in Drizzle.
+## 객체 타입 비교하기 (instanceof 대안)
+
+Drizzle에서 특정 타입의 객체인지 확인하려면 `is()` 함수를 사용할 수 있습니다. 이 함수는 Drizzle에서 사용 가능한 모든 타입과 함께 사용할 수 있습니다.
 
 <Callout type="warning" emoji="⭐️">
-  You should always use `is()` instead of `instanceof`
+  항상 `instanceof` 대신 `is()`를 사용해야 합니다.
 </Callout>
 
-**Few examples**
+**예제 몇 가지**
 ```ts
 import { Column, is } from 'drizzle-orm';
 
 if (is(value, Column)) {
-  // value's type is narrowed to Column
+  // value의 타입이 Column으로 좁혀집니다
 }
 ```
 
-### Mock Driver
-This API is a successor to an undefined `drizzle({} as any)` API which we've used internally in Drizzle tests and rarely recommended to external developers. 
 
-We decided to build and expose a proper API, every `drizzle` driver now has `drizzle.mock()`:
+### Mock Driver
+
+이 API는 Drizzle 테스트에서 내부적으로 사용하던 `drizzle({} as any)` API를 대체하는 것입니다. 이전에는 외부 개발자에게 거의 권장하지 않았지만, 이제는 제대로 된 API를 구축하고 공개하기로 결정했습니다. 모든 `drizzle` 드라이버는 이제 `drizzle.mock()`을 제공합니다:
+
 ```ts
 import { drizzle } from "drizzle-orm/node-postgres";
 
 const db = drizzle.mock();
 ```
 
-you can provide schema if necessary for types
+필요한 경우 타입을 위해 스키마를 제공할 수도 있습니다:
+
 ```ts
 import { drizzle } from "drizzle-orm/node-postgres";
 import * as schema from "./schema"
 
 const db = drizzle.mock({ schema });
 ```
+
+

@@ -1,7 +1,7 @@
 ---
-title: "Drizzle with Supabase Database"
+title: "Supabase 데이터베이스와 Drizzle 사용하기"
 date: "2024-05-07"
-svgs: ['<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 43.4805 67.3037)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 76.9395 46.5342)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 128.424 46.5352)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 94.957 67.3037)" fill="currentColor"></rect></svg>', <svg width="24" height="25" viewBox="0 0 24 25" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M13.3501 21.1611C12.9303 21.6898 12.079 21.4002 12.0689 20.7251L11.921 10.8511H18.5603C19.7628 10.8511 20.4335 12.24 19.6857 13.1818L13.3501 21.1611Z" /><path d="M10.6499 5.27307C11.0697 4.7443 11.921 5.03403 11.9311 5.70913L11.996 15.5831H5.43981C4.23723 15.5831 3.56652 14.1942 4.31432 13.2524L10.6499 5.27307Z"/></svg>]
+svgs: ['<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 43.4805 67.3037)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 76.9395 46.5342)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 128.424 46.5352)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 94.957 67.3037)" fill="currentColor"></rect></svg>', <svg width="24" height="25" viewBox="0 0 24 25" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M13.3501 21.1611C12.9303 21.6898 12.079 21.4002 12.0689 20.7251L11.921 10.8511H18.5603C19.7628 10.8511 20.4335 12.24 19.6857 13.1818L13.3501 21.1611Z" /><path d="M10.6499 5.27307C11.0697 4.7443 11.921 5.03403 11.9311 5.70913L11.996 15.5831H5.43981C4.23723 15.5831 3.56652 14.1942 4.31432 13.2524L10.6499 5.27307Z"/></svg>']
 ---
 
 import Prerequisites from "@mdx/Prerequisites.astro";
@@ -10,132 +10,156 @@ import Steps from '@mdx/Steps.astro';
 import Section from "@mdx/Section.astro";
 import Callout from '@mdx/Callout.astro';
 
-This tutorial demonstrates how to use Drizzle ORM with [Supabase Database](https://supabase.com/docs/guides/database/overview). Every Supabase project comes with a full [Postgres](https://www.postgresql.org/) database.
+## Supabase와 Drizzle ORM 설정하기
+
+이 튜토리얼은 [Supabase 데이터베이스](https://supabase.com/docs/guides/database/overview)와 함께 Drizzle ORM을 사용하는 방법을 보여줍니다. 모든 Supabase 프로젝트는 완전한 [Postgres](https://www.postgresql.org/) 데이터베이스를 제공합니다.
 
 <Prerequisites>
-- You should have installed Drizzle ORM and [Drizzle kit](/docs/kit-overview). You can do this by running the following command:
+- Drizzle ORM과 [Drizzle Kit](/docs/kit-overview)을 설치해야 합니다. 다음 명령어를 실행하여 설치할 수 있습니다:
 <Npm>
 drizzle-orm
 -D drizzle-kit
 </Npm>
-- You should have installed `dotenv` package for managing environment variables. Read more about this package [here](https://www.npmjs.com/package/dotenv)
+- 환경 변수를 관리하기 위해 `dotenv` 패키지를 설치해야 합니다. 이 패키지에 대한 자세한 내용은 [여기](https://www.npmjs.com/package/dotenv)에서 확인할 수 있습니다.
 <Npm>
   dotenv
 </Npm>
 
-- You should have installed `postgres` package for connecting to the Postgres database. Read more about this package [here](https://www.npmjs.com/package/postgres)
+- Postgres 데이터베이스에 연결하기 위해 `postgres` 패키지를 설치해야 합니다. 이 패키지에 대한 자세한 내용은 [여기](https://www.npmjs.com/package/postgres)에서 확인할 수 있습니다.
 <Npm>
   postgres
 </Npm>
 
-- You should have the latest version of [Supabase CLI](https://supabase.com/docs/guides/cli/getting-started#installing-the-supabase-cli) installed (Only if you want to use the Supabase CLI for migrations)
+- 마이그레이션을 위해 Supabase CLI를 사용하려면 최신 버전의 [Supabase CLI](https://supabase.com/docs/guides/cli/getting-started#installing-the-supabase-cli)를 설치해야 합니다.
 </Prerequisites>
 
-Check [Supabase documentation](https://supabase.com/docs/guides/database/connecting-to-postgres#connecting-with-drizzle) to learn how to connect to the database with Drizzle ORM.
-
-## Setup Supabase and Drizzle ORM
+Drizzle ORM을 사용하여 데이터베이스에 연결하는 방법은 [Supabase 문서](https://supabase.com/docs/guides/database/connecting-to-postgres#connecting-with-drizzle)에서 확인할 수 있습니다.
 
 <Steps>
-#### Create a new Supabase project
 
-You can create new Supabase project in the [dashboard](https://supabase.com/dashboard) or by following this [link](https://database.new/).
 
-#### Setup connection string variable
+#### 새로운 Supabase 프로젝트 생성하기
 
-Navigate to [Database Settings](https://supabase.com/dashboard/project/_/settings/database) and copy the URI from the `Connection String` section. Make sure to use `connection pooling`. Remember to replace the password placeholder with your actual database password.
+새로운 Supabase 프로젝트는 [대시보드](https://supabase.com/dashboard)에서 생성하거나, 이 [링크](https://database.new/)를 따라가면 바로 만들 수 있습니다.
 
-Add `DATABASE_URL` variable to your `.env` or `.env.local` file.
+
+#### 연결 문자열 변수 설정하기
+
+1. [데이터베이스 설정](https://supabase.com/dashboard/project/_/settings/database) 페이지로 이동합니다.
+2. `Connection String` 섹션에서 URI를 복사합니다. 이때, **연결 풀링(connection pooling)**을 사용해야 합니다.
+3. 복사한 연결 문자열에서 비밀번호 부분을 실제 데이터베이스 비밀번호로 변경합니다.
+
+4. `.env` 또는 `.env.local` 파일에 `DATABASE_URL` 변수를 추가합니다.
 
 ```plaintext copy
-DATABASE_URL=<YOUR_DATABASE_URL>
+DATABASE_URL=
 ```
 
-Read more about Connection Pooler and pooling modes in the [documentation](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler).
+연결 풀러(Connection Pooler)와 풀링 모드에 대해 더 자세히 알고 싶다면 [공식 문서](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler)를 참고하세요.
 
-#### Connect Drizzle ORM to your database
 
-Create a `index.ts` file in the `src/db` directory and set up your database configuration:
+#### Drizzle ORM을 데이터베이스에 연결하기
 
-```typescript copy filename="src/db/index.ts"
+`src/db` 디렉토리에 `index.ts` 파일을 생성하고 데이터베이스 설정을 구성합니다:
+
+```typescript
 import { config } from 'dotenv';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 
-config({ path: '.env' }); // or .env.local
+// .env 또는 .env.local 파일에서 환경 변수 로드
+config({ path: '.env' });
 
+// 데이터베이스 연결 클라이언트 생성
 const client = postgres(process.env.DATABASE_URL!);
+
+// Drizzle ORM 인스턴스 생성 및 내보내기
 export const db = drizzle({ client });
 ```
 
-#### Create tables
+이 코드는 Drizzle ORM을 사용하여 데이터베이스에 연결하는 기본 설정을 보여줍니다. `.env` 파일에서 `DATABASE_URL` 환경 변수를 읽어와 데이터베이스에 연결하고, 이를 기반으로 Drizzle ORM 인스턴스를 생성합니다.
 
-Create a `schema.ts` file in the `src/db` directory and declare your tables:
 
-```typescript copy filename="src/db/schema.ts"
+#### 테이블 생성하기
+
+`src/db` 디렉토리에 `schema.ts` 파일을 생성하고 테이블을 선언합니다:
+
+```typescript
 import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 
+// 사용자 테이블 정의
 export const usersTable = pgTable('users_table', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
-  age: integer('age').notNull(),
-  email: text('email').notNull().unique(),
+  id: serial('id').primaryKey(), // 기본 키로 설정된 자동 증가 ID
+  name: text('name').notNull(), // 이름 (필수)
+  age: integer('age').notNull(), // 나이 (필수)
+  email: text('email').notNull().unique(), // 이메일 (필수, 고유값)
 });
 
+// 게시물 테이블 정의
 export const postsTable = pgTable('posts_table', {
-  id: serial('id').primaryKey(),
-  title: text('title').notNull(),
-  content: text('content').notNull(),
-  userId: integer('user_id')
+  id: serial('id').primaryKey(), // 기본 키로 설정된 자동 증가 ID
+  title: text('title').notNull(), // 제목 (필수)
+  content: text('content').notNull(), // 내용 (필수)
+  userId: integer('user_id') // 사용자 ID (필수)
     .notNull()
-    .references(() => usersTable.id, { onDelete: 'cascade' }),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at')
+    .references(() => usersTable.id, { onDelete: 'cascade' }), // 사용자 테이블의 ID 참조, 삭제 시 연쇄 삭제
+  createdAt: timestamp('created_at').notNull().defaultNow(), // 생성 시간 (필수, 기본값 현재 시간)
+  updatedAt: timestamp('updated_at') // 수정 시간 (필수)
     .notNull()
-    .$onUpdate(() => new Date()),
+    .$onUpdate(() => new Date()), // 업데이트 시 현재 시간으로 자동 설정
 });
 
+// 사용자 테이블의 삽입 타입 정의
 export type InsertUser = typeof usersTable.$inferInsert;
+// 사용자 테이블의 선택 타입 정의
 export type SelectUser = typeof usersTable.$inferSelect;
 
+// 게시물 테이블의 삽입 타입 정의
 export type InsertPost = typeof postsTable.$inferInsert;
+// 게시물 테이블의 선택 타입 정의
 export type SelectPost = typeof postsTable.$inferSelect;
 ```
 
-#### Setup Drizzle config file
 
-**Drizzle config** - a configuration file that is used by [Drizzle Kit](/docs/kit-overview) and contains all the information about your database connection, migration folder and schema files.
+#### Drizzle 설정 파일 설정하기
 
-Create a `drizzle.config.ts` file in the root of your project and add the following content:
+**Drizzle 설정 파일**은 [Drizzle Kit](/docs/kit-overview)에서 사용하는 구성 파일로, 데이터베이스 연결 정보, 마이그레이션 폴더, 스키마 파일 등에 대한 모든 정보를 포함합니다.
+
+프로젝트 루트에 `drizzle.config.ts` 파일을 생성하고 다음 내용을 추가하세요:
 
 ```typescript copy filename="drizzle.config.ts"
 import { config } from 'dotenv';
 import { defineConfig } from 'drizzle-kit';
 
+// .env 파일에서 환경 변수 로드
 config({ path: '.env' });
 
 export default defineConfig({
-  schema: './src/db/schema.ts',
-  out: './supabase/migrations',
-  dialect: 'postgresql',
+  schema: './src/db/schema.ts', // 스키마 파일 경로
+  out: './supabase/migrations', // 마이그레이션 파일 출력 경로
+  dialect: 'postgresql', // 데이터베이스 종류
   dbCredentials: {
-    url: process.env.DATABASE_URL!,
+    url: process.env.DATABASE_URL!, // 데이터베이스 연결 URL
   },
 });
 ```
 
-#### Applying changes to the database
+이 설정 파일은 Drizzle Kit이 데이터베이스 스키마를 관리하고 마이그레이션을 생성하는 데 필요한 정보를 제공합니다.
 
-You can generate migrations using `drizzle-kit generate` command and then run them using the `drizzle-kit migrate` command.
 
-Generate migrations:
+#### 데이터베이스에 변경 사항 적용하기
 
-```bash copy
+`drizzle-kit generate` 커맨드를 사용해 마이그레이션을 생성하고, `drizzle-kit migrate` 커맨드로 실행할 수 있습니다.
+
+마이그레이션 생성:
+
+```bash
 npx drizzle-kit generate
 ```
 
-These migrations are stored in the `supabase/migrations`  directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
+이 마이그레이션은 `drizzle.config.ts`에 지정된 대로 `supabase/migrations` 디렉토리에 저장됩니다. 이 디렉토리에는 데이터베이스 스키마를 업데이트하는 데 필요한 SQL 파일과, 다양한 마이그레이션 단계에서의 스키마 스냅샷을 저장하는 `meta` 폴더가 포함됩니다.
 
-Example of a generated migration:
+생성된 마이그레이션 예제:
 
 ```sql
 CREATE TABLE IF NOT EXISTS "posts_table" (
@@ -162,53 +186,53 @@ EXCEPTION
 END $$;
 ```
 
-Run migrations:
+마이그레이션 실행:
 
-```bash copy
+```bash
 npx drizzle-kit migrate
 ```
 
-Learn more about [migration process](/docs/migrations). You can also apply migrations using [Supabase CLI](https://supabase.com/docs/guides/cli/getting-started):
-- For tables that already exist, manually review the generated migration files from `npx drizzle-kit generate` and comment out or adjust any unsafe pure create statements (e.g., `CREATE SCHEMA "auth";`) while ensuring safe conditional creates (e.g., `CREATE TABLE IF NOT EXISTS "auth"."users"`) are properly handled.
+[마이그레이션 프로세스](/docs/migrations)에 대해 더 알아보세요. 또한 [Supabase CLI](https://supabase.com/docs/guides/cli/getting-started)를 사용해 마이그레이션을 적용할 수도 있습니다:
+- 이미 존재하는 테이블의 경우, `npx drizzle-kit generate`로 생성된 마이그레이션 파일을 수동으로 검토하고, 안전하지 않은 순수 생성 구문(예: `CREATE SCHEMA "auth";`)을 주석 처리하거나 조정해야 합니다. 동시에 안전한 조건부 생성 구문(예: `CREATE TABLE IF NOT EXISTS "auth"."users"`)이 올바르게 처리되도록 해야 합니다.
 
-Alternatively, you can push changes directly to the database using [Drizzle kit push command](/docs/kit-overview#prototyping-with-db-push):
+또는 [Drizzle kit push 커맨드](/docs/kit-overview#prototyping-with-db-push)를 사용해 데이터베이스에 직접 변경 사항을 적용할 수 있습니다:
 
-```bash copy
+```bash
 npx drizzle-kit push
 ```
 
-<Callout type="warning">Push command is good for situations where you need to quickly test new schema designs or changes in a local development environment, allowing for fast iterations without the overhead of managing migration files.</Callout>
+<Callout type="warning">푸시 커맨드는 로컬 개발 환경에서 새로운 스키마 디자인이나 변경 사항을 빠르게 테스트해야 할 때 유용합니다. 마이그레이션 파일을 관리하는 오버헤드 없이 빠르게 반복 작업을 할 수 있습니다.</Callout>
 
-To apply migrations using the Supabase CLI you should follow these steps:
- 
-Generate migrations using Drizzle Kit:
+Supabase CLI를 사용해 마이그레이션을 적용하려면 다음 단계를 따르세요:
 
-```bash copy
+Drizzle Kit로 마이그레이션 생성:
+
+```bash
 npx drizzle-kit generate
 ```
 
-Initialize the local Supabase project:
+로컬 Supabase 프로젝트 초기화:
 
-```bash copy
+```bash
 supabase init
 ```
 
-Link it to your remote project:
+원격 프로젝트와 연결:
 
-```bash copy
+```bash
 supabase link
 ```
 
-Push changes to the database:
+데이터베이스에 변경 사항 적용:
 
-```bash copy
+```bash
 supabase db push
 ```
 </Steps>
 
-## Basic file structure
+## 기본 파일 구조
 
-This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `index.ts` and schema definitions in `schema.ts`.
+이 프로젝트의 기본 파일 구조입니다. `src/db` 디렉토리에는 데이터베이스 관련 파일들이 위치하며, `index.ts` 파일에는 데이터베이스 연결 설정이, `schema.ts` 파일에는 스키마 정의가 포함되어 있습니다.
 
 ```plaintext
 📦 <project root>
@@ -229,13 +253,15 @@ This is the basic file structure of the project. In the `src/db` directory, we h
  └ 📜 tsconfig.json
 ```
 
-## Query examples
 
-For instance, we create `src/db/queries` folder and separate files for each operation: insert, select, update, delete.
+## 쿼리 예제
 
-#### Insert data
+예를 들어, `src/db/queries` 폴더를 생성하고 각 작업(삽입, 선택, 업데이트, 삭제)별로 파일을 분리합니다.
 
-Read more about insert query in the [documentation](/docs/insert).
+
+#### 데이터 삽입
+
+데이터 삽입 쿼리에 대해 더 알아보려면 [문서](/docs/insert)를 참고하세요.
 
 ```typescript copy filename="src/db/queries/insert.ts" {4, 8}
 import { db } from '../index';
@@ -250,15 +276,17 @@ export async function createPost(data: InsertPost) {
 }
 ```
 
-#### Select data
 
-Read more about select query in the [documentation](/docs/select).
+#### 데이터 선택하기
+
+선택 쿼리에 대한 더 자세한 내용은 [문서](/docs/select)에서 확인할 수 있습니다.
 
 ```typescript copy filename="src/db/queries/select.ts" {5, 16, 41}
 import { asc, between, count, eq, getTableColumns, sql } from 'drizzle-orm';
 import { db } from '../index';
 import { SelectUser, postsTable, usersTable } from '../schema';
 
+// 특정 ID를 가진 사용자 정보를 가져오는 함수
 export async function getUserById(id: SelectUser['id']): Promise<
   Array<{
     id: number;
@@ -270,6 +298,7 @@ export async function getUserById(id: SelectUser['id']): Promise<
   return db.select().from(usersTable).where(eq(usersTable.id, id));
 }
 
+// 사용자와 그들의 게시물 수를 함께 가져오는 함수
 export async function getUsersWithPostsCount(
   page = 1,
   pageSize = 5,
@@ -295,6 +324,7 @@ export async function getUsersWithPostsCount(
     .offset((page - 1) * pageSize);
 }
 
+// 지난 24시간 동안 작성된 게시물을 가져오는 함수
 export async function getPostsForLast24Hours(
   page = 1,
   pageSize = 5,
@@ -317,24 +347,29 @@ export async function getPostsForLast24Hours(
 }
 ```
 
-Alternatively, you can use [relational query syntax](/docs/rqb).
-#### Update data
+또는 [관계형 쿼리 문법](/docs/rqb)을 사용할 수도 있습니다.
 
-Read more about update query in the [documentation](/docs/update).
+
+#### 데이터 업데이트
+
+데이터 업데이트 쿼리에 대해 더 알아보려면 [문서](/docs/update)를 참고하세요.
 
 ```typescript copy filename="src/db/queries/update.ts" {5}
 import { eq } from 'drizzle-orm';
 import { db } from '../index';
 import { SelectPost, postsTable } from '../schema';
 
-export async function updatePost(id: SelectPost['id'], data: Partial<Omit<SelectPost, 'id'>>) {
+export async function updatePost(id: SelectPost['id'], data: Partial<SelectPost>) {
   await db.update(postsTable).set(data).where(eq(postsTable.id, id));
 }
 ```
 
-#### Delete data
+위 코드는 `postsTable`에서 특정 ID를 가진 게시물을 업데이트하는 함수입니다. `db.update` 메서드를 사용하여 데이터를 업데이트하고, `eq` 함수를 통해 특정 ID를 조건으로 지정합니다.
 
-Read more about delete query in the [documentation](/docs/delete).
+
+#### 데이터 삭제
+
+삭제 쿼리에 대한 자세한 내용은 [문서](/docs/delete)에서 확인할 수 있습니다.
 
 ```typescript copy filename="src/db/queries/delete.ts" {5}
 import { eq } from 'drizzle-orm';
@@ -345,3 +380,5 @@ export async function deleteUser(id: SelectUser['id']) {
   await db.delete(usersTable).where(eq(usersTable.id, id));
 }
 ```
+
+

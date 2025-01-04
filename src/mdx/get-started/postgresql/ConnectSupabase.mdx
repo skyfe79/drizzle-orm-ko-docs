@@ -1,8 +1,8 @@
 import Callout from '@mdx/Callout.astro';
 
-Create a `index.ts` file in the `src/db` directory and initialize the connection:
+`src/db` 디렉토리에 `index.ts` 파일을 생성하고 데이터베이스 연결을 초기화해 보겠습니다.
 
-```typescript copy filename="index.ts"
+```typescript
 import { drizzle } from 'drizzle-orm'
 
 async function main() {
@@ -11,10 +11,10 @@ async function main() {
 
 main();
 ```
-If you need a synchronous connection, you can use our additional connection API, 
-where you specify a driver connection and pass it to the Drizzle instance.
 
-```typescript copy filename="index.ts"
+동기 연결이 필요한 경우, 드라이버 연결을 지정하고 Drizzle 인스턴스에 전달하는 추가 연결 API를 사용할 수 있습니다.
+
+```typescript
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 
@@ -26,15 +26,15 @@ async function main() {
 main();
 ```
 
-<Callout title='tips'>
-If you decide to use connection pooling via Supabase (described [here](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler)), and have "Transaction" pool mode enabled, then ensure to turn off prepare, as prepared statements are not supported. 
+<Callout title='팁'>
+Supabase를 통해 연결 풀링을 사용하고 "Transaction" 풀 모드를 활성화한 경우, 준비된 문장(prepared statements)이 지원되지 않으므로 `prepare`를 꺼야 합니다.
 
-```typescript copy filename="index.ts"
+```typescript
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 
 async function main() {
-    // Disable prefetch as it is not supported for "Transaction" pool mode 
+    // "Transaction" 풀 모드에서는 prefetch를 지원하지 않으므로 비활성화
     const client = postgres(process.env.DATABASE_URL, { prepare: false })
     const db = drizzle({ client });
 }
@@ -42,3 +42,5 @@ async function main() {
 main();
 ```
 </Callout>
+
+

@@ -5,54 +5,68 @@ import Steps from '@mdx/Steps.astro';
 import Npm from "@mdx/Npm.astro";
 import Npx from "@mdx/Npx.astro";
 
-<CenteredLayout isStudio={true} customTitle="Meet Drizzle Studio">
-# Meet Drizzle Studio
-🖥 Drizzle Studio is a new way for you to explore SQL database on Drizzle projects.
+
+<CenteredLayout isStudio={true} customTitle="Drizzle Studio 소개">
+# Drizzle Studio 소개
+
+🖥 Drizzle Studio는 Drizzle 프로젝트에서 SQL 데이터베이스를 탐색할 수 있는 새로운 방법입니다.
 
 ![Drizzle Studio](@/assets/images/drizzle-studio.jpeg)
 
-Drizzle studio grabs your drizzle config file, connects to your database and lets you browse, add, 
-delete and update everything based on your existing drizzle sql schema. It supports explicit `null` and `empty string` values, 
-`booleans`, `numbers` and `big integers`, `json objects` and `json arrays`.
+Drizzle Studio는 여러분의 Drizzle 설정 파일을 가져와 데이터베이스에 연결하고, 기존 Drizzle SQL 스키마를 기반으로 모든 것을 탐색, 추가, 삭제, 업데이트할 수 있게 해줍니다. 명시적인 `null`과 `빈 문자열` 값, `불리언`, `숫자`, `큰 정수`, `JSON 객체`, `JSON 배열`을 지원합니다.
 
-## Quick start
+
+
+## 빠른 시작
+
 <Steps>
 
-#### Install dependencies
-Make sure to go through our [get started](/docs/get-started) guides first!
 
-<Npx>
-drizzle-orm
--D drizzle-kit
-</Npx>
+#### 의존성 설치
 
-#### Prepare your database schema
-Check out extended schema declaration **[docs.](/docs/sql-schema-declaration)**
+시작하기 전에 [시작 가이드](/docs/get-started)를 먼저 확인하세요!
+
+```bash
+npx drizzle-orm -D drizzle-kit
+```
+
+
+#### 데이터베이스 스키마 준비하기
+
+확장된 스키마 선언에 대한 자세한 내용은 **[문서](/docs/sql-schema-declaration)**를 참고하세요.
+
 ```typescript copy filename="schema.ts"
 import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
 
 export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
-  fullName: text('full_name'),
-  phone: varchar('phone', { length: 256 }),
+  id: serial('id').primaryKey(), // 사용자 ID (기본 키)
+  fullName: text('full_name'),   // 사용자 전체 이름
+  phone: varchar('phone', { length: 256 }), // 사용자 전화번호
 });
 ```
 
-#### Prepare config file
-Check out extended config file **[docs.](/docs/drizzle-config-file)**
-```typescript copy filename="drizzle.config.ts"
+
+#### 설정 파일 준비
+
+확장된 설정 파일은 **[문서](/docs/drizzle-config-file)**에서 확인할 수 있습니다.
+
+```typescript
+// drizzle.config.ts 파일
 import { defineConfig } from "drizzle-kit";
- 
+
 export default defineConfig({
-  schema: "./schema/*",
-  out: "./drizzle",
-  dialect: 'postgresql',
+  schema: "./schema/*",  // 스키마 파일 경로
+  out: "./drizzle",      // 출력 디렉토리
+  dialect: 'postgresql', // 데이터베이스 종류
   dbCredentials: {
-    url: process.env.DB_URL,
+    url: process.env.DB_URL,  // 데이터베이스 연결 URL
   }
 });
 ```
-#### Launch Drizzle Studio
+
+
+#### Drizzle Studio 실행하기
+
 <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
 <Tab>
 ```bash copy
@@ -76,19 +90,22 @@ bunx drizzle-kit studio
 </Tab>
 </Tabs>
 
-You can launch studio with `port` cli flag to customise process port and `verbose` flag for extended SQL statements logging
+`port` CLI 플래그를 사용해 프로세스 포트를 커스터마이징하고, `verbose` 플래그를 통해 확장된 SQL 문 로깅을 활성화할 수 있습니다.
 ```bash
 yarn drizzle-kit studio --port 3000 --verbose
 ```
 
-By default, Drizzle Studio will be launched on the `https://local.drizzle.studio` host, and studio server will be launched on 127.0.0.1 host but you can specify any host you want
+기본적으로 Drizzle Studio는 `https://local.drizzle.studio` 호스트에서 실행되며, 스튜디오 서버는 127.0.0.1 호스트에서 실행됩니다. 하지만 원하는 호스트를 지정할 수도 있습니다.
 ```bash
 yarn drizzle-kit studio --host 0.0.0.0
 ```
 </Steps>
 
 
-## What's next?
-We're going to massively improve and extend Drizzle Studio in the upcoming months!   
-Subscribe on [Twitter](https://twitter.com/DrizzleORM) and welcome to our [Discord](https://driz.link/discord)
+## 다음은 무엇일까요?
+
+앞으로 몇 달 동안 Drizzle Studio를 대폭 개선하고 확장할 예정입니다!  
+[Twitter](https://twitter.com/DrizzleORM)에서 구독하고 [Discord](https://driz.link/discord)에 참여해 주세요.
 </CenteredLayout>
+
+

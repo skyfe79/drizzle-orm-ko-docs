@@ -2,7 +2,11 @@ import IsSupportedChipGroup from '@mdx/IsSupportedChipGroup.astro';
 import Callout from '@mdx/Callout.astro';
 import Section from '@mdx/Section.astro';
 
-# SQL Update
+
+# SQL 업데이트
+
+
+
 
 ```typescript copy
 await db.update(users)
@@ -10,9 +14,9 @@ await db.update(users)
   .where(eq(users.name, 'Dan'));
 ```
 
-The object that you pass to `update` should have keys that match column names in your database schema.
-Values of `undefined` are ignored in the object: to set a column to `null`, pass `null`.
-You can pass SQL as a value to be used in the update object, like this:
+`update`에 전달하는 객체는 데이터베이스 스키마의 컬럼 이름과 일치하는 키를 가져야 합니다.  
+객체에서 `undefined` 값은 무시됩니다. 컬럼을 `null`로 설정하려면 `null`을 전달하세요.  
+다음과 같이 업데이트 객체에 SQL을 값으로 전달할 수도 있습니다:
 
 ```typescript copy
 await db.update(users)
@@ -20,11 +24,13 @@ await db.update(users)
   .where(eq(users.name, 'Dan'));
 ```
 
-### Limit
+
+### Limit (제한)
 
 <IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'MySQL': true, 'SQLite': true, 'SingleStore': true }} />
 
-Use `.limit()` to add `limit` clause to the query - for example:
+`.limit()` 메서드를 사용하면 쿼리에 `limit` 절을 추가할 수 있습니다. 예를 들어:
+
 <Section>
 ```typescript
 await db.update(usersTable).set({ verified: true }).limit(2);
@@ -34,45 +40,59 @@ update "users" set "verified" = $1 limit $2;
 ```
 </Section>
 
+위 예제에서는 `users` 테이블에서 `verified` 컬럼을 `true`로 업데이트하는 쿼리에 `limit 2`를 적용했습니다. 이는 최대 2개의 행만 업데이트하도록 제한합니다.
+
+
 ### Order By
-Use `.orderBy()` to add `order by` clause to the query, sorting the results by the specified fields:
-<Section>
+
+`.orderBy()`를 사용하여 쿼리에 `order by` 절을 추가할 수 있습니다. 이를 통해 지정된 필드로 결과를 정렬할 수 있습니다.
+
 ```typescript
 import { asc, desc } from 'drizzle-orm';
 
+// 단일 필드로 정렬
 await db.update(usersTable).set({ verified: true }).orderBy(usersTable.name);
 await db.update(usersTable).set({ verified: true }).orderBy(desc(usersTable.name));
 
-// order by multiple fields
+// 여러 필드로 정렬
 await db.update(usersTable).set({ verified: true }).orderBy(usersTable.name, usersTable.name2);
 await db.update(usersTable).set({ verified: true }).orderBy(asc(usersTable.name), desc(usersTable.name2));
 ```
+
+위 코드는 다음과 같은 SQL 쿼리로 변환됩니다.
+
 ```sql
+-- 단일 필드로 정렬
 update "users" set "verified" = $1 order by "name";
 update "users" set "verified" = $1 order by "name" desc;
 
+-- 여러 필드로 정렬
 update "users" set "verified" = $1 order by "name", "name2";
 update "users" set "verified" = $1 order by "name" asc, "name2" desc;
 ```
-</Section>
 
-### Update with returning
+
+### 업데이트 후 결과 반환하기
+
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false , 'SingleStore': false}} />
-You can update a row and get it back in PostgreSQL and SQLite:
-```typescript copy
+PostgreSQL과 SQLite에서는 행을 업데이트하고 결과를 반환받을 수 있습니다:
+
+```typescript
 const updatedUserId: { updatedId: number }[] = await db.update(users)
   .set({ name: 'Mr. Dan' })
   .where(eq(users.name, 'Dan'))
   .returning({ updatedId: users.id });
 ```
 
-## `with update` clause
+
+## `with update` 절
 
 <Callout>
-  Check how to use WITH statement with [select](/docs/select#with-clause), [insert](/docs/insert#with-insert-clause), [delete](/docs/delete#with-delete-clause)
+  [select](/docs/select#with-clause), [insert](/docs/insert#with-insert-clause), [delete](/docs/delete#with-delete-clause)와 함께 `WITH` 구문을 사용하는 방법을 확인하세요.
 </Callout>
 
-Using the `with` clause can help you simplify complex queries by splitting them into smaller subqueries called common table expressions (CTEs):
+`with` 절을 사용하면 복잡한 쿼리를 작은 하위 쿼리로 나누어 단순화할 수 있습니다. 이 하위 쿼리는 공통 테이블 표현식(CTE)이라고 합니다:
+
 <Section>
 ```typescript copy
 const averagePrice = db.$with('average_price').as(
@@ -97,22 +117,22 @@ returning "id"
 ```
 </Section>
 
+
 ## Update ... from
 
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': false, 'SQLite': true, 'SingleStore': false }} />
 
-As the SQLite documentation mentions:
+SQLite 문서에 따르면:
 
-> The UPDATE-FROM idea is an extension to SQL that allows an UPDATE statement to be driven by other tables in the database. 
-The "target" table is the specific table that is being updated. With UPDATE-FROM you can join the target table 
-against other tables in the database in order to help compute which rows need updating and what 
-the new values should be on those rows
+> UPDATE-FROM은 SQL의 확장 기능으로, 데이터베이스의 다른 테이블을 기반으로 UPDATE 문을 실행할 수 있게 해줍니다.
+"대상" 테이블은 업데이트할 특정 테이블을 의미합니다. UPDATE-FROM을 사용하면 대상 테이블을 데이터베이스의 다른 테이블과 조인하여
+어떤 행을 업데이트해야 하는지와 해당 행의 새로운 값을 계산할 수 있습니다.
 
-Similarly, the PostgreSQL documentation states:
+PostgreSQL 문서에서도 비슷하게 설명합니다:
 
-> A table expression allowing columns from other tables to appear in the WHERE condition and update expressions
+> 테이블 표현식을 사용하면 다른 테이블의 컬럼을 WHERE 조건과 업데이트 표현식에 포함할 수 있습니다.
 
-Drizzle also supports this feature starting from version `drizzle-orm@0.36.3`
+Drizzle도 `drizzle-orm@0.36.3` 버전부터 이 기능을 지원합니다.
 
 <Section>
 ```ts
@@ -131,7 +151,7 @@ where ("cities"."name" = $1 and "users"."name" = $2)
 ```
 </Section>
 
-You can also alias tables that are joined (in PG, you can also alias the updating table too).
+조인된 테이블에 별칭을 지정할 수도 있습니다 (PostgreSQL에서는 업데이트 대상 테이블에도 별칭을 지정할 수 있습니다).
 <Section>
 ```ts
 const c = alias(cities, 'c');
@@ -148,7 +168,7 @@ from "cities" "c"
 
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': false, 'SQLite': false, 'SingleStore': false }} />
 
-In Postgres, you can also return columns from the joined tables.
+PostgreSQL에서는 조인된 테이블의 컬럼을 반환할 수도 있습니다.
 <Section>
 ```ts
 const updatedUsers = await db
@@ -163,3 +183,5 @@ from "cities"
 returning "users"."id", "cities"."name"
 ```
 </Section>
+
+

@@ -9,54 +9,81 @@ import Prerequisites from "@mdx/Prerequisites.astro";
 import CodeTabs from "@mdx/CodeTabs.astro";
 import FileStructure from '@mdx/get-started/FileStructure.mdx';
 import InstallPackages from '@mdx/get-started/InstallPackages.mdx';
-import ConnectPgLite from '@mdx/get-started/postgresql/ConnectPgLite.mdx'
-import CreateTable from '@mdx/get-started/postgresql/CreateTable.mdx'
+import ConnectPgLite from '@mdx/get-started/postgresql/ConnectPgLite.mdx';
+import CreateTable from '@mdx/get-started/postgresql/CreateTable.mdx';
 import SetupConfig from '@mdx/get-started/SetupConfig.mdx';
 import ApplyChanges from '@mdx/get-started/ApplyChanges.mdx';
 import RunFile from '@mdx/get-started/RunFile.mdx';
 import QueryDatabase from '@mdx/get-started/QueryDatabase.mdx';
 import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 
+
 <Breadcrumbs/>
 
-# Get Started with Drizzle and PGlite
+# Drizzle와 PGlite 시작하기
 
 <Prerequisites>
-  - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
-  - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
-  - **ElectricSQL** - [website](https://electric-sql.com/)
-  - **pglite driver** - [docs](https://pglite.dev/) & [GitHub](https://github.com/electric-sql/pglite)
+  - **dotenv** - 환경 변수를 관리하기 위한 패키지 - [여기서 읽기](https://www.npmjs.com/package/dotenv)
+  - **tsx** - TypeScript 파일을 실행하기 위한 패키지 - [여기서 읽기](https://tsx.is/)
+  - **ElectricSQL** - [웹사이트](https://electric-sql.com/)
+  - **pglite 드라이버** - [문서](https://pglite.dev/) & [GitHub](https://github.com/electric-sql/pglite)
 </Prerequisites>
 
 <FileStructure/>
 
-#### Step 1 - Install all needed packages
+
+#### 1단계 - 필요한 패키지 설치하기
+
+
 <InstallPackages lib='@electric-sql/pglite' />
 
-#### Step 2 - Setup connection variables
+
+#### 2단계 - 연결 변수 설정
+
 
 <SetupEnv env_variable='DATABASE_URL' />
 
-#### Step 3 - Connect Drizzle ORM to the database
+
+
+#### 3단계 - Drizzle ORM을 데이터베이스에 연결하기
 
 <ConnectPgLite/>
 
-#### Step 4 - Create a table
+
+
+#### 4단계 - 테이블 생성
 
 <CreateTable />
 
-#### Step 5 - Setup Drizzle config file
+#### 5단계 - Drizzle 설정 파일 설정하기
+
 
 <SetupConfig dialect='postgresql' env_variable='DATABASE_URL'/>
 
-#### Step 6 - Applying changes to the database
+
+
+
+
+#### 6단계 - 데이터베이스에 변경 사항 적용하기
+
 
 <ApplyChanges />
 
-#### Step 7 - Seed and Query the database
+
+
+
+
+#### 7단계 - 데이터베이스 시드 및 쿼리
+
 
 <QueryDatabase dialect='pglite' env_variable='DATABASE_URL'/>
 
-#### Step 8 - Run index.ts file
+
+
+
+
+#### 8단계 - index.ts 파일 실행하기
 
 <RunFile/>
+
+

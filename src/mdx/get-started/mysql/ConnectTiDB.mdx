@@ -1,16 +1,20 @@
-Create a `index.ts` file in the `src/db` directory and initialize the connection:
+`src/db` 디렉토리에 `index.ts` 파일을 생성하고 데이터베이스 연결을 초기화해 보겠습니다.
 
-```typescript copy
+```typescript
 import { drizzle } from 'drizzle-orm/tidb-serverless';
 
 const db = drizzle(process.env.DATABASE_URL!);
 ```
 
-If you need to provide your existing driver:
-```typescript copy
+기존 드라이버를 제공해야 한다면 다음과 같이 작성할 수 있습니다.
+
+```typescript
 import { connect } from '@tidbcloud/serverless';
 import { drizzle } from 'drizzle-orm/tidb-serverless';
 
 const client = connect({ url: process.env.DATABASE_URL! });
 const db = drizzle({ client: client });
 ```
+
+
+

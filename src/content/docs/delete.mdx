@@ -2,21 +2,26 @@ import IsSupportedChipGroup from '@mdx/IsSupportedChipGroup.astro';
 import Callout from '@mdx/Callout.astro';
 import Section from '@mdx/Section.astro';
 
-# SQL Delete
-You can delete all rows in the table:
+# SQL 삭제(Delete)
+
+
+테이블의 모든 행을 삭제할 수 있습니다:
 ```typescript copy
 await db.delete(users);
 ```
-And you can delete with filters and conditions:
+
+필터와 조건을 사용하여 삭제할 수도 있습니다:
 ```typescript copy
 await db.delete(users).where(eq(users.name, 'Dan'));
 ```
 
-### Limit
+
+### Limit (제한)
 
 <IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'MySQL': true, 'SQLite': true, 'SingleStore': true }} />
 
-Use `.limit()` to add `limit` clause to the query - for example:
+`.limit()`을 사용하여 쿼리에 `limit` 절을 추가할 수 있습니다. 예를 들어:
+
 <Section>
 ```typescript
 await db.delete(users).where(eq(users.name, 'Dan')).limit(2);
@@ -26,49 +31,70 @@ delete from "users" where "users"."name" = $1 limit $2;
 ```
 </Section>
 
+위 예제에서는 `users` 테이블에서 `name`이 'Dan'인 레코드 중 최대 2개를 삭제하는 쿼리를 생성합니다.
+
+
 ### Order By
-Use `.orderBy()` to add `order by` clause to the query, sorting the results by the specified fields:
-<Section>
+
+`.orderBy()`를 사용하여 쿼리에 `order by` 절을 추가하고, 지정된 필드로 결과를 정렬할 수 있습니다.
+
 ```typescript
 import { asc, desc } from 'drizzle-orm';
 
+// 이름을 기준으로 오름차순 정렬
 await db.delete(users).where(eq(users.name, 'Dan')).orderBy(users.name);
+
+// 이름을 기준으로 내림차순 정렬
 await db.delete(users).where(eq(users.name, 'Dan')).orderBy(desc(users.name));
 
-// order by multiple fields
+// 여러 필드를 기준으로 정렬
 await db.delete(users).where(eq(users.name, 'Dan')).orderBy(users.name, users.name2);
+
+// 여러 필드를 각각 오름차순과 내림차순으로 정렬
 await db.delete(users).where(eq(users.name, 'Dan')).orderBy(asc(users.name), desc(users.name2));
 ```
+
 ```sql
+-- 이름을 기준으로 오름차순 정렬
 delete from "users" where "users"."name" = $1 order by "name";
+
+-- 이름을 기준으로 내림차순 정렬
 delete from "users" where "users"."name" = $1 order by "name" desc;
 
+-- 이름과 이름2를 기준으로 오름차순 정렬
 delete from "users" where "users"."name" = $1 order by "name", "name2";
+
+-- 이름은 오름차순, 이름2는 내림차순으로 정렬
 delete from "users" where "users"."name" = $1 order by "name" asc, "name2" desc;
 ```
-</Section>
 
-### Delete with return
+
+### 삭제 후 반환하기
+
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false, 'SingleStore': false}} />
-You can delete a row and get it back in PostgreSQL and SQLite:
-```typescript copy
+PostgreSQL과 SQLite에서는 행을 삭제하고 삭제된 데이터를 반환받을 수 있습니다:
+
+```typescript
+// 전체 데이터 반환
 const deletedUser = await db.delete(users)
   .where(eq(users.name, 'Dan'))
   .returning();
 
-// partial return
+// 부분 데이터 반환
 const deletedUserIds: { deletedId: number }[] = await db.delete(users)
   .where(eq(users.name, 'Dan'))
   .returning({ deletedId: users.id });
 ```
 
-## WITH DELETE clause
+
+## WITH DELETE 절
 
 <Callout>
-  Check how to use WITH statement with [select](/docs/select#with-clause), [insert](/docs/insert#with-insert-clause), [update](/docs/update#with-update-clause)
+  [SELECT](/docs/select#with-clause), [INSERT](/docs/insert#with-insert-clause), [UPDATE](/docs/update#with-update-clause)과 함께 WITH 문을 사용하는 방법을 확인하세요.
 </Callout>
 
-Using the `with` clause can help you simplify complex queries by splitting them into smaller subqueries called common table expressions (CTEs):
+`WITH` 절을 사용하면 복잡한 쿼리를 더 작은 하위 쿼리로 나누어 간단하게 만들 수 있습니다. 이 하위 쿼리를 공통 테이블 표현식(CTE)이라고 합니다.
+
 <Section>
 ```typescript copy
 const averageAmount = db.$with('average_amount').as(
@@ -90,3 +116,5 @@ where "orders"."amount" > (select * from "average_amount")
 returning "id"
 ```
 </Section>
+
+

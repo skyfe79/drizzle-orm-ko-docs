@@ -1,12 +1,12 @@
 ---
-title: DrizzleORM v0.30.8 release
+title: DrizzleORM v0.30.8 릴리스
 pubDate: 2024-04-11
-description: Added custom schema support to enums in Postgres, changed D1 'migrate()' function to use batch API, updated '.onConflictDoUpdate' method, fixed query generation for 'where' clause in Postgres '.onConflictDoNothing' method and fixed various bugs related to AWS Data API.
+description: Postgres에서 열거형(enum)에 커스텀 스키마 지원 추가, D1 'migrate()' 함수가 배치 API를 사용하도록 변경, '.onConflictDoUpdate' 메서드 업데이트, Postgres '.onConflictDoNothing' 메서드의 'where' 절 쿼리 생성 수정 및 AWS Data API 관련 다양한 버그 수정.
 ---
 
-## New Features
+## 새로운 기능
 
-- Added custom schema support to enums in Postgres (fixes [#669](https://github.com/drizzle-team/drizzle-orm/issues/669) via [#2048](https://github.com/drizzle-team/drizzle-orm/pull/2048)):
+- **Postgres 열거형(enum)에 커스텀 스키마 지원 추가** ([#669](https://github.com/drizzle-team/drizzle-orm/issues/669) 수정, [#2048](https://github.com/drizzle-team/drizzle-orm/pull/2048)을 통해):
 
 ```ts copy {3,4}
 import { pgSchema } from 'drizzle-orm/pg-core';
@@ -15,15 +15,16 @@ const mySchema = pgSchema('mySchema');
 const colors = mySchema.enum('colors', ['red', 'green', 'blue']);
 ```
 
-Learn more about Postgres [schemas](/docs/schemas) and [enums](/docs/column-types/pg#enum).
+Postgres [스키마](/docs/schemas)와 [열거형](/docs/column-types/pg#enum)에 대해 더 알아보세요.
 
-## Fixes
 
-- Changed D1 `migrate()` function to use batch API ([#2137](https://github.com/drizzle-team/drizzle-orm/pull/2137))
+## 수정 사항
 
-To get started with Drizzle and D1 follow the [documentation](/docs/get-started-sqlite#cloudflare-d1).
+- D1 `migrate()` 함수가 배치 API를 사용하도록 변경 ([#2137](https://github.com/drizzle-team/drizzle-orm/pull/2137))
 
-- Split `where` clause in Postgres `.onConflictDoUpdate` method into `setWhere` and `targetWhere` clauses, to support both `where` cases in `on conflict ...` clause (fixes [#1628](https://github.com/drizzle-team/drizzle-orm/issues/1628), [#1302](https://github.com/drizzle-team/drizzle-orm/issues/1302) via [#2056](https://github.com/drizzle-team/drizzle-orm/pull/2056)). 
+Drizzle과 D1을 시작하려면 [문서](/docs/get-started-sqlite#cloudflare-d1)를 참고하세요.
+
+- Postgres `.onConflictDoUpdate` 메서드의 `where` 절을 `setWhere`와 `targetWhere` 절로 분리하여 `on conflict ...` 절에서 두 가지 `where` 경우를 모두 지원하도록 함 ([#1628](https://github.com/drizzle-team/drizzle-orm/issues/1628), [#1302](https://github.com/drizzle-team/drizzle-orm/issues/1302) 수정, [#2056](https://github.com/drizzle-team/drizzle-orm/pull/2056)을 통해)
 
 ```ts copy
 await db.insert(employees)
@@ -43,12 +44,15 @@ await db.insert(employees)
   });
 ```
 
-Learn more about `.onConflictDoUpdate` method [here](/docs/insert#on-conflict-do-update).
-- Fixed query generation for `where` clause in Postgres `.onConflictDoNothing` method, as it was placed in a wrong spot (fixes [#1628](https://github.com/drizzle-team/drizzle-orm/issues/1628) via [#2056](https://github.com/drizzle-team/drizzle-orm/pull/2056)).
+`.onConflictDoUpdate` 메서드에 대해 더 알아보려면 [여기](/docs/insert#on-conflict-do-update)를 참고하세요.
 
-Learn more about `.onConflictDoNothing` method [here](/docs/insert#on-conflict-do-nothing).
+- Postgres `.onConflictDoNothing` 메서드의 `where` 절 쿼리 생성이 잘못된 위치에 배치되는 문제를 수정 ([#1628](https://github.com/drizzle-team/drizzle-orm/issues/1628) 수정, [#2056](https://github.com/drizzle-team/drizzle-orm/pull/2056)을 통해)
 
-- Fixed multiple issues with AWS Data API driver (fixes [#1931](https://github.com/drizzle-team/drizzle-orm/pull/1931), [#1932](https://github.com/drizzle-team/drizzle-orm/issues/1932), [#1934](https://github.com/drizzle-team/drizzle-orm/issues/1934), [#1936](https://github.com/drizzle-team/drizzle-orm/issues/1936) via [#2119](https://github.com/drizzle-team/drizzle-orm/pull/2119))
-- Fix inserting and updating array values in AWS Data API (fixes [#1912](https://github.com/drizzle-team/drizzle-orm/issues/1912) via [#1911](https://github.com/drizzle-team/drizzle-orm/pull/1911))
+`.onConflictDoNothing` 메서드에 대해 더 알아보려면 [여기](/docs/insert#on-conflict-do-nothing)를 참고하세요.
 
-To get started with Drizzle and AWS Data API follow the [documentation](/docs/get-started-postgresql#aws-data-api).
+- AWS Data API 드라이버의 여러 문제를 수정 ([#1931](https://github.com/drizzle-team/drizzle-orm/pull/1931), [#1932](https://github.com/drizzle-team/drizzle-orm/issues/1932), [#1934](https://github.com/drizzle-team/drizzle-orm/issues/1934), [#1936](https://github.com/drizzle-team/drizzle-orm/issues/1936) 수정, [#2119](https://github.com/drizzle-team/drizzle-orm/pull/2119)을 통해)
+- AWS Data API에서 배열 값 삽입 및 업데이트 문제를 수정 ([#1912](https://github.com/drizzle-team/drizzle-orm/issues/1912) 수정, [#1911](https://github.com/drizzle-team/drizzle-orm/pull/1911)을 통해)
+
+Drizzle과 AWS Data API를 시작하려면 [문서](/docs/get-started-postgresql#aws-data-api)를 참고하세요.
+
+

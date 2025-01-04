@@ -9,27 +9,30 @@ import CodeTabs from "@mdx/CodeTabs.astro";
 # Drizzle \<\> Bun SQLite
 
 <Prerequisites>
-- Database [connection basics](/docs/connect-overview) with Drizzle
-- Bun - [website](https://bun.sh/docs)
-- Bun SQLite driver - [docs](https://bun.sh/docs/api/sqlite)
+- Drizzle를 사용한 데이터베이스 [연결 기본 사항](/docs/connect-overview)
+- Bun - [공식 웹사이트](https://bun.sh/docs)
+- Bun SQLite 드라이버 - [문서](https://bun.sh/docs/api/sqlite)
 </Prerequisites>
 
-According to the **[official website](https://bun.sh/)**, Bun is a fast all-in-one JavaScript runtime. 
+**[공식 웹사이트](https://bun.sh/)**에 따르면, Bun은 빠른 올인원 자바스크립트 런타임입니다.
 
-Drizzle ORM natively supports **[`bun:sqlite`](https://bun.sh/docs/api/sqlite)** module and it's crazy fast 🚀  
+Drizzle ORM은 **[`bun:sqlite`](https://bun.sh/docs/api/sqlite)** 모듈을 기본적으로 지원하며, 이는 매우 빠릅니다 🚀
 
-We embraces SQL dialects and dialect specific drivers and syntax and unlike any other ORM, 
-for synchronous drivers like `bun:sqlite` we have both **async** and **sync** APIs and we mirror most popular 
-SQLite-like `all`, `get`, `values` and `run` query methods syntax.
+Drizzle는 SQL 방언과 방언별 드라이버 및 문법을 적극적으로 수용합니다. 다른 ORM과 달리, `bun:sqlite`와 같은 동기식 드라이버에 대해 **비동기**와 **동기** API를 모두 제공하며, 가장 많이 사용되는 SQLite 스타일의 `all`, `get`, `values`, `run` 쿼리 메서드 문법을 그대로 반영합니다.
 
-#### Step 1 - Install packages
+
+#### 1단계 - 패키지 설치
+
 <Npm>
 drizzle-orm
 -D drizzle-kit
 </Npm>
 
-#### Step 2 - Initialize the driver and make a query
-```typescript copy
+
+
+#### 2단계 - 드라이버 초기화 및 쿼리 실행
+
+```typescript
 import { drizzle } from 'drizzle-orm/bun-sqlite';
 
 const db = drizzle();
@@ -37,8 +40,8 @@ const db = drizzle();
 const result = await db.select().from(...);
 ```
 
-If you need to provide your existing driver:
-```typescript copy
+기존 드라이버를 제공해야 한다면:
+```typescript
 import { drizzle } from 'drizzle-orm/bun-sqlite';
 import { Database } from 'bun:sqlite';
 
@@ -48,8 +51,8 @@ const db = drizzle({ client: sqlite });
 const result = await db.select().from(...);
 ```
 
-If you want to use **sync** APIs:
-```typescript copy
+**동기** API를 사용하고 싶다면:
+```typescript
 import { drizzle } from 'drizzle-orm/bun-sqlite';
 import { Database } from 'bun:sqlite';
 
@@ -62,6 +65,9 @@ const result = db.select().from(users).values();
 const result = db.select().from(users).run();
 ```
 
-#### What's next?
+
+#### 다음 단계는 무엇인가요?
 
 <WhatsNextPostgres/>
+
+

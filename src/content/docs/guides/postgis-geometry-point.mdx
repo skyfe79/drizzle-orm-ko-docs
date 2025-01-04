@@ -1,5 +1,5 @@
 ---
-title: PostGIS geometry point
+title: PostGIS 지오메트리 포인트
 slug: postgis-geometry-point
 ---
 
@@ -9,16 +9,16 @@ import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
 
 <Prerequisites>
-- Get started with [PostgreSQL](/docs/get-started-postgresql)
-- [Postgis extension](/docs/extensions/pg#postgis)
-- [Indexes](/docs/indexes-constraints#indexes)
-- [Filtering in select statement](/docs/select#filtering)
-- [sql operator](/docs/sql)
+- [PostgreSQL 시작하기](/docs/get-started-postgresql)
+- [Postgis 확장 기능](/docs/extensions/pg#postgis)
+- [인덱스](/docs/indexes-constraints#indexes)
+- [SELECT 문에서 필터링](/docs/select#filtering)
+- [SQL 연산자](/docs/sql)
 </Prerequisites>
 
-`PostGIS` extends the capabilities of the PostgreSQL relational database by adding support for storing, indexing, and querying geospatial data. 
+`PostGIS`는 PostgreSQL 관계형 데이터베이스의 기능을 확장하여 지리 공간 데이터를 저장, 인덱싱, 쿼리할 수 있도록 지원합니다.
 
-As for now, Drizzle doesn't create extension automatically, so you need to create it manually. Create an empty migration file and add SQL query:
+현재 Drizzle은 확장 기능을 자동으로 생성하지 않으므로, 수동으로 생성해야 합니다. 빈 마이그레이션 파일을 만들고 SQL 쿼리를 추가하세요.
 
 <Section>
 ```bash
@@ -30,7 +30,7 @@ CREATE EXTENSION postgis;
 ```
 </Section>
 
-This is how you can create table with `geometry` datatype and spatial index in Drizzle:
+Drizzle에서 `geometry` 데이터 타입과 공간 인덱스를 가진 테이블을 생성하는 방법은 다음과 같습니다.
 
 <CodeTabs items={["schema.ts", "migration.sql"]}>
   <CodeTab>
@@ -60,9 +60,8 @@ This is how you can create table with `geometry` datatype and spatial index in D
   CREATE INDEX IF NOT EXISTS "spatial_index" ON "stores" USING gist ("location");
   ```
 </CodeTabs>
- 
-This is how you can insert `geometry` data into the table in Drizzle. `ST_MakePoint()` in PostGIS creates a geometric object of type `point` using the specified coordinates.
-`ST_SetSRID()` sets the `SRID` (unique identifier associated with a specific coordinate system, tolerance, and resolution) on a geometry to a particular integer value:
+
+Drizzle에서 `geometry` 데이터를 테이블에 삽입하는 방법은 다음과 같습니다. PostGIS의 `ST_MakePoint()`는 지정된 좌표를 사용하여 `point` 타입의 지오메트리 객체를 생성합니다. `ST_SetSRID()`는 지오메트리의 `SRID`(특정 좌표계, 허용 오차 및 해상도와 연결된 고유 식별자)를 특정 정수 값으로 설정합니다.
 
 ```ts {4, 10, 16}
 // mode: 'xy'
@@ -84,7 +83,7 @@ await db.insert(stores).values({
 });
 ```
 
-To compute the distance between the objects you can use `<->` operator and `ST_Distance()` function, which for `geometry types` returns the minimum planar distance between two geometries. This is how you can query for the nearest location by coordinates in Drizzle with PostGIS:
+객체 간의 거리를 계산하려면 `<->` 연산자와 `ST_Distance()` 함수를 사용할 수 있습니다. `ST_Distance()`는 `geometry 타입`에 대해 두 지오메트리 간의 최소 평면 거리를 반환합니다. PostGIS와 함께 Drizzle에서 좌표를 기준으로 가장 가까운 위치를 쿼리하는 방법은 다음과 같습니다.
 
 <Section>
 ```ts copy {9, 14, 17}
@@ -104,18 +103,18 @@ await db
     distance: sql`ST_Distance(${stores.location}, ${sqlPoint})`,
   })
   .from(stores)
-  .orderBy(sql`${stores.location} <-> ${sqlPoint}`)
+  .orderBy(sql`${stores.location}  ${sqlPoint}`)
   .limit(1);
 ```
 
 ```sql
 select *, ST_Distance(location, ST_SetSRID(ST_MakePoint(-73.935_242, 40.730_61), 4326))
-from stores order by location <-> ST_SetSRID(ST_MakePoint(-73.935_242, 40.730_61), 4326)
+from stores order by location  ST_SetSRID(ST_MakePoint(-73.935_242, 40.730_61), 4326)
 limit 1;
 ```
 </Section>
 
-To filter stores located within a specified rectangular area, you can use `ST_MakeEnvelope()` and `ST_Within()` functions. `ST_MakeEnvelope()` creates a rectangular Polygon from the minimum and maximum values for X and Y. `ST_Within()` Returns TRUE if geometry A is within geometry B.
+지정된 직사각형 영역 내에 위치한 매장을 필터링하려면 `ST_MakeEnvelope()`와 `ST_Within()` 함수를 사용할 수 있습니다. `ST_MakeEnvelope()`는 X와 Y의 최소 및 최대 값을 사용하여 직사각형 폴리곤을 생성합니다. `ST_Within()`은 지오메트리 A가 지오메트리 B 내부에 있으면 TRUE를 반환합니다.
 
 <Section>
 ```ts copy {13}
@@ -140,3 +139,6 @@ await db
 select * from stores where ST_Within(location, ST_MakeEnvelope(-88, 40, -73, 43, 4326));
 ```
 </Section>
+```
+
+

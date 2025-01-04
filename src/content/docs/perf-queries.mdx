@@ -1,23 +1,22 @@
 import Tab from '@mdx/Tab.astro';
 import Tabs from '@mdx/Tabs.astro';
 
-# Query performance
-When it comes to **Drizzle** — we're a thin TypeScript layer on top of SQL with 
-almost 0 overhead and to make it actual 0, you can utilise our prepared statements API.
-  
-**When you run a query on the database, there are several things that happen:**
-- all the configurations of the query builder got concatenated to the SQL string
-- that string and params are sent to the database driver
-- driver compiles SQL query to the binary SQL executable format and sends it to the database
+# 쿼리 성능
 
-With prepared statements you do SQL concatenation once on the Drizzle ORM side and then database 
-driver is able to reuse precompiled binary SQL instead of parsing query all the time. 
-It has extreme performance benefits on large SQL queries.  
+**Drizzle**는 SQL 위에 얇은 TypeScript 레이어를 제공하며, 거의 0에 가까운 오버헤드를 가지고 있습니다. 이를 실제로 0으로 만들기 위해, 여러분은 우리의 **prepared statements API**를 활용할 수 있습니다.
 
-Different database drivers support prepared statements in different ways and sometimes 
-Drizzle ORM you can go [**faster than better-sqlite3 driver.**](https://twitter.com/_alexblokh/status/1593593415907909634)
+**데이터베이스에서 쿼리를 실행할 때 다음과 같은 일들이 발생합니다:**
+- 쿼리 빌더의 모든 설정이 SQL 문자열로 연결됩니다.
+- 해당 문자열과 파라미터가 데이터베이스 드라이버로 전송됩니다.
+- 드라이버는 SQL 쿼리를 바이너리 SQL 실행 가능 형식으로 컴파일하고 데이터베이스로 보냅니다.
 
-## Prepared statement
+prepared statements를 사용하면, Drizzle ORM 측에서 SQL 연결을 한 번만 수행하고, 이후 데이터베이스 드라이버가 매번 쿼리를 파싱하는 대신 미리 컴파일된 바이너리 SQL을 재사용할 수 있습니다. 이는 특히 큰 SQL 쿼리에서 극적인 성능 향상을 가져옵니다.
+
+다양한 데이터베이스 드라이버는 prepared statements를 각기 다른 방식으로 지원하며, 때로는 Drizzle ORM이 [**better-sqlite3 드라이버보다 더 빠르게 동작할 수 있습니다.**](https://twitter.com/_alexblokh/status/1593593415907909634)
+
+
+## 준비된 쿼리(Prepared Statement)
+
 <Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore"]}>
   <Tab>
     ```typescript copy {3}
@@ -65,8 +64,11 @@ Drizzle ORM you can go [**faster than better-sqlite3 driver.**](https://twitter.
   </Tab> 
 </Tabs>
 
-## Placeholder
-Whenever you need to embed a dynamic runtime value - you can use the `sql.placeholder(...)` api
+
+## 플레이스홀더
+
+동적인 런타임 값을 삽입해야 할 때는 `sql.placeholder(...)` API를 사용할 수 있습니다.
+
 <Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore"]}>
   <Tab>
     ```ts {6,9-10,15,18}
@@ -157,3 +159,5 @@ Whenever you need to embed a dynamic runtime value - you can use the `sql.placeh
     ```
   </Tab>
 </Tabs>
+
+

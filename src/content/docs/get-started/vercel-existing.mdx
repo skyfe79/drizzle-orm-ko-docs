@@ -20,49 +20,60 @@ import QueryDatabase from '@mdx/get-started/QueryDatabase.mdx';
 import QueryDatabaseUpdated from '@mdx/get-started/QueryDatabaseUpdated.mdx';
 import UpdateSchema from '@mdx/get-started/postgresql/UpdateSchema.mdx';
 
+
 <Breadcrumbs/>
 
-# Get Started with Drizzle and Vercel Postgres in existing project
+# 기존 프로젝트에 Drizzle와 Vercel Postgres 시작하기
 
 <Prerequisites>
-  - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
-  - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
-  - **Vercel Postgres database** - [read here](https://vercel.com/docs/storage/vercel-postgres)
-  - **Vercel Postgres driver** - [read here](https://vercel.com/docs/storage/vercel-postgres/sdk) & [GitHub](https://github.com/vercel/storage/tree/main/packages/postgres)
+  - **dotenv** - 환경 변수를 관리하기 위한 패키지 - [여기서 읽기](https://www.npmjs.com/package/dotenv)
+  - **tsx** - TypeScript 파일을 실행하기 위한 패키지 - [여기서 읽기](https://tsx.is/)
+  - **Vercel Postgres 데이터베이스** - [여기서 읽기](https://vercel.com/docs/storage/vercel-postgres)
+  - **Vercel Postgres 드라이버** - [여기서 읽기](https://vercel.com/docs/storage/vercel-postgres/sdk) & [GitHub](https://github.com/vercel/storage/tree/main/packages/postgres)
 </Prerequisites>
 
 <FileStructure/>
 
-#### Step 1 - Install required package
+
+#### 1단계 - 필요한 패키지 설치하기
+
 <InstallPackages lib='@vercel/postgres'/>
 
-#### Step 2 - Setup connection variables
+
+#### 2단계 - 연결 변수 설정
 
 <SetupEnv env_variable='POSTGRES_URL' />
 
-<Callout title='warning'>
-It's important to name the variable `POSTGRES_URL` for Vercel Postgres.
+<Callout title='경고'>
+Vercel Postgres를 사용할 때는 반드시 변수 이름을 `POSTGRES_URL`로 지정해야 합니다.
 
-In the Vercel Postgres storage tab, you can find the `.env.local` tab and copy the `POSTGRES_URL` variable
+Vercel Postgres 저장소 탭에서 `.env.local` 탭을 찾아 `POSTGRES_URL` 변수를 복사할 수 있습니다.
 </Callout>
 
-#### Step 3 - Setup Drizzle config file
 
-<SetupConfig dialect='postgresql' env_variable='POSTGRES_URL'/>
+#### 3단계 - Drizzle 설정 파일 구성
 
-#### Step 4 - Introspect your database
+
+<SetupConfig dialect='postgresql' env_variable='POSTGRES_URL' />
+
+
+
+#### 4단계 - 데이터베이스 내부 살펴보기
 
 <IntrospectPostgreSQL/>
 
-#### Step 5 - Transfer code to your actual schema file
+
+#### 5단계 - 실제 스키마 파일로 코드 옮기기
 
 <TransferCode/>
 
-#### Step 6 - Connect Drizzle ORM to the database
+
+#### 6단계 - Drizzle ORM을 데이터베이스에 연결하기
 
 <ConnectVercel/>
 
-#### Step 7 - Query the database
+
+#### 7단계 - 데이터베이스 쿼리하기
 
 ```typescript copy filename="src/index.ts"
 import 'dotenv/config';
@@ -79,11 +90,13 @@ async function main() {
     email: 'john@example.com',
   };
 
+  // 새로운 사용자 추가
   await db.insert(usersTable).values(user);
-  console.log('New user created!')
+  console.log('새로운 사용자가 생성되었습니다!');
 
+  // 모든 사용자 조회
   const users = await db.select().from(usersTable);
-  console.log('Getting all users from the database: ', users)
+  console.log('데이터베이스에서 모든 사용자를 가져옵니다: ', users);
   /*
   const users: {
     id: number;
@@ -93,34 +106,45 @@ async function main() {
   }[]
   */
 
+  // 사용자 정보 업데이트
   await db
     .update(usersTable)
     .set({
       age: 31,
     })
     .where(eq(usersTable.email, user.email));
-  console.log('User info updated!')
+  console.log('사용자 정보가 업데이트되었습니다!');
 
+  // 사용자 삭제
   await db.delete(usersTable).where(eq(usersTable.email, user.email));
-  console.log('User deleted!')
+  console.log('사용자가 삭제되었습니다!');
 }
 
 main();
 ```
 
-#### Step 8 - Run index.ts file
+
+#### 8단계 - index.ts 파일 실행하기
 
 <RunFile/>
 
-#### Step 9 - Update your table schema (optional)
+
+
+#### 9단계 - 테이블 스키마 업데이트 (선택 사항)
 
 <UpdateSchema/>
 
-#### Step 10 - Applying changes to the database (optional)
+
+
+#### 10단계 - 데이터베이스에 변경 사항 적용하기 (선택 사항)
+
 
 <ApplyChanges />
 
-#### Step 11 - Query the database with a new field (optional)
+
+
+
+#### 11단계 - 새로운 필드로 데이터베이스 쿼리하기 (선택 사항)
 
 ```typescript copy filename="src/index.ts"
 import 'dotenv/config';
@@ -139,10 +163,10 @@ async function main() {
   };
 
   await db.insert(usersTable).values(user);
-  console.log('New user created!')
+  console.log('새로운 사용자가 생성되었습니다!');
 
   const users = await db.select().from(usersTable);
-  console.log('Getting all users from the database: ', users)
+  console.log('데이터베이스에서 모든 사용자 가져오기: ', users);
   /*
   const users: {
     id: number;
@@ -159,11 +183,13 @@ async function main() {
       age: 31,
     })
     .where(eq(usersTable.email, user.email));
-  console.log('User info updated!')
+  console.log('사용자 정보가 업데이트되었습니다!');
 
   await db.delete(usersTable).where(eq(usersTable.email, user.email));
-  console.log('User deleted!')
+  console.log('사용자가 삭제되었습니다!');
 }
 
 main();
 ```
+
+

@@ -3,70 +3,81 @@ import Tabs from "@mdx/Tabs.astro";
 import Callout from "@mdx/Callout.astro";
 import TableWrapper from "@mdx/TableWrapper.astro";
 
-# Versioning
 
-`drizzle-seed` uses versioning to manage outputs for static and dynamic data. To ensure true 
-determinism, ensure that values remain unchanged when using the same `seed` number. If changes are made to 
-static data sources or dynamic data generation logic, the version will be updated, allowing
-you to choose between sticking with the previous version or using the latest.
+# 버전 관리
 
-You can upgrade to the latest `drizzle-seed` version for new features, such as additional
-generators, while maintaining deterministic outputs with a previous version if needed. This
-is particularly useful when you need to rely on existing deterministic data while accessing new functionality.
+
+
+
+`drizzle-seed`는 정적 데이터와 동적 데이터의 출력을 관리하기 위해 버전 관리를 사용합니다. 완전한 결정론적 결과를 보장하려면 동일한 `seed` 번호를 사용할 때 값이 변경되지 않도록 해야 합니다. 정적 데이터 소스나 동적 데이터 생성 로직을 변경하면 버전이 업데이트됩니다. 이를 통해 이전 버전을 유지하거나 최신 버전을 사용할 수 있습니다.
+
+필요한 경우 새로운 기능(예: 추가 생성기)을 위해 최신 `drizzle-seed` 버전으로 업그레이드할 수 있습니다. 동시에 기존의 결정론적 데이터를 유지하면서 새로운 기능을 활용할 수 있습니다. 이는 기존 데이터에 의존하면서도 새로운 기능을 사용해야 할 때 특히 유용합니다.
 
 ```ts
 await seed(db, schema, { version: '2' });
 ```
 
-## History
+
+## 버전 히스토리
+
 <TableWrapper>
-|          api version  |   npm version    |     Changed generators                             |
-|  :-------------- | :-------------- | :-------------                         |
-|       `v1`            | `0.1.1`          |                                         |
-|       `v2 (LTS) `       | `0.2.1`          |`string()`, `interval({ isUnique: true })` |
+| API 버전 | npm 버전 | 변경된 생성기 |
+| :------- | :------- | :------------ |
+| `v1`     | `0.1.1`  |               |
+| `v2 (LTS)` | `0.2.1`  | `string()`, `interval({ isUnique: true })` |
 </TableWrapper>
 
-<Callout collapsed="How it works under the hood?">
-> This is not an actual API change; it is just an example of how we will proceed with `drizzle-seed` versioning.
+<Callout collapsed="내부 동작 원리는 어떻게 되나요?">
+> 이는 실제 API 변경 사항이 아닙니다. `drizzle-seed` 버전 관리를 어떻게 진행할지 보여주는 예시일 뿐입니다.
 
-For example, `lastName` generator was changed, and new version, `V2`, of this generator became available.
+예를 들어, `lastName` 생성기가 변경되어 새로운 버전인 `V2`가 제공되었습니다.
 
-Later, `firstName` generator was changed, making `V3` version of this generator available.
+이후 `firstName` 생성기가 변경되면서 `V3` 버전이 제공되었습니다.
 
-|                  |       `V1`       |      `V2`       |   `V3(latest)`   |
-| :--------------: | :--------------: | :-------------: | :--------------: |
-| **LastNameGen**  | `LastNameGenV1`  | `LastNameGenV2` |                  |
-| **FirstNameGen** | `FirstNameGenV1` |                 | `FirstNameGenV3` |
+|                  | `V1`            | `V2`            | `V3(최신)`      |
+| :--------------: | :-------------: | :-------------: | :-------------: |
+| **LastNameGen**  | `LastNameGenV1` | `LastNameGenV2` |                 |
+| **FirstNameGen** | `FirstNameGenV1`|                 | `FirstNameGenV3`|
+</Callout>
 
 
-##### Use the `firstName` generator of version 3 and the `lastName` generator of version 2
+##### `firstName` 생성기는 버전 3, `lastName` 생성기는 버전 2 사용하기
+
 ```ts
 await seed(db, schema);
 ```
 
-If you are not ready to use latest generator version right away, you can specify max version to use
+최신 버전의 생성기를 바로 사용할 준비가 되지 않았다면, 사용할 최대 버전을 지정할 수 있습니다.
 
-##### Use the `firstName` generator of version 1 and the `lastName` generator of version 2
+
+##### 버전 1의 `firstName` 생성기와 버전 2의 `lastName` 생성기 사용하기
+
 ```ts
 await seed(db, schema, { version: '2' });
 ```
 
-##### Use the `firstName` generator of version 1 and the `lastName` generator of version 1.
+
+##### `firstName` 생성기는 버전 1을, `lastName` 생성기는 버전 1을 사용하세요.
+
 ```ts
 await seed(db, schema, { version: '1' });
 ```
 
-</Callout>
 
 ## Version 2
-#### Unique `interval` generator was changed
 
-<Callout title='Reason for upgrade'>
-An older version of the generator could produce intervals like `1 minute 60 seconds` and `2 minutes 0 seconds`, treating them as distinct intervals.
-However, when the `1 minute 60 seconds` interval is inserted into a PostgreSQL database, it is automatically converted to `2 minutes 0 seconds`. As a result, attempting to insert the `2 minutes 0 seconds` interval into a unique column afterwards will cause an error
+
+
+
+
+#### 고유 `interval` 생성기가 변경되었습니다
+
+<Callout title='업그레이드 이유'>
+이전 버전의 생성기는 `1분 60초`와 `2분 0초`와 같은 간격을 생성할 수 있었고, 이를 서로 다른 간격으로 처리했습니다.
+하지만 `1분 60초` 간격을 PostgreSQL 데이터베이스에 삽입하면 자동으로 `2분 0초`로 변환됩니다. 결과적으로, 이후에 `2분 0초` 간격을 고유 컬럼에 삽입하려고 하면 오류가 발생합니다.
 </Callout>
 
-You will be affected, if your table includes a unique column of type `interval`:
+여러분이 영향을 받는 경우는 테이블에 `interval` 타입의 고유 컬럼이 포함되어 있을 때입니다:
 <Tabs items={['PostgreSQL']}>
 <Tab>
 ```ts
@@ -89,7 +100,7 @@ main();
 </Tab>
 </Tabs>
 
-You will be affected, if you use the unique `interval` generator in your seeding script, as shown in the script below:
+여러분이 시딩 스크립트에서 고유 `interval` 생성기를 사용하는 경우에도 영향을 받습니다. 아래 스크립트와 같이 사용한 경우입니다:
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
 <Tab>
 ```ts
@@ -207,13 +218,17 @@ main();
 </Tab>
 </Tabs>
 
-#### `string` generators were changed: both non-unique and unique
 
-<Callout title='Reason to upgrade'>
-Ability to generate a unique string based on the length of the text column (e.g., `varchar(20)`)
+#### `string` 생성자가 변경됨: 중복 가능 및 중복 불가능 문자열 모두
+
+<Callout title='업그레이드 이유'>
+텍스트 컬럼의 길이를 기반으로 고유한 문자열을 생성할 수 있는 기능 (예: `varchar(20)`)
 </Callout>
 
-You will be affected, if your table includes a column of a text-like type with a maximum length parameter or a unique column of a text-like type:
+다음과 같은 경우 영향을 받습니다:
+- 테이블에 최대 길이 파라미터가 있는 텍스트 타입 컬럼이 포함된 경우
+- 텍스트 타입 컬럼이 고유(unique) 제약 조건을 가진 경우
+
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
 <Tab>
 ```ts
@@ -263,7 +278,6 @@ async function main() {
 }
 
 main();
-
 ```
 </Tab>
 <Tab>
@@ -290,7 +304,7 @@ main();
 </Tab>
 </Tabs>
 
-You will be affected, if you use the `string` generator in your seeding script, as shown in the script below:
+시딩 스크립트에서 `string` 생성자를 사용하는 경우에도 영향을 받습니다. 아래 스크립트를 참고하세요:
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
 <Tab>
 ```ts
@@ -422,3 +436,5 @@ main();
 ```
 </Tab>
 </Tabs>
+
+

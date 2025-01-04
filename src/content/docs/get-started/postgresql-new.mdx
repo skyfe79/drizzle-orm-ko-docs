@@ -17,56 +17,79 @@ import RunFile from '@mdx/get-started/RunFile.mdx';
 import QueryDatabase from '@mdx/get-started/QueryDatabase.mdx';
 import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 
+
 <Breadcrumbs/>
 
-# Get Started with Drizzle and PostgreSQL
+# Drizzle와 PostgreSQL 시작하기
 
 <Prerequisites>
-  - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
-  - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
-  - **node-postgres** - package for querying your PostgreSQL database - [read here](https://node-postgres.com/)
+  - **dotenv** - 환경 변수를 관리하기 위한 패키지 - [여기서 읽어보기](https://www.npmjs.com/package/dotenv)
+  - **tsx** - TypeScript 파일을 실행하기 위한 패키지 - [여기서 읽어보기](https://tsx.is/)
+  - **node-postgres** - PostgreSQL 데이터베이스를 쿼리하기 위한 패키지 - [여기서 읽어보기](https://node-postgres.com/)
 </Prerequisites>
 
-Drizzle has native support for PostgreSQL connections with the `node-postgres` and `postgres.js` drivers.
+Drizzle는 `node-postgres`와 `postgres.js` 드라이버를 통해 PostgreSQL 연결을 기본적으로 지원합니다.
 
-We will use `node-postgres` for this get started example. But if you want to find more ways to connect to postgresql check
-our [PostgreSQL Connection](/docs/get-started-postgresql) page 
+이 시작 예제에서는 `node-postgres`를 사용할 것입니다. PostgreSQL에 연결하는 더 많은 방법을 찾고 싶다면 [PostgreSQL 연결](/docs/get-started-postgresql) 페이지를 확인하세요.
 
 <FileStructure/>
 
-#### Step 1 - Install **node-postgres** package
+
+#### 1단계 - **node-postgres** 패키지 설치하기
+
 <InstallPackages lib='pg' devlib=' @types/pg'/>
 
-#### Step 2 - Setup connection variables
+
+#### 2단계 - 연결 변수 설정하기
 
 <SetupEnv env_variable='DATABASE_URL' />
 
-<Callout title='tips'>
-If you don't have a PostgreSQL database yet and want to create one for testing, you can use our guide on how to set up PostgreSQL in Docker.
+<Callout title='팁'>
+아직 PostgreSQL 데이터베이스가 없고 테스트용으로 하나를 만들고 싶다면, Docker에서 PostgreSQL을 설정하는 방법에 대한 가이드를 참고하세요.
 
-The PostgreSQL in Docker guide is available [here](/docs/guides/postgresql-local-setup). Go set it up, generate a database URL (explained in the guide), and come back for the next steps
+Docker에서 PostgreSQL 설정 가이드는 [여기](/docs/guides/postgresql-local-setup)에서 확인할 수 있습니다. 가이드를 따라 설정하고 데이터베이스 URL을 생성한 후(가이드에서 설명됨), 다음 단계를 진행하세요.
 </Callout>
 
-#### Step 3 - Connect Drizzle ORM to the database
+
+#### 3단계 - Drizzle ORM을 데이터베이스에 연결하기
 
 <ConnectPostgreSQL/>
 
-#### Step 4 - Create a table
+
+
+#### 4단계 - 테이블 생성
+
 
 <CreateTable />
 
-#### Step 5 - Setup Drizzle config file
+
+
+
+
+#### 5단계 - Drizzle 설정 파일 설정하기
+
 
 <SetupConfig dialect='postgresql' env_variable='DATABASE_URL'/>
 
-#### Step 6 - Applying changes to the database
+
+
+
+
+#### 6단계 - 데이터베이스에 변경 사항 적용하기
+
 
 <ApplyChanges />
 
-#### Step 7 - Seed and Query the database
+
+
+
+
+#### 7단계 - 데이터베이스 시드 및 쿼리
 
 <QueryDatabase dialect='node-postgres' env_variable='DATABASE_URL'/>
 
-#### Step 8 - Run index.ts file
+
+#### 8단계 - index.ts 파일 실행하기
 
 <RunFile/>
+

@@ -4,57 +4,56 @@ import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
 import Callout from '@mdx/Callout.astro';
 
-# Generated Columns
+# 생성된 컬럼(Generated Columns)
 
 <Callout type="info">
-To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `drizzle-kit@0.23.0` or higher
+이 기능을 사용하려면 `drizzle-orm@0.32.0` 이상과 `drizzle-kit@0.23.0` 이상 버전이 필요합니다.
 </Callout>
 
-Generated columns in SQL are a feature that allows you to create columns in a table whose values are automatically computed based on expressions involving other columns within the same table. This can help ensure data consistency, simplify database design, and improve query performance.
+SQL에서 생성된 컬럼은 동일한 테이블 내의 다른 컬럼을 기반으로 자동으로 계산된 값을 가지는 컬럼을 생성할 수 있는 기능입니다. 이를 통해 데이터 일관성을 보장하고, 데이터베이스 설계를 단순화하며, 쿼리 성능을 향상시킬 수 있습니다.
 
-There are two types of generated columns:
+생성된 컬럼에는 두 가지 유형이 있습니다:
 
-1. Virtual (or non-persistent) Generated Columns: These columns are computed dynamically whenever they are queried. They do not occupy storage space in the database.
+1. **가상(Virtual) 생성된 컬럼**: 쿼리할 때마다 동적으로 계산됩니다. 데이터베이스 저장 공간을 차지하지 않습니다.
 
-2. Stored (or persistent) Generated Columns: These columns are computed when a row is inserted or updated and their values are stored in the database. This allows them to be indexed and can improve query performance since the values do not need to be recomputed for each query.
+2. **저장(Stored) 생성된 컬럼**: 행이 삽입되거나 업데이트될 때 계산되며, 그 값은 데이터베이스에 저장됩니다. 이로 인해 인덱싱이 가능하며, 쿼리 성능이 향상됩니다.
 
-Generated columns can be especially useful for:
+생성된 컬럼은 다음과 같은 경우에 특히 유용합니다:
 
-- Deriving new data from existing columns
-- Automating calculations to avoid manual updates
-- Enforcing data integrity and consistency
-- Simplifying application logic by keeping complex calculations within the database schema
+- 기존 컬럼에서 새로운 데이터를 도출할 때
+- 수동 업데이트를 피하기 위해 계산을 자동화할 때
+- 데이터 무결성과 일관성을 강화할 때
+- 복잡한 계산을 데이터베이스 스키마 내에 유지하여 애플리케이션 로직을 단순화할 때
 
 <Callout type="info">
-    The implementation and usage of generated columns can vary significantly across different SQL databases. PostgreSQL, MySQL, and SQLite each have unique features, capabilities, and limitations when it comes to generated columns. In this section, we will explore these differences in detail to help you understand how to best utilize generated columns in each database system.
+생성된 컬럼의 구현과 사용법은 SQL 데이터베이스마다 크게 다를 수 있습니다. PostgreSQL, MySQL, SQLite는 각각 고유한 기능, 능력, 제한 사항을 가지고 있습니다. 이 섹션에서는 각 데이터베이스 시스템에서 생성된 컬럼을 최적으로 활용하는 방법을 자세히 살펴보겠습니다.
 </Callout>
 
 <Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore(WIP)"]}>
   <Tab>
-    #### Database side
-    **Types**: `STORED` only
+    #### 데이터베이스 측면
+    **유형**: `STORED`만 지원
 
-    **How It Works**
-    - Automatically computes values based on other columns during insert or update.
+    **동작 방식**
+    - 삽입 또는 업데이트 시 다른 컬럼을 기반으로 값을 자동으로 계산합니다.
 
-    **Capabilities**
-    - Simplifies data access by precomputing complex expressions.
-    - Enhances query performance with index support on generated columns.
+    **기능**
+    - 복잡한 표현식을 미리 계산하여 데이터 접근을 단순화합니다.
+    - 생성된 컬럼에 인덱스를 지원하여 쿼리 성능을 향상시킵니다.
 
-    **Limitations**
-    - Cannot specify default values.
-    - Expressions cannot reference other generated columns or include subqueries.
-    - Schema changes required to modify generated column expressions.
-    - Cannot directly use in primary keys, foreign keys, or unique constraints   
+    **제한 사항**
+    - 기본값을 지정할 수 없습니다.
+    - 표현식이 다른 생성된 컬럼을 참조하거나 서브쿼리를 포함할 수 없습니다.
+    - 생성된 컬럼 표현식을 수정하려면 스키마 변경이 필요합니다.
+    - 기본 키, 외래 키, 고유 제약 조건에 직접 사용할 수 없습니다.
 
-    For more info, please check [PostgreSQL](https://www.postgresql.org/docs/current/ddl-generated-columns.html) docs 
+    자세한 내용은 [PostgreSQL](https://www.postgresql.org/docs/current/ddl-generated-columns.html) 문서를 참조하세요.
 
-    #### Drizzle side
-    In Drizzle you can specify `.generatedAlwaysAs()` function on any column type and add a supported sql query, 
-    that will generate this column data do you
+    #### Drizzle 측면
+    Drizzle에서는 모든 컬럼 타입에 `.generatedAlwaysAs()` 함수를 지정하고 지원되는 SQL 쿼리를 추가하여 이 컬럼 데이터를 생성할 수 있습니다.
 
-    #### Features 
-    This function can accept generated expression in 3 ways:
+    #### 기능
+    이 함수는 세 가지 방식으로 생성된 표현식을 받을 수 있습니다:
 
     **`string`**
     <CodeTab>
@@ -70,8 +69,7 @@ Generated columns can be especially useful for:
     ```
     </CodeTab>
 
-    **`sql`** tag - if you want drizzle to escape some values for you
-
+    **`sql` 태그** - Drizzle가 일부 값을 이스케이프하도록 할 때
     <CodeTab>
     ```ts
     export const test = pgTable("test", {
@@ -85,7 +83,7 @@ Generated columns can be especially useful for:
     ```
     </CodeTab>
 
-    **`callback`** - if you need to reference columns from a table
+    **`콜백`** - 테이블의 컬럼을 참조해야 할 때
     <CodeTab>
     ```ts
     export const test = pgTable("test", {
@@ -103,14 +101,14 @@ Generated columns can be especially useful for:
     ```
     </CodeTab>
 
-    **Example** generated columns with full-text search
+    **예제** 전체 텍스트 검색과 함께 생성된 컬럼
    <CodeTabs items={["schema.ts"]}>
 	<CodeTab>
 	```typescript copy {17-19}
     import { SQL, sql } from "drizzle-orm";
     import { customType, index, integer, pgTable, text } from "drizzle-orm/pg-core";
 
-    const tsVector = customType<{ data: string }>({
+    const tsVector = customType({
       dataType() {
         return "tsvector";
       },
@@ -145,27 +143,27 @@ Generated columns can be especially useful for:
    </CodeTabs>
   </Tab> 
   <Tab>
-    #### Database side
-    **Types**: `STORED`, `VIRTUAL`
+    #### 데이터베이스 측면
+    **유형**: `STORED`, `VIRTUAL`
 
-    **How It Works**
-    - Defined with an expression in the table schema.
-    - Virtual columns are computed during read operations.
-    - Stored columns are computed during write operations and stored.
+    **동작 방식**
+    - 테이블 스키마에 표현식으로 정의됩니다.
+    - 가상 컬럼은 읽기 작업 중에 계산됩니다.
+    - 저장 컬럼은 쓰기 작업 중에 계산되고 저장됩니다.
 
-    **Capabilities**
-    - Used in SELECT, INSERT, UPDATE, and DELETE statements.
-    - Can be indexed, both virtual and stored.
-    - Can specify NOT NULL and other constraints.
+    **기능**
+    - SELECT, INSERT, UPDATE, DELETE 문에서 사용할 수 있습니다.
+    - 가상 및 저장 컬럼 모두 인덱싱이 가능합니다.
+    - NOT NULL 및 기타 제약 조건을 지정할 수 있습니다.
     
-    **Limitations**
-    - Cannot directly insert or update values in a generated column 
+    **제한 사항**
+    - 생성된 컬럼에 직접 값을 삽입하거나 업데이트할 수 없습니다.
 
-    For more info, please check [MySQL Alter Generated](https://dev.mysql.com/doc/refman/8.4/en/alter-table-generated-columns.html) docs and [MySQL create generated](https://dev.mysql.com/doc/refman/8.4/en/create-table-generated-columns.html) docs
+    자세한 내용은 [MySQL Alter Generated](https://dev.mysql.com/doc/refman/8.4/en/alter-table-generated-columns.html) 문서와 [MySQL create generated](https://dev.mysql.com/doc/refman/8.4/en/create-table-generated-columns.html) 문서를 참조하세요.
 
-    #### Drizzle side
+    #### Drizzle 측면
 
-    #### Features 
+    #### 기능
 
     **`string`**
     <CodeTab>
@@ -181,8 +179,7 @@ Generated columns can be especially useful for:
     ```
     </CodeTab>
 
-    **`sql`** tag - if you want drizzle to escape some values for you
-
+    **`sql` 태그** - Drizzle가 일부 값을 이스케이프하도록 할 때
     <CodeTab>
     ```ts
     export const test = mysqlTable("test", {
@@ -196,8 +193,7 @@ Generated columns can be especially useful for:
     ```
     </CodeTab>
 
-    **`callback`** - if you need to reference columns from a table
-
+    **`콜백`** - 테이블의 컬럼을 참조해야 할 때
     <CodeTab>
     ```ts
     export const test = mysqlTable("test", {
@@ -214,10 +210,10 @@ Generated columns can be especially useful for:
     );
     ```
     </CodeTab>
-    #### Limitations
-    Drizzle Kit will also have limitations for `push` command:
-    1. You can't change the generated constraint expression and type using `push`. Drizzle-kit will ignore this change. To make it work, you would need to `drop the column`, `push`, and then `add a column with a new expression`. This was done due to the complex mapping from the database side, where the schema expression will be modified on the database side and, on introspection, we will get a different string. We can't be sure if you changed this expression or if it was changed and formatted by the database. As long as these are generated columns and `push` is mostly used for prototyping on a local database, it should be fast to `drop` and `create` generated columns. Since these columns are `generated`, all the data will be restored
-    2. `generate` should have no limitations
+    #### 제한 사항
+    Drizzle Kit의 `push` 명령에도 다음과 같은 제한 사항이 있습니다:
+    1. `push`를 사용하여 생성된 제약 조건 표현식과 타입을 변경할 수 없습니다. Drizzle-kit은 이 변경을 무시합니다. 이를 작동시키려면 `컬럼을 삭제`, `push`, 그리고 `새로운 표현식으로 컬럼을 추가`해야 합니다. 이는 데이터베이스 측면에서 복잡한 매핑 때문에 이루어졌습니다. 데이터베이스 측에서 스키마 표현식이 수정되고, 인트로스펙션 시 다른 문자열을 얻을 수 있기 때문입니다. 이 표현식이 변경되었는지 또는 데이터베이스에 의해 변경되고 포맷되었는지 확신할 수 없습니다. 생성된 컬럼이므로 `push`는 주로 로컬 데이터베이스에서 프로토타이핑에 사용되며, 생성된 컬럼을 `삭제`하고 `생성`하는 것이 빠를 것입니다. 이 컬럼은 `생성된` 컬럼이므로 모든 데이터가 복원됩니다.
+    2. `generate`에는 제한 사항이 없어야 합니다.
 
   <CodeTabs items={["schema.ts"]}>
 	<CodeTab>
@@ -249,27 +245,27 @@ Generated columns can be especially useful for:
   </CodeTabs>
   </Tab> 
   <Tab>
-    #### Database side
-    **Types**: `STORED`, `VIRTUAL`
+    #### 데이터베이스 측면
+    **유형**: `STORED`, `VIRTUAL`
 
-    **How It Works**
-    - Defined with an expression in the table schema.
-    - Virtual columns are computed during read operations.
-    - Stored columns are computed during write operations and stored.
+    **동작 방식**
+    - 테이블 스키마에 표현식으로 정의됩니다.
+    - 가상 컬럼은 읽기 작업 중에 계산됩니다.
+    - 저장 컬럼은 쓰기 작업 중에 계산되고 저장됩니다.
 
-    **Capabilities**
-    - Used in SELECT, INSERT, UPDATE, and DELETE statements.
-    - Can be indexed, both virtual and stored.
-    - Can specify NOT NULL and other constraints.
+    **기능**
+    - SELECT, INSERT, UPDATE, DELETE 문에서 사용할 수 있습니다.
+    - 가상 및 저장 컬럼 모두 인덱싱이 가능합니다.
+    - NOT NULL 및 기타 제약 조건을 지정할 수 있습니다.
     
-    **Limitations**
-    - Cannot directly insert or update values in a generated column 
+    **제한 사항**
+    - 생성된 컬럼에 직접 값을 삽입하거나 업데이트할 수 없습니다.
 
-    For more info, please check [SQLite](https://www.sqlite.org/gencol.html) docs 
+    자세한 내용은 [SQLite](https://www.sqlite.org/gencol.html) 문서를 참조하세요.
 
-    #### Drizzle side
+    #### Drizzle 측면
 
-    #### Features
+    #### 기능
     **`string`**
     ```ts
     export const test = sqliteTable("test", {
@@ -282,8 +278,7 @@ Generated columns can be especially useful for:
     );
     ```
 
-    **`sql`** tag - if you want drizzle to escape some values for you
-
+    **`sql` 태그** - Drizzle가 일부 값을 이스케이프하도록 할 때
     ```ts
     export const test = sqliteTable("test", {
         generatedName: text("gen_name").generatedAlwaysAs(sql`hello "world"!`),
@@ -295,8 +290,7 @@ Generated columns can be especially useful for:
     );
     ```
 
-    **`callback`** - if you need to reference columns from a table
-
+    **`콜백`** - 테이블의 컬럼을 참조해야 할 때
     ```ts
     export const test = sqliteTable("test", {
         name: text("first_name"),
@@ -312,12 +306,12 @@ Generated columns can be especially useful for:
     );
     ```
 
-    #### Limitations
-    Drizzle Kit will also have limitations for `push` and `generate` command:
-    1. You can't change the generated constraint expression with the stored type in an existing table. You would need to delete this table and create it again. This is due to SQLite limitations for such actions. We will handle this case in future releases (it will involve the creation of a new table with data migration).
-    2. You can't add a `stored` generated expression to an existing column for the same reason as above. However, you can add a `virtual` expression to an existing column.
-    3. You can't change a `stored` generated expression in an existing column for the same reason as above. However, you can change a `virtual` expression.
-    4. You can't change the generated constraint type from `virtual` to `stored` for the same reason as above. However, you can change from `stored` to `virtual`.
+    #### 제한 사항
+    Drizzle Kit의 `push` 및 `generate` 명령에도 다음과 같은 제한 사항이 있습니다:
+    1. 기존 테이블에서 저장 타입의 생성된 제약 조건 표현식을 변경할 수 없습니다. 이 테이블을 삭제하고 다시 생성해야 합니다. 이는 SQLite의 제한 사항 때문입니다. 향후 릴리스에서 이 경우를 처리할 예정입니다(새 테이블 생성 및 데이터 마이그레이션 포함).
+    2. 기존 컬럼에 `저장` 생성된 표현식을 추가할 수 없습니다. 그러나 `가상` 표현식은 추가할 수 있습니다.
+    3. 기존 컬럼에서 `저장` 생성된 표현식을 변경할 수 없습니다. 그러나 `가상` 표현식은 변경할 수 있습니다.
+    4. 생성된 제약 조건 타입을 `가상`에서 `저장`으로 변경할 수 없습니다. 그러나 `저장`에서 `가상`으로는 변경할 수 있습니다.
 
    <CodeTabs items={["index.ts", "schema.ts"]}>
 	<CodeTab>
@@ -347,6 +341,8 @@ Generated columns can be especially useful for:
   </CodeTabs>
   </Tab> 
   <Tab>
-  Work in Progress
+  작업 중
   </Tab>
 </Tabs>
+
+

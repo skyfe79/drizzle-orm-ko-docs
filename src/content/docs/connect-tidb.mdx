@@ -10,45 +10,54 @@ import CodeTabs from "@mdx/CodeTabs.astro";
 # Drizzle \<\> TiDB Serverless
 
 <Prerequisites>
-- Database [connection basics](/docs/connect-overview) with Drizzle
-- TiDB database - [website](https://docs.pingcap.com/)
-- TiDB HTTP Driver - [website](https://docs.pingcap.com/tidbcloud/serverless-driver)
-- Drizzle MySQL drivers - [docs](/docs/get-started-mysql)
+- Drizzle를 사용한 데이터베이스 [연결 기본 사항](/docs/connect-overview)
+- TiDB 데이터베이스 - [웹사이트](https://docs.pingcap.com/)
+- TiDB HTTP 드라이버 - [웹사이트](https://docs.pingcap.com/tidbcloud/serverless-driver)
+- Drizzle MySQL 드라이버 - [문서](/docs/get-started-mysql)
 </Prerequisites>
 
-According to the **[official website](https://www.pingcap.com/tidb-serverless/)**, 
-TiDB Serverless is a fully-managed, autonomous DBaaS with split-second cluster provisioning and consumption-based pricing.
+**[공식 웹사이트](https://www.pingcap.com/tidb-serverless/)**에 따르면, TiDB Serverless는 완전 관리형이며 자율적인 DBaaS로, 초단위 클러스터 프로비저닝과 사용량 기반 가격 정책을 제공합니다.
 
 <Callout type="info" emoji="ℹ️">
-TiDB Serverless is compatible with MySQL, so you can use [MySQL connection guide](/docs/get-started-mysql) to connect to it.
+TiDB Serverless는 MySQL과 호환되므로, [MySQL 연결 가이드](/docs/get-started-mysql)를 사용하여 연결할 수 있습니다.
 </Callout>
 
-TiDB Serverless provides an [HTTP driver](https://docs.pingcap.com/tidbcloud/serverless-driver) for edge environments. It is natively supported by Drizzle ORM via `drizzle-orm/tidb-serverless` package.
+TiDB Serverless는 에지 환경을 위한 [HTTP 드라이버](https://docs.pingcap.com/tidbcloud/serverless-driver)를 제공합니다. 이 드라이버는 `drizzle-orm/tidb-serverless` 패키지를 통해 Drizzle ORM에서 기본적으로 지원됩니다.
 
-#### Step 1 - Install packages
+
+#### 1단계 - 패키지 설치
+
 <Npm>
 drizzle-orm @tidbcloud/serverless
 -D drizzle-kit
 </Npm>
 
-#### Step 2 - Initialize the driver and make a query
-```typescript copy filename="index.ts"
+
+#### 2단계 - 드라이버 초기화 및 쿼리 실행
+
+```typescript
 import { drizzle } from 'drizzle-orm/tidb-serverless';
 
+// 드라이버 초기화
 const db = drizzle({ connection: { url: process.env.TIDB_URL }});
 
+// 쿼리 실행
 const response = await db.select().from(...)
 ```
 
-If you need to provide your existing driver:
-```typescript copy"
+기존 드라이버를 사용해야 한다면 다음과 같이 설정합니다:
+```typescript
 import { connect } from '@tidbcloud/serverless';
 import { drizzle } from 'drizzle-orm/tidb-serverless';
 
+// 기존 드라이버 연결
 const client = connect({ url: process.env.TIDB_URL });
 const db = drizzle({ client });
 ```
 
-#### What's next?
+
+#### 다음 단계는 무엇인가요?
 
 <WhatsNextPostgres/>
+
+

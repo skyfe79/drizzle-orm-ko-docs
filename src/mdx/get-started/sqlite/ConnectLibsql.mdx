@@ -1,6 +1,6 @@
 import CodeTabs from "@mdx/CodeTabs.astro";
 
-Create a `index.ts` file in the `src` directory and initialize the connection:
+`src` 디렉토리에 `index.ts` 파일을 생성하고 데이터베이스 연결을 초기화해 보겠습니다.
 
 <CodeTabs items={["libsql", "libsql with config"]}>
 ```typescript copy
@@ -13,12 +13,12 @@ const db = drizzle(process.env.DB_FILE_NAME!);
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/libsql';
 
-// You can specify any property from the libsql connection options
+// libsql 연결 옵션에서 원하는 속성을 지정할 수 있습니다.
 const db = drizzle({ connection: { url: process.env.DB_FILE_NAME! }});
 ```
 </CodeTabs>
 
-If you need to provide your existing driver:
+기존 드라이버를 제공해야 한다면 다음과 같이 작성합니다:
 
 ```typescript copy
 import 'dotenv/config';
@@ -28,3 +28,5 @@ import { createClient } from '@libsql/client';
 const client = createClient({ url: process.env.DB_FILE_NAME! });
 const db = drizzle({ client });
 ```
+
+

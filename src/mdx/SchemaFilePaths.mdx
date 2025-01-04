@@ -1,7 +1,8 @@
+
 import CodeTabs from "@mdx/CodeTabs.astro";
 import Section from "@mdx/Section.astro";
 
-<CodeTabs items={["Example 1", "Example 2", "Example 3", "Example 4"]}>
+<CodeTabs items={["예제 1", "예제 2", "예제 3", "예제 4"]}>
 <Section>
 ```plaintext {7}
 📦 <project root>
@@ -43,7 +44,7 @@ import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
   schema: "./src/**/schema.ts",
-  //or
+  // 또는
   schema: ["./src/user/schema.ts", "./src/posts/schema.ts"]
 });
 ```
@@ -91,7 +92,7 @@ export default defineConfig({
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  schema: "./src/**/*.sql.ts", // Dax's favourite
+  schema: "./src/**/*.sql.ts", // Dax가 가장 좋아하는 방식
 });
 ```
 </Section>

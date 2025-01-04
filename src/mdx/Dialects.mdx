@@ -1,5 +1,11 @@
+```markdown
 ---
 dialects: ['postgresql', 'mysql', 'sqlite', 'turso', 'singlestore']
 ---
 
 {frontmatter.dialects.map(dialect => <><code>{dialect}</code>&#32;</>)}
+```
+
+위 코드는 `frontmatter.dialects` 배열에 있는 각 데이터베이스 방언(dialect)을 순회하며 `<code>` 태그로 감싸고, 각 항목 뒤에 공백을 추가하는 코드입니다. 이렇게 하면 각 방언 이름이 코드 형식으로 표시되고, 항목 사이에 공백이 생깁니다.
+
+

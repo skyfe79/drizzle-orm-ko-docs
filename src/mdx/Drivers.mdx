@@ -1,5 +1,11 @@
----
+```javascript
 drivers: ['aws-data-api', 'd1-http', 'pglight']
----
+```
 
+```javascript
 {frontmatter.drivers.map((driver) => <><code>{driver}</code>&#32;</>)}
+```
+
+위 코드는 `drivers` 배열에 있는 각 드라이버를 순회하며, 각 드라이버 이름을 `<code>` 태그로 감싸서 출력합니다. `&#32;`는 공백 문자를 나타내며, 각 드라이버 이름 사이에 공백을 추가합니다.
+
+

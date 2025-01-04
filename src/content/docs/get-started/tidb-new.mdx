@@ -14,52 +14,65 @@ import ApplyChanges from '@mdx/get-started/ApplyChanges.mdx';
 import RunFile from '@mdx/get-started/RunFile.mdx';
 import SetupConfig from '@mdx/get-started/SetupConfig.mdx';
 
+
 <Breadcrumbs/>
 
-# Get Started with Drizzle and TiDB
+# Drizzle와 TiDB 시작하기
 
 <Prerequisites>  
-  - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
-  - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
-  - **TiDB** - The Distributed SQL Database by PingCAP - [read here](https://www.pingcap.com/)
-  - **serverless-js** - package for serverless and edge compute platforms that require HTTP external connections - [read here](https://github.com/tidbcloud/serverless-js)
+  - **dotenv** - 환경 변수를 관리하기 위한 패키지 - [여기서 읽기](https://www.npmjs.com/package/dotenv)
+  - **tsx** - TypeScript 파일을 실행하기 위한 패키지 - [여기서 읽기](https://tsx.is/)
+  - **TiDB** - PingCAP의 분산 SQL 데이터베이스 - [여기서 읽기](https://www.pingcap.com/)
+  - **serverless-js** - HTTP 외부 연결이 필요한 서버리스 및 엣지 컴퓨팅 플랫폼을 위한 패키지 - [여기서 읽기](https://github.com/tidbcloud/serverless-js)
 </Prerequisites>
 
-<Callout title='important' type='warning'>
-For this tutorial, we will use the `@tidbcloud/serverless` driver to make **HTTP** calls. If you need to
-connect to TiDB through TCP, you can refer to our [MySQL Get Started](/docs/get-started/mysql-new) page
+<Callout title='중요' type='warning'>
+이 튜토리얼에서는 **HTTP** 호출을 위해 `@tidbcloud/serverless` 드라이버를 사용합니다. TCP를 통해 TiDB에 연결해야 한다면 [MySQL 시작하기](/docs/get-started/mysql-new) 페이지를 참고하세요.
 </Callout>
 
 <FileStructure/>
 
-#### Step 1 - Install **@tidbcloud/serverless** package
+
+#### 1단계 - **@tidbcloud/serverless** 패키지 설치
 
 <InstallPackages lib='@tidbcloud/serverless'/>
 
-#### Step 2 - Setup connection variables
+#### 2단계 - 연결 변수 설정하기
+
 
 <SetupEnv env_variable='DATABASE_URL' />
 
-#### Step 3 - Connect Drizzle ORM to the database
+
+#### 3단계 - Drizzle ORM을 데이터베이스에 연결하기
 
 <ConnectTiDB/>
 
-#### Step 4 - Create a table
+#### 4단계 - 테이블 생성
 
-<CreateTable/>
+<CreateTable />
 
-#### Step 5 - Setup Drizzle config file
+
+#### 5단계 - Drizzle 설정 파일 구성
+
 
 <SetupConfig dialect='mysql' env_variable='DATABASE_URL'/>
 
-#### Step 6 - Applying changes to the database
+
+
+#### 6단계 - 데이터베이스에 변경 사항 적용하기
+
 
 <ApplyChanges />
 
-#### Step 7 - Seed and Query the database
+
+
+#### 7단계 - 데이터베이스 시드 및 쿼리
+
 
 <QueryDatabase dialect='tidb-serverless' env_variable='DATABASE_URL'/>
 
-#### Step 8 - Run index.ts file
+
+#### 8단계 - index.ts 파일 실행하기
 
 <RunFile/>
+

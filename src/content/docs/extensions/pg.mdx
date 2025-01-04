@@ -1,5 +1,5 @@
 ---
-title: PostgreSQL extensions
+title: PostgreSQL 확장 기능
 ---
 
 import Callout from '@mdx/Callout.astro';
@@ -8,26 +8,26 @@ import Section from '@mdx/Section.astro';
 ### `pg_vector`
 
 <Callout>
-There is no specific code to create an extension inside the Drizzle schema. We assume that if you are using vector types, 
-indexes, and queries, you have a PostgreSQL database with the pg_vector extension installed.
+Drizzle 스키마 내에서 확장 기능을 생성하기 위한 특별한 코드는 없습니다. 벡터 타입, 인덱스, 쿼리를 사용하고 있다면, 
+`pg_vector` 확장 기능이 설치된 PostgreSQL 데이터베이스를 사용하고 있다고 가정합니다.
 </Callout>
 
-[`pg_vector`](https://github.com/pgvector/pgvector) is open-source vector similarity search for Postgres
+[`pg_vector`](https://github.com/pgvector/pgvector)는 PostgreSQL을 위한 오픈소스 벡터 유사성 검색 도구입니다.
 
-Store your vectors with the rest of your data. Supports:
+여러분의 데이터와 함께 벡터를 저장할 수 있습니다. 지원 기능은 다음과 같습니다:
 
-- exact and approximate nearest neighbor search
-- single-precision, half-precision, binary, and sparse vectors
-- L2 distance, inner product, cosine distance, L1 distance, Hamming distance, and Jaccard distance
+- 정확한 및 근사 최근접 이웃 검색
+- 단정밀도, 반정밀도, 이진 및 희소 벡터
+- L2 거리, 내적, 코사인 거리, L1 거리, 해밍 거리, 자카드 거리
 
-#### Column Types
+
+#### 컬럼 타입
 
 **`vector`**
 
-Store your vectors with the rest of your data
+벡터 데이터를 다른 데이터와 함께 저장할 수 있습니다.
 
-For more info please refer to the official pg_vector docs **[docs.](https://github.com/pgvector/pgvector)**
-
+더 자세한 정보는 공식 pg_vector 문서를 참고하세요. **[문서 보기](https://github.com/pgvector/pgvector)**
 
 <Section>
 ```ts
@@ -43,29 +43,47 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
-#### Indexes
 
-You can now specify indexes for `pg_vector` and utilize `pg_vector` functions for querying, ordering, etc.
+#### 인덱스
 
-Let's take a few examples of `pg_vector` indexes from the `pg_vector` docs and translate them to Drizzle
+Drizzle에서 제공하는 인덱스 API를 사용하면 PostGIS를 위한 모든 인덱스를 작성할 수 있습니다.
 
-#### L2 distance, Inner product and Cosine distance
+**예제**
 
 ```ts
+// CREATE INDEX custom_idx ON table USING GIST (geom);
+
+const table = pgTable('table', {
+    geo: geometry({ type: 'point' }),
+}, (table) => ({
+    gist: index('custom_idx').using('gist', table.geo)
+}))
+```
+
+
+#### L2 거리, 내적, 코사인 거리
+
+```ts
+// L2 거리 인덱스 생성
 // CREATE INDEX ON items USING hnsw (embedding vector_l2_ops);
+// 내적 인덱스 생성
 // CREATE INDEX ON items USING hnsw (embedding vector_ip_ops);
+// 코사인 거리 인덱스 생성
 // CREATE INDEX ON items USING hnsw (embedding vector_cosine_ops);
 
 const table = pgTable('items', {
     embedding: vector({ dimensions: 3 })
 }, (table) => ({
-    l2: index('l2_index').using('hnsw', table.embedding.op('vector_l2_ops'))
-    ip: index('ip_index').using('hnsw', table.embedding.op('vector_ip_ops'))
+    l2: index('l2_index').using('hnsw', table.embedding.op('vector_l2_ops')),
+    ip: index('ip_index').using('hnsw', table.embedding.op('vector_ip_ops')),
     cosine: index('cosine_index').using('hnsw', table.embedding.op('vector_cosine_ops'))
 }))
 ```
 
-#### L1 distance, Hamming distance and Jaccard distance - added in pg_vector 0.7.0 version
+위 코드는 PostgreSQL에서 `items` 테이블에 대한 다양한 거리 측정 방식의 인덱스를 생성하는 예제입니다. 각 인덱스는 `hnsw` 알고리즘을 사용하며, `vector_l2_ops`, `vector_ip_ops`, `vector_cosine_ops` 연산자를 통해 각각 L2 거리, 내적, 코사인 거리를 계산합니다.
+
+
+#### L1 거리, 해밍 거리, 자카드 거리 - pg_vector 0.7.0 버전에서 추가됨
 
 ```ts
 // CREATE INDEX ON items USING hnsw (embedding vector_l1_ops);
@@ -75,92 +93,98 @@ const table = pgTable('items', {
 const table = pgTable('table', {
     embedding: vector({ dimensions: 3 })
 }, (table) => ({
-    l1: index('l1_index').using('hnsw', table.embedding.op('vector_l1_ops'))
-    hamming: index('hamming_index').using('hnsw', table.embedding.op('bit_hamming_ops'))
+    l1: index('l1_index').using('hnsw', table.embedding.op('vector_l1_ops')),
+    hamming: index('hamming_index').using('hnsw', table.embedding.op('bit_hamming_ops')),
     bit: index('bit_jaccard_index').using('hnsw', table.embedding.op('bit_jaccard_ops'))
 }))
 ```
 
-#### Helper Functions
+pg_vector 0.7.0 버전에서는 **L1 거리**, **해밍 거리**, **자카드 거리**와 같은 새로운 거리 측정 방법이 추가되었습니다. 이를 통해 벡터 데이터를 더욱 효율적으로 인덱싱하고 검색할 수 있습니다. 위의 코드 예제는 이러한 거리 측정 방법을 사용하여 인덱스를 생성하는 방법을 보여줍니다. 각각의 인덱스는 `hnsw` 알고리즘을 사용하며, `vector_l1_ops`, `bit_hamming_ops`, `bit_jaccard_ops` 연산자를 통해 거리를 계산합니다.
 
-For queries, you can use predefined functions for vectors or create custom ones using the SQL template operator.
 
-You can also use the following helpers:
+#### 헬퍼 함수
+
+쿼리를 작성할 때 벡터를 위한 미리 정의된 함수를 사용하거나 SQL 템플릿 연산자를 이용해 커스텀 함수를 만들 수 있습니다.
+
+다음과 같은 헬퍼 함수를 사용할 수도 있습니다:
 
 ```ts
 import { l2Distance, l1Distance, innerProduct, 
           cosineDistance, hammingDistance, jaccardDistance } from 'drizzle-orm'
 
-l2Distance(table.column, [3, 1, 2]) // table.column <-> '[3, 1, 2]'
-l1Distance(table.column, [3, 1, 2]) // table.column <+> '[3, 1, 2]'
+l2Distance(table.column, [3, 1, 2]) // table.column  '[3, 1, 2]'
+l1Distance(table.column, [3, 1, 2]) // table.column  '[3, 1, 2]'
 
-innerProduct(table.column, [3, 1, 2]) // table.column <#> '[3, 1, 2]'
-cosineDistance(table.column, [3, 1, 2]) // table.column <=> '[3, 1, 2]'
+innerProduct(table.column, [3, 1, 2]) // table.column  '[3, 1, 2]'
+cosineDistance(table.column, [3, 1, 2]) // table.column  '[3, 1, 2]'
 
-hammingDistance(table.column, '101') // table.column <~> '101'
-jaccardDistance(table.column, '101') // table.column <%> '101'
+hammingDistance(table.column, '101') // table.column  '101'
+jaccardDistance(table.column, '101') // table.column  '101'
 ```
 
-If `pg_vector` has some other functions to use, you can replicate implementation from existing one we have. Here is how it can be done
+만약 `pg_vector`에서 사용할 수 있는 다른 함수가 있다면, 기존에 있는 함수를 참고하여 구현을 복제할 수 있습니다. 아래는 그 방법입니다:
 
 ```ts
 export function l2Distance(
   column: SQLWrapper | AnyColumn,
-  value: number[] | string[] | TypedQueryBuilder<any> | string,
+  value: number[] | string[] | TypedQueryBuilder | string,
 ): SQL {
-  if (is(value, TypedQueryBuilder<any>) || typeof value === 'string') {
-    return sql`${column} <-> ${value}`;
+  if (is(value, TypedQueryBuilder) || typeof value === 'string') {
+    return sql`${column}  ${value}`;
   }
-  return sql`${column} <-> ${JSON.stringify(value)}`;
+  return sql`${column}  ${JSON.stringify(value)}`;
 }
 ```
 
-Name it as you wish and change the operator. This example allows for a numbers array, strings array, string, or even a select query. Feel free to create any other type you want or even contribute and submit a PR
+원하는 이름으로 함수를 만들고 연산자를 변경하면 됩니다. 이 예제는 숫자 배열, 문자열 배열, 문자열, 심지어 쿼리까지 허용합니다. 원하는 타입을 자유롭게 만들거나, 기여하고 PR을 제출해도 좋습니다.
 
-#### Examples
 
-Let's take a few examples of `pg_vector` queries from the `pg_vector` docs and translate them to Drizzle
+#### 예제
+
+`pg_vector` 문서에서 몇 가지 쿼리 예제를 가져와 Drizzle로 변환해 보겠습니다.
 
 ```ts
 import { l2Distance } from 'drizzle-orm';
 
-// SELECT * FROM items ORDER BY embedding <-> '[3,1,2]' LIMIT 5;
+// SELECT * FROM items ORDER BY embedding  '[3,1,2]' LIMIT 5;
 db.select().from(items).orderBy(l2Distance(items.embedding, [3,1,2]))
 
-// SELECT embedding <-> '[3,1,2]' AS distance FROM items;
+// SELECT embedding  '[3,1,2]' AS distance FROM items;
 db.select({ distance: l2Distance(items.embedding, [3,1,2]) })
 
-// SELECT * FROM items ORDER BY embedding <-> (SELECT embedding FROM items WHERE id = 1) LIMIT 5;
+// SELECT * FROM items ORDER BY embedding  (SELECT embedding FROM items WHERE id = 1) LIMIT 5;
 const subquery = db.select({ embedding: items.embedding }).from(items).where(eq(items.id, 1));
 db.select().from(items).orderBy(l2Distance(items.embedding, subquery)).limit(5)
 
-// SELECT (embedding <#> '[3,1,2]') * -1 AS inner_product FROM items;
+// SELECT (embedding  '[3,1,2]') * -1 AS inner_product FROM items;
 db.select({ innerProduct: sql`(${maxInnerProduct(items.embedding, [3,1,2])}) * -1` }).from(items)
 
-// and more!
+// 그리고 더 많은 예제들이 있습니다!
 ```
+
 
 ### `postgis`
 
 <Callout>
-There is no specific code to create an extension inside the Drizzle schema. We assume that if you are using postgis types, indexes, and queries, you have a PostgreSQL database with the `postgis` extension installed.
+Drizzle 스키마 내부에서 확장 기능을 생성하는 특별한 코드는 없습니다. PostGIS 타입, 인덱스, 쿼리를 사용한다면, `postgis` 확장 기능이 설치된 PostgreSQL 데이터베이스를 사용하고 있다고 가정합니다.
 </Callout>
 
-As [PostGIS](https://postgis.net/) website mentions:
+[PostGIS](https://postgis.net/) 웹사이트에서 언급한 대로:
 
-> PostGIS extends the capabilities of the PostgreSQL relational database by adding support for storing, indexing, and querying geospatial data.
+> PostGIS는 PostgreSQL 관계형 데이터베이스의 기능을 확장하여 지리 공간 데이터를 저장, 인덱싱, 쿼리하는 기능을 추가합니다.
 
 <Callout type="info">
-If you are using the `introspect` or `push` commands with the PostGIS extension and don't want PostGIS tables to be included, you can use [`extensionsFilters`](/docs/drizzle-config-file#extensionsfilters) to ignore all the PostGIS tables
+PostGIS 확장 기능과 함께 `introspect` 또는 `push` 커맨드를 사용하면서 PostGIS 테이블을 포함하고 싶지 않다면, [`extensionsFilters`](/docs/drizzle-config-file#extensionsfilters)를 사용하여 모든 PostGIS 테이블을 무시할 수 있습니다.
 </Callout>
 
-#### Column Types
+
+#### 컬럼 타입: Geometry
 
 **`geometry`**
 
-Store your geometry data with the rest of your data
+여러분의 데이터와 함께 지리 데이터를 저장할 수 있습니다.
 
-For more info please refer to the official PostGIS docs **[docs.](https://postgis.net/workshops/postgis-intro/geometries.html)**
+더 자세한 정보는 공식 PostGIS 문서를 참고하세요: [PostGIS 공식 문서](https://postgis.net/workshops/postgis-intro/geometries.html)
 
 ```ts
 const items = pgTable('items', {
@@ -172,27 +196,13 @@ const items = pgTable('items', {
 
 **mode**
 
-Type `geometry` has 2 modes for mappings from the database: `tuple` and `xy`.
+`geometry` 타입은 데이터베이스에서 매핑할 때 두 가지 모드를 제공합니다: `tuple`과 `xy`.
 
-- `tuple` will be accepted for insert and mapped on select to a tuple. So, the database geometry will be typed as [1,2] with drizzle.
-- `xy` will be accepted for insert and mapped on select to an object with x, y coordinates. So, the database geometry will be typed as `{ x: 1, y: 2 }` with drizzle
+- `tuple`은 삽입 시에 사용되며, 선택 시에는 튜플로 매핑됩니다. 따라서 데이터베이스의 지리 데이터는 Drizzle을 통해 `[1, 2]`와 같은 형태로 타입이 지정됩니다.
+- `xy`는 삽입 시에 사용되며, 선택 시에는 `x`와 `y` 좌표를 가진 객체로 매핑됩니다. 따라서 데이터베이스의 지리 데이터는 Drizzle을 통해 `{ x: 1, y: 2 }`와 같은 형태로 타입이 지정됩니다.
 
 **type**
 
-The current release has a predefined type: `point`, which is the `geometry(Point)` type in the PostgreSQL PostGIS extension. You can specify any string there if you want to use some other type
+현재 릴리스에서는 `point`라는 미리 정의된 타입을 제공합니다. 이는 PostgreSQL PostGIS 확장에서의 `geometry(Point)` 타입에 해당합니다. 다른 타입을 사용하고 싶다면 여기에 원하는 문자열을 지정할 수 있습니다.
 
-#### Indexes
 
-With the available Drizzle indexes API, you should be able to write any indexes for PostGIS
-
-**Examples**
-
-```ts
-// CREATE INDEX custom_idx ON table USING GIST (geom);
-
-const table = pgTable('table', {
-  	geo: geometry({ type: 'point' }),
-}, (table) => ({
-    gist: index('custom_idx').using('gist', table.geo)
-}))
-```

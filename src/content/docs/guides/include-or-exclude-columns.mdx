@@ -1,5 +1,5 @@
 ---
-title: Include or Exclude Columns in Query
+title: 쿼리에서 컬럼 포함 또는 제외하기
 slug: include-or-exclude-columns
 ---
 
@@ -12,15 +12,15 @@ import CodeTab from '@mdx/CodeTab.astro';
 <IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
 
 <Prerequisites>
-- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql) and [SQLite](/docs/get-started-sqlite)
-- [Select statement](/docs/select)
-- [Get typed table columns](/docs/goodies#get-typed-table-columns)
-- [Joins](/docs/joins)
-- [Relational queries](/docs/rqb)
-- [Partial select with relational queries](/docs/rqb#partial-fields-select)
+- [PostgreSQL 시작하기](/docs/get-started-postgresql), [MySQL 시작하기](/docs/get-started-mysql), [SQLite 시작하기](/docs/get-started-sqlite)
+- [SELECT 문](/docs/select)
+- [타입이 지정된 테이블 컬럼 가져오기](/docs/goodies#get-typed-table-columns)
+- [조인](/docs/joins)
+- [관계형 쿼리](/docs/rqb)
+- [관계형 쿼리로 부분 선택하기](/docs/rqb#partial-fields-select)
 </Prerequisites>
 
-Drizzle has flexible API for including or excluding columns in queries. To include all columns you can use `.select()` method like this:
+Drizzle은 쿼리에서 컬럼을 포함하거나 제외할 수 있는 유연한 API를 제공합니다. 모든 컬럼을 포함하려면 다음과 같이 `.select()` 메서드를 사용할 수 있습니다.
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
 	<CodeTab>
@@ -33,7 +33,7 @@ Drizzle has flexible API for including or excluding columns in queries. To inclu
     ```
 
     ```ts
-    // result type
+    // 결과 타입
     type Result = {
       id: number;
       title: string;
@@ -55,7 +55,7 @@ Drizzle has flexible API for including or excluding columns in queries. To inclu
 	```
 </CodeTabs>
 
-To include specific columns you can use `.select()` method like this:
+특정 컬럼만 포함하려면 다음과 같이 `.select()` 메서드를 사용합니다.
 
 <Section>
   ```ts copy {1}
@@ -63,14 +63,14 @@ To include specific columns you can use `.select()` method like this:
   ```
 
   ```ts
-  // result type
+  // 결과 타입
   type Result = {
     title: string;
   }[];
   ```
 </Section>
 
-To include all columns with extra columns you can use `getTableColumns()` utility function like this:
+모든 컬럼과 추가 컬럼을 포함하려면 `getTableColumns()` 유틸리티 함수를 사용합니다.
 
 <Section>
   ```ts copy {5,6}
@@ -79,13 +79,13 @@ To include all columns with extra columns you can use `getTableColumns()` utilit
   await db
     .select({
       ...getTableColumns(posts),
-      titleLength: sql<number>`length(${posts.title})`,
+      titleLength: sql`length(${posts.title})`,
     })
     .from(posts);
   ```
 
   ```ts
-  // result type
+  // 결과 타입
   type Result = {
     id: number;
     title: string;
@@ -96,19 +96,19 @@ To include all columns with extra columns you can use `getTableColumns()` utilit
   ```
 </Section>
 
-To exclude columns you can use `getTableColumns()` utility function like this:
+컬럼을 제외하려면 `getTableColumns()` 유틸리티 함수를 사용합니다.
 
 <Section>
   ```ts copy {3,5}
   import { getTableColumns } from 'drizzle-orm';
 
-  const { content, ...rest } = getTableColumns(posts); // exclude "content" column
+  const { content, ...rest } = getTableColumns(posts); // "content" 컬럼 제외
 
-  await db.select({ ...rest }).from(posts); // select all other columns
+  await db.select({ ...rest }).from(posts); // 나머지 컬럼 선택
   ```
 
   ```ts
-  // result type
+  // 결과 타입
   type Result = {
     id: number;
     title: string;
@@ -117,7 +117,7 @@ To exclude columns you can use `getTableColumns()` utility function like this:
   ```
 </Section>
 
-This is how you can include or exclude columns with joins:
+조인과 함께 컬럼을 포함하거나 제외하는 방법은 다음과 같습니다.
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
   <CodeTab>
@@ -125,14 +125,14 @@ This is how you can include or exclude columns with joins:
     import { eq, getTableColumns } from 'drizzle-orm';
     import { comments, posts, users } from './db/schema';
 
-    // exclude "userId" and "postId" columns from "comments"
+    // "comments"에서 "userId"와 "postId" 컬럼 제외
     const { userId, postId, ...rest } = getTableColumns(comments);
 
     await db
       .select({
-        postId: posts.id, // include "id" column from "posts"
-        comment: { ...rest }, // include all other columns
-        user: users, // equivalent to getTableColumns(users)
+        postId: posts.id, // "posts"에서 "id" 컬럼 포함
+        comment: { ...rest }, // 나머지 컬럼 포함
+        user: users, // getTableColumns(users)와 동일
       })
       .from(posts)
       .leftJoin(comments, eq(posts.id, comments.postId))
@@ -140,7 +140,7 @@ This is how you can include or exclude columns with joins:
     ```
 
     ```ts
-    // result type
+    // 결과 타입
     type Result = {
       postId: number;
       comment: {
@@ -184,7 +184,7 @@ This is how you can include or exclude columns with joins:
   ```
 </CodeTabs>
 
-Drizzle has useful relational queries API, that lets you easily include or exclude columns in queries. This is how you can include all columns:
+Drizzle은 관계형 쿼리 API를 제공하여 쿼리에서 컬럼을 쉽게 포함하거나 제외할 수 있습니다. 모든 컬럼을 포함하는 방법은 다음과 같습니다.
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
   <CodeTab>
@@ -197,7 +197,7 @@ Drizzle has useful relational queries API, that lets you easily include or exclu
     ```
 
     ```ts
-    // result type
+    // 결과 타입
     type Result = {
       id: number;
       title: string;
@@ -219,7 +219,7 @@ Drizzle has useful relational queries API, that lets you easily include or exclu
 	```
 </CodeTabs>
 
-This is how you can include specific columns using relational queries:
+관계형 쿼리를 사용하여 특정 컬럼만 포함하는 방법은 다음과 같습니다.
 
 <Section>
   ```ts copy {2,3,4}
@@ -231,14 +231,14 @@ This is how you can include specific columns using relational queries:
   ```
 
   ```ts
-  // result type
+  // 결과 타입
   type Result = {
     title: string;
   }[]
   ```
 </Section>
 
-This is how you can include all columns with extra columns using relational queries:
+관계형 쿼리를 사용하여 모든 컬럼과 추가 컬럼을 포함하는 방법은 다음과 같습니다.
 
 <Section>
   ```ts copy {4,5,6}
@@ -246,13 +246,13 @@ This is how you can include all columns with extra columns using relational quer
 
   await db.query.posts.findMany({
     extras: {
-      titleLength: sql<number>`length(${posts.title})`.as('title_length'),
+      titleLength: sql`length(${posts.title})`.as('title_length'),
     },
   });
   ```
 
   ```ts
-  // result type
+  // 결과 타입
   type Result = {
     id: number;
     title: string;
@@ -263,7 +263,7 @@ This is how you can include all columns with extra columns using relational quer
   ```
 </Section>
 
-This is how you can exclude columns using relational queries:
+관계형 쿼리를 사용하여 컬럼을 제외하는 방법은 다음과 같습니다.
 
 <Section>
   ```ts copy {2,3,4}
@@ -275,7 +275,7 @@ This is how you can exclude columns using relational queries:
   ```
 
   ```ts
-  // result type
+  // 결과 타입
   type Result = {
     id: number;
     title: string;
@@ -284,7 +284,7 @@ This is how you can exclude columns using relational queries:
   ```
 </Section>
 
-This is how you can include or exclude columns with relations using relational queries:
+관계형 쿼리를 사용하여 관계와 함께 컬럼을 포함하거나 제외하는 방법은 다음과 같습니다.
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
   <CodeTab>
@@ -295,22 +295,22 @@ This is how you can include or exclude columns with relations using relational q
 
   await db.query.posts.findMany({
     columns: {
-      id: true, // include "id" column
+      id: true, // "id" 컬럼 포함
     },
     with: {
       comments: {
         columns: {
-          userId: false, // exclude "userId" column
-          postId: false, // exclude "postId" column
+          userId: false, // "userId" 컬럼 제외
+          postId: false, // "postId" 컬럼 제외
         },
       },
-      user: true, // include all columns from "users" table
+      user: true, // "users" 테이블의 모든 컬럼 포함
     },
   });
   ```
 
   ```ts
-  // result type
+  // 결과 타입
   type Result = {
     id: number;
     user: {
@@ -370,7 +370,7 @@ This is how you can include or exclude columns with relations using relational q
   ```
 </CodeTabs>
 
-This is how you can create custom solution for conditional select:
+조건부 선택을 위한 커스텀 솔루션을 만드는 방법은 다음과 같습니다.
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
   <CodeTab>
@@ -391,7 +391,7 @@ This is how you can create custom solution for conditional select:
     ```
 
     ```ts
-    // result type
+    // 결과 타입
     type Result = {
       id: number;
       title?: string | undefined;
@@ -410,3 +410,5 @@ This is how you can create custom solution for conditional select:
   });
 	```
 </CodeTabs>
+
+

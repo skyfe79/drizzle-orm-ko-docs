@@ -1,5 +1,6 @@
 ---
-title: Seeding using 'with' option
+title: >- 
+    'with' 옵션을 사용한 시딩
 slug: seeding-using-with-option
 ---
 
@@ -13,15 +14,15 @@ import Section from "@mdx/Section.astro";
 <IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
 
 <Prerequisites>
-- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql) or [SQLite](/docs/get-started-sqlite)
-- Get familiar with [One-to-many Relation](/docs/relations#one-to-many)
-- Get familiar with [Drizzle Seed](/docs/seed-overview)
+- [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql), [SQLite](/docs/get-started-sqlite) 시작하기
+- [일대다 관계](/docs/relations#one-to-many)에 익숙해지기
+- [Drizzle 시드](/docs/seed-overview) 이해하기
 </Prerequisites>
 
-<Callout title='Warning'>
-Using `with` implies tables to have a one-to-many relationship.
+<Callout title='경고'>
+`with`를 사용하려면 테이블 간에 일대다 관계가 있어야 합니다.
 
-Therefore, if `one` user has `many` posts, you can use `with` as follows:
+예를 들어, 한 명의 사용자가 여러 개의 게시글을 가질 경우 다음과 같이 `with`를 사용할 수 있습니다:
 ```ts
 users: {
     count: 2,
@@ -32,7 +33,6 @@ users: {
 ```
 </Callout>
 
-## Example 1
 <CodeTabs items={["index.ts", "schema.ts"]}>
 <CodeTab>
 ```ts
@@ -50,7 +50,6 @@ async function main() {
     }));
 }
 main();
-
 ```
 </CodeTab>
 
@@ -72,16 +71,16 @@ export const posts = pgTable('posts', {
 </CodeTab>
 </CodeTabs>
 
-Running the seeding script above will cause an error.
+위의 시딩 스크립트를 실행하면 다음과 같은 오류가 발생합니다.
 
 ```
-Error: "posts" table doesn't have a reference to "users" table or
-you didn't include your one-to-many relation in the seed function schema.
-You can't specify "posts" as parameter in users.with object.
+오류: "posts" 테이블이 "users" 테이블을 참조하지 않거나,
+시드 함수 스키마에 일대다 관계를 포함하지 않았습니다.
+users.with 객체에서 "posts"를 매개변수로 지정할 수 없습니다.
 ```
 
-You will have several options to resolve an error:
-- You can add reference to the `authorId` column in `posts` table in your schema
+이 오류를 해결하기 위한 몇 가지 방법이 있습니다:
+- `posts` 테이블의 `authorId` 컬럼에 `users` 테이블을 참조하도록 스키마를 수정할 수 있습니다.
 <CodeTabs items={["index.ts", "schema.ts"]}>
 <CodeTab>
 <Section>
@@ -101,7 +100,7 @@ async function main() {
 }
 main();
 
-// Running the seeding script above will fill you database with values shown below
+// 위의 시딩 스크립트를 실행하면 데이터베이스에 다음과 같은 값이 채워집니다.
 ```
 
 ```mdx
@@ -143,7 +142,7 @@ export const posts = pgTable('posts', {
 </CodeTab>
 </CodeTabs>
 
-- You can add one-to-many relation to your schema and include it in the seed function schema
+- 스키마에 일대다 관계를 추가하고 시드 함수 스키마에 포함시킬 수 있습니다.
 <CodeTabs items={["index.ts", "schema.ts"]}>
 <CodeTab>
 <Section>
@@ -163,7 +162,7 @@ async function main() {
 }
 main();
 
-// Running the seeding script above will fill you database with values shown below
+// 위의 시딩 스크립트를 실행하면 데이터베이스에 다음과 같은 값이 채워집니다.
 ```
 
 ```mdx
@@ -215,7 +214,8 @@ export const postsRelations = relations(posts, ({ one }) => ({
 </CodeTabs>
 
 
-## Example 2
+## 예제 2
+
 <CodeTabs items={["index.ts", "schema.ts"]}>
 <CodeTab>
 ```ts
@@ -233,7 +233,6 @@ async function main() {
     }));
 }
 main();
-
 ```
 </CodeTab>
 
@@ -242,42 +241,42 @@ main();
 import { serial, pgTable, integer, text } from "drizzle-orm/pg-core";
 
 export const users = pgTable('users', {
-	id: serial('id').primaryKey(),
-	name: text('name'),
+    id: serial('id').primaryKey(),
+    name: text('name'),
 });
 
 export const posts = pgTable('posts', {
-	id: serial('id').primaryKey(),
-	content: text('content'),
-	authorId: integer('author_id').notNull().references(() => users.id),
+    id: serial('id').primaryKey(),
+    content: text('content'),
+    authorId: integer('author_id').notNull().references(() => users.id),
 });
 ```
 </CodeTab>
 </CodeTabs>
 
-Running the seeding script above will cause an error.
+위의 시딩 스크립트를 실행하면 다음과 같은 오류가 발생합니다.
 
 ```
-Error: "posts" table doesn't have a reference to "users" table or
-you didn't include your one-to-many relation in the seed function schema.
-You can't specify "posts" as parameter in users.with object.
+Error: "posts" 테이블이 "users" 테이블을 참조하지 않거나,
+시드 함수 스키마에 일대다 관계를 포함하지 않았습니다.
+users.with 객체에서 "posts"를 매개변수로 지정할 수 없습니다.
 ```
 
-<Callout title='Why?'>
-You have a `posts` table referencing a `users` table in your schema, 
+<Callout title='왜?'>
+스키마에서 `posts` 테이블이 `users` 테이블을 참조하고 있습니다.
 ```ts copy{7}
 .
 .
 .
 export const posts = pgTable('posts', {
-	id: serial('id').primaryKey(),
-	content: text('content'),
-	authorId: integer('author_id').notNull().references(() => users.id),
+    id: serial('id').primaryKey(),
+    content: text('content'),
+    authorId: integer('author_id').notNull().references(() => users.id),
 });
 ```
-or in other words, you have one-to-many relation where `one` user can have `many` posts.
+다시 말해, `하나`의 사용자가 `여러` 개의 게시물을 가질 수 있는 일대다 관계가 있습니다.
 
-However, in your seeding script, you're attempting to generate 3 (`many`) users for `one` post.
+그러나 시딩 스크립트에서는 `하나`의 게시물에 대해 `여러` 명의 사용자(3명)를 생성하려고 시도하고 있습니다.
 ```ts
 posts: {
     count: 2,
@@ -288,7 +287,7 @@ posts: {
 ```
 </Callout>
 
-To resolve the error, you can modify your seeding script as follows:
+이 오류를 해결하려면 시딩 스크립트를 다음과 같이 수정할 수 있습니다:
 <Section>
 ```ts copy{6-9}
 import { users, posts, postsRelations } from './schema.ts';
@@ -306,7 +305,7 @@ async function main() {
 }
 main();
 
-// Running the seeding script above will fill you database with values shown below
+// 위의 시딩 스크립트를 실행하면 데이터베이스에 아래와 같은 값이 채워집니다.
 ```
 
 ```mdx
@@ -330,7 +329,8 @@ main();
 ```
 </Section>
 
-## Example 3
+
+## 예제 3
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
 <CodeTab>
@@ -367,15 +367,15 @@ export const users = pgTable('users', {
 </CodeTab>
 </CodeTabs>
 
-Running the seeding script above will cause an error.
+위의 시딩 스크립트를 실행하면 오류가 발생합니다.
 
 ```
-Error: "users" table has self reference.
-You can't specify "users" as parameter in users.with object.
+Error: "users" 테이블이 자기 자신을 참조하고 있습니다.
+users.with 객체에서 "users"를 매개변수로 지정할 수 없습니다.
 ```
 
-<Callout title='Why?'>
-You have a `users` table referencing a `users` table in your schema, 
+<Callout title='왜 그럴까요?'>
+스키마에서 `users` 테이블이 `users` 테이블을 참조하고 있습니다.
 ```ts copy{7}
 .
 .
@@ -386,9 +386,9 @@ export const users = pgTable('users', {
     reportsTo: integer('reports_to').references((): AnyPgColumn => users.id),
 });
 ```
-or in other words, you have one-to-one relation where `one` user can have only `one` user.
+다시 말해, 한 명의 사용자가 오직 한 명의 사용자만 가질 수 있는 일대일 관계를 정의한 것입니다.
 
-However, in your seeding script, you're attempting to generate 3 (`many`) users for `one` user, which is impossible.
+하지만 시딩 스크립트에서는 한 명의 사용자에게 3명(`다수`)의 사용자를 생성하려고 시도하고 있습니다. 이는 불가능합니다.
 ```ts
 users: {
     count: 2,
@@ -398,3 +398,5 @@ users: {
 },
 ```
 </Callout>
+
+

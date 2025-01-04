@@ -1,8 +1,9 @@
 import CodeWithProps from "@mdx/CodeWithProps.astro";
 
-**Drizzle config** - a configuration file that is used by [Drizzle Kit](/docs/kit-overview) and contains all the information about your database connection, migration folder and schema files.
 
-Create a `drizzle.config.ts` file in the root of your project and add the following content:
+**Drizzle 설정 파일** - [Drizzle Kit](/docs/kit-overview)에서 사용하는 설정 파일로, 데이터베이스 연결 정보, 마이그레이션 폴더, 스키마 파일 등 모든 정보를 포함합니다.
+
+프로젝트 루트에 `drizzle.config.ts` 파일을 생성하고 다음 내용을 추가하세요:
 
 <CodeWithProps dialect={props.dialect} env_variable={props.env_variable}>
 ```typescript copy filename="drizzle.config.ts"
@@ -19,3 +20,6 @@ export default defineConfig({
 });
 ```
 </CodeWithProps>
+
+
+

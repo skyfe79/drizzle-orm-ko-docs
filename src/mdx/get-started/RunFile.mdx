@@ -1,22 +1,27 @@
+
 import Npx from '@mdx/Npx.astro';
 import Callout from '@mdx/Callout.astro';
 
-To run any TypeScript files, you have several options, but let's stick with one: using `tsx`
 
-You've already installed `tsx`, so we can run our queries now
+TypeScript 파일을 실행하는 방법은 여러 가지가 있지만, 여기서는 `tsx`를 사용하는 방법을 살펴보겠습니다.
 
-**Run `index.ts` script**
+이미 `tsx`를 설치했으므로, 이제 쿼리를 실행할 수 있습니다.
+
+**`index.ts` 스크립트 실행하기**
+```bash
 <Npx>
   tsx src/index.ts
 </Npx>
+```
 
-<Callout title='tips'>
-  We suggest using `bun` to run TypeScript files. With `bun`, such scripts can be executed without issues or additional 
-  settings, regardless of whether your project is configured with CommonJS (CJS), ECMAScript Modules (ESM), or any other module format. 
-  To run a script with `bun`, use the following command:
+<Callout title='팁'>
+  TypeScript 파일을 실행할 때 `bun`을 사용하는 것을 추천합니다. `bun`을 사용하면 프로젝트가 CommonJS(CJS), ECMAScript Modules(ESM) 또는 다른 모듈 형식으로 구성되어 있더라도 추가 설정 없이 스크립트를 실행할 수 있습니다. `bun`으로 스크립트를 실행하려면 다음 명령어를 사용하세요:
   ```bash copy
   bun src/index.ts
   ```
 
-  If you don't have bun installed, check the [Bun installation docs](https://bun.sh/docs/installation#installing)
+  만약 `bun`이 설치되어 있지 않다면, [Bun 설치 문서](https://bun.sh/docs/installation#installing)를 참고하세요.
 </Callout>
+
+
+

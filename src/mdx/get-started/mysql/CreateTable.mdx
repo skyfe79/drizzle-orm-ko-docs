@@ -1,12 +1,14 @@
-Create a `schema.ts` file in the `src/db` directory and declare your table:
+`src/db` 디렉토리에 `schema.ts` 파일을 생성하고 테이블을 선언해 보겠습니다.
 
-```typescript copy filename="src/db/schema.ts"
+```typescript
 import { int, mysqlTable, serial, varchar } from 'drizzle-orm/mysql-core';
 
 export const usersTable = mysqlTable('users_table', {
-  id: serial().primaryKey(),
-  name: varchar({ length: 255 }).notNull(),
-  age: int().notNull(),
-  email: varchar({ length: 255 }).notNull().unique(),
+  id: serial().primaryKey(), // 고유 식별자, 자동 증가
+  name: varchar({ length: 255 }).notNull(), // 이름, 최대 255자, 필수
+  age: int().notNull(), // 나이, 필수
+  email: varchar({ length: 255 }).notNull().unique(), // 이메일, 최대 255자, 필수, 고유
 });
 ```
+
+

@@ -20,57 +20,93 @@ import QueryDatabase from '@mdx/get-started/QueryDatabase.mdx';
 import QueryDatabaseUpdated from '@mdx/get-started/QueryDatabaseUpdated.mdx';
 import UpdateSchema from '@mdx/get-started/postgresql/UpdateSchema.mdx';
 
+
 <Breadcrumbs/>
 
-# Get Started with Drizzle and Supabase in existing project
+# 기존 프로젝트에 Drizzle과 Supabase 시작하기
 
 <Prerequisites>
-  - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
-  - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
-  - **Supabase** - open source Firebase alternative - [read here](https://supabase.com/)
+  - **dotenv** - 환경 변수를 관리하기 위한 패키지 - [여기서 읽기](https://www.npmjs.com/package/dotenv)
+  - **tsx** - TypeScript 파일을 실행하기 위한 패키지 - [여기서 읽기](https://tsx.is/)
+  - **Supabase** - 오픈 소스 Firebase 대안 - [여기서 읽기](https://supabase.com/)
 </Prerequisites>
 
 <FileStructure/>
 
-#### Step 1 - Install **postgres** package
+
+#### 1단계 - **postgres** 패키지 설치하기
+
 <InstallPackages lib='postgres'/>
 
-#### Step 2 - Setup connection variables
+
+
+
+#### 2단계 - 연결 변수 설정
+
 
 <SetupEnv env_variable='DATABASE_URL' />
 
-#### Step 3 - Setup Drizzle config file
+
+
+
+#### 3단계 - Drizzle 설정 파일 설정하기
+
 
 <SetupConfig dialect='postgresql' env_variable='DATABASE_URL'/>
 
-#### Step 4 - Introspect your database
+
+
+
+
+#### 4단계 - 데이터베이스 내부 구조 확인하기
 
 <IntrospectPostgreSQL/>
 
-#### Step 5 - Transfer code to your actual schema file
+
+
+#### 5단계 - 실제 스키마 파일로 코드 옮기기
 
 <TransferCode/>
 
-#### Step 6 - Connect Drizzle ORM to the database
+
+#### 6단계 - Drizzle ORM을 데이터베이스에 연결하기
 
 <ConnectSupabase/>
 
-#### Step 7 - Query the database
+
+
+#### 7단계 - 데이터베이스 쿼리하기
+
 
 <QueryDatabase dialect='postgres-js' env_variable='DATABASE_URL'/>
 
-#### Step 8 - Run index.ts file
+
+
+
+#### 8단계 - index.ts 파일 실행하기
 
 <RunFile/>
 
-#### Step 9 - Update your table schema (optional)
+
+#### 9단계 - 테이블 스키마 업데이트 (선택 사항)
 
 <UpdateSchema/>
 
-#### Step 10 - Applying changes to the database (optional)
+
+#### 10단계 - 데이터베이스에 변경 사항 적용하기 (선택 사항)
+
 
 <ApplyChanges />
 
-#### Step 11 - Query the database with a new field (optional)
+
+
+
+#### 11단계 - 새로운 필드로 데이터베이스 쿼리하기 (선택 사항)
+
 
 <QueryDatabaseUpdated dialect='postgres-js' env_variable='DATABASE_URL' />
+
+
+
+
+

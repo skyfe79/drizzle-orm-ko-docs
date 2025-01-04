@@ -1,24 +1,33 @@
 ---
-title: DrizzleORM v0.28.3 release
+title: DrizzleORM v0.28.3 릴리스
 pubDate: 2023-08-22
-description: Added SQLite simplified query API, added methods to column builders and to table model type inference. Fixed sqlite-proxy and SQL.js response from '.get()' when the result is empty.
+description: SQLite 간소화된 쿼리 API 추가, 컬럼 빌더 및 테이블 모델 타입 추론에 메서드 추가. sqlite-proxy 및 SQL.js에서 `.get()` 결과가 비어 있을 때의 응답 수정.
 ---
 
-## Fixes
+## 수정 사항
 
-- Fixed sqlite-proxy and SQL.js response from `.get()` when the result is empty
+- sqlite-proxy 및 SQL.js에서 `.get()` 결과가 비어 있을 때의 응답을 수정했습니다.
+
 
 ## New Features
 
+
+
+
+
 ### 🎉 Added SQLite simplified query API
 
-### 🎉 Added `.$defaultFn()` / `.$default()` methods to column builders
 
-For more information check docs for [PostgreSQL](/docs/column-types/pg#default-value), [MySQL](/docs/column-types/mysql#default-value) and [SQLite](/docs/column-types/sqlite#default-value).
 
-You can specify any logic and any implementation for a function like `cuid()` for runtime defaults. Drizzle won't limit you in the number of implementations you can add.
 
-> Note: This value does not affect the `drizzle-kit` behavior, it is only used at runtime in `drizzle-orm`
+
+### 🎉 컬럼 빌더에 `.$defaultFn()` / `.$default()` 메서드 추가
+
+자세한 내용은 [PostgreSQL](/docs/column-types/pg#default-value), [MySQL](/docs/column-types/mysql#default-value), [SQLite](/docs/column-types/sqlite#default-value) 문서를 참고하세요.
+
+`cuid()`와 같은 함수를 사용해 런타임 기본값을 설정할 수 있습니다. Drizzle은 여러분이 추가할 수 있는 구현의 수를 제한하지 않습니다.
+
+> 참고: 이 값은 `drizzle-kit` 동작에 영향을 미치지 않으며, `drizzle-orm`에서만 런타임에 사용됩니다.
 
 ```ts copy {5}
 import { varchar, mysqlTable } from "drizzle-orm/mysql-core";
@@ -29,9 +38,10 @@ const table = mysqlTable('table', {
 });
 ```
 
-### 🎉 Added `table.$inferSelect` / `table._.inferSelect` and `table.$inferInsert` / `table._.inferInsert` for more convenient table model type inference
 
-- 🛠 Deprecated `InferModel` type in favor of more explicit `InferSelectModel` and `InferInsertModel`
+### 🎉 `table.$inferSelect` / `table._.inferSelect`와 `table.$inferInsert` / `table._.inferInsert` 추가: 테이블 모델 타입 추론이 더 편리해졌습니다.
+
+- 🛠 `InferModel` 타입을 더 명확한 `InferSelectModel`과 `InferInsertModel`로 대체했습니다.
 
 ```ts copy {11,12,14,15}
 import { InferSelectModel, InferInsertModel } from 'drizzle-orm'
@@ -40,15 +50,17 @@ const usersTable = pgTable('users', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
   verified: boolean('verified').notNull().default(false),
-  jsonb: jsonb('jsonb').$type<string[]>(),
+  jsonb: jsonb('jsonb').$type(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 type SelectUser = typeof usersTable.$inferSelect;
 type InsertUser = typeof usersTable.$inferInsert;
 
-type SelectUser2 = InferSelectModel<typeof usersTable>;
-type InsertUser2 = InferInsertModel<typeof usersTable>;
+type SelectUser2 = InferSelectModel;
+type InsertUser2 = InferInsertModel;
 ```
 
-- 🛠 Disabled `.d.ts` files bundling
+- 🛠 `.d.ts` 파일 번들링을 비활성화했습니다.
+
+

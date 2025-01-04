@@ -1,18 +1,18 @@
 ---
-title: DrizzleORM v0.30.5 release
+title: DrizzleORM v0.30.5 릴리스
 pubDate: 2024-03-27
-description: Added '$onUpdate' functionality for PostgreSQL, MySQL and SQLite and fixed insertions on columns with the smallserial datatype.
+description: PostgreSQL, MySQL, SQLite에 '$onUpdate' 기능 추가 및 smallserial 데이터 타입을 가진 컬럼에 대한 삽입 문제 수정
 ---
 
-## New Features
+## 새로운 기능
 
-### `$onUpdate` functionality for PostgreSQL, MySQL and SQLite
+### PostgreSQL, MySQL, SQLite에서의 `$onUpdate` 기능
 
-Adds a dynamic update value to the column.
-The function will be called when the row is updated, and the returned value will be used as the column value if none is provided.
-If no `default` (or `$defaultFn`) value is provided, the function will be called when the row is inserted as well, and the returned value will be used as the column value.
+이 기능은 컬럼에 동적 업데이트 값을 추가합니다.  
+해당 함수는 행이 업데이트될 때 호출되며, 반환된 값은 제공된 값이 없을 때 컬럼 값으로 사용됩니다.  
+만약 `default`(또는 `$defaultFn`) 값이 제공되지 않았다면, 행이 삽입될 때도 이 함수가 호출되고 반환된 값이 컬럼 값으로 사용됩니다.
 
-> Note: This value does not affect the `drizzle-kit` behavior, it is only used at runtime in `drizzle-orm`.
+> 참고: 이 값은 `drizzle-kit` 동작에 영향을 주지 않으며, `drizzle-orm`에서 런타임 시에만 사용됩니다.
 
 ```ts copy {4,5,6}
 const usersOnUpdate = pgTable('users_on_update', {
@@ -20,10 +20,13 @@ const usersOnUpdate = pgTable('users_on_update', {
   name: text('name').notNull(),
   updateCounter: integer('update_counter').default(sql`1`).$onUpdateFn(() => sql`update_counter + 1`),
   updatedAt: timestamp('updated_at', { mode: 'date', precision: 3 }).$onUpdate(() => new Date()),
-  alwaysNull: text('always_null').$type<string | null>().$onUpdate(() => null),
+  alwaysNull: text('always_null').$type().$onUpdate(() => null),
 });
 ```
 
-## Fixes
 
-- Insertions on columns with the smallserial datatype are not optional - [#1848](https://github.com/drizzle-team/drizzle-orm/issues/1848)
+## 수정 사항
+
+- `smallserial` 데이터 타입을 가진 컬럼에 대한 삽입이 필수가 아니던 문제를 수정했습니다. - [#1848](https://github.com/drizzle-team/drizzle-orm/issues/1848)
+
+

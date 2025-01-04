@@ -1,17 +1,18 @@
 ---
-title: DrizzleORM v0.31.1 release
+title: DrizzleORM v0.31.1 릴리스
 pubDate: 2024-06-04
 description: React Live Queries 🎉
 ---
 
-# New Features
+# 새로운 기능
 
-## Live Queries 🎉
 
-> ### For a full explanation about Drizzle + Expo welcome to [discussions](https://github.com/drizzle-team/drizzle-orm/discussions/2447)
+## 라이브 쿼리 🎉
 
-As of `v0.31.1` Drizzle ORM now has native support for Expo SQLite Live Queries!
-We've implemented a native `useLiveQuery` React Hook which observes necessary database changes and automatically re-runs database queries. It works with both SQL-like and Drizzle Queries:
+> ### Drizzle + Expo에 대한 자세한 설명은 [토론](https://github.com/drizzle-team/drizzle-orm/discussions/2447)을 참고하세요.
+
+`v0.31.1` 버전부터 Drizzle ORM은 Expo SQLite 라이브 쿼리를 네이티브로 지원합니다!  
+필요한 데이터베이스 변경 사항을 관찰하고 데이터베이스 쿼리를 자동으로 다시 실행하는 네이티브 `useLiveQuery` React Hook을 구현했습니다. 이 기능은 SQL과 Drizzle 쿼리 모두에서 작동합니다.
 
 ```tsx
 import { useLiveQuery, drizzle } from 'drizzle-orm/expo-sqlite';
@@ -19,23 +20,24 @@ import { openDatabaseSync } from 'expo-sqlite/next';
 import { users } from './schema';
 import { Text } from 'react-native';
 
-const expo = openDatabaseSync('db.db', { enableChangeListener: true }); // <-- enable change listeners
+const expo = openDatabaseSync('db.db', { enableChangeListener: true }); // <-- 변경 리스너 활성화
 const db = drizzle(expo);
 
 const App = () => {
-  // Re-renders automatically when data changes
+  // 데이터가 변경되면 자동으로 리렌더링
   const { data } = useLiveQuery(db.select().from(users));
 
   // const { data, error, updatedAt } = useLiveQuery(db.query.users.findFirst());
   // const { data, error, updatedAt } = useLiveQuery(db.query.users.findMany());
 
-
-  return <Text>{JSON.stringify(data)}</Text>;
+  return {JSON.stringify(data)};
 };
 
 export default App;
 ```
 
-We've intentionally not changed the API of ORM itself to stay with conventional React Hook API, so we have `useLiveQuery(databaseQuery)` as opposed to `db.select().from(users).useLive()` or `db.query.users.useFindMany()`
+기존 React Hook API와의 일관성을 유지하기 위해 ORM 자체의 API는 변경하지 않았습니다. 따라서 `db.select().from(users).useLive()`나 `db.query.users.useFindMany()` 대신 `useLiveQuery(databaseQuery)`를 사용합니다.
 
-We've also decided to provide `data`, `error` and `updatedAt` fields as a result of hook for concise explicit error handling following practices of `React Query` and `Electric SQL`
+또한 `React Query`와 `Electric SQL`의 모범 사례를 따라 명시적인 오류 처리를 위해 `data`, `error`, `updatedAt` 필드를 결과로 제공합니다.
+
+

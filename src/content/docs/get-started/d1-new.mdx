@@ -17,62 +17,72 @@ import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 import CreateTable from '@mdx/get-started/sqlite/CreateTable.mdx';
 import ConnectLibsql from '@mdx/get-started/sqlite/ConnectLibsql.mdx';
 
+
 <Breadcrumbs/>
 
-# Get Started with Drizzle and D1
+# Drizzle와 D1 시작하기
 
 <Prerequisites>  
-  - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
-  - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
-  - **Cloudflare D1** - Serverless SQL database to query from your Workers and Pages projects - [read here](https://developers.cloudflare.com/d1/)
-  - **wrangler** - Cloudflare Developer Platform command-line interface - [read here](https://developers.cloudflare.com/workers/wrangler)
+  - **dotenv** - 환경 변수를 관리하기 위한 패키지 - [여기서 읽기](https://www.npmjs.com/package/dotenv)
+  - **tsx** - TypeScript 파일을 실행하기 위한 패키지 - [여기서 읽기](https://tsx.is/)
+  - **Cloudflare D1** - Workers 및 Pages 프로젝트에서 쿼리할 수 있는 서버리스 SQL 데이터베이스 - [여기서 읽기](https://developers.cloudflare.com/d1/)
+  - **wrangler** - Cloudflare 개발자 플랫폼 커맨드라인 인터페이스 - [여기서 읽기](https://developers.cloudflare.com/workers/wrangler)
 </Prerequisites>
 
 <FileStructure />
 
-#### Step 1 - Install required packages
+#### 1단계 - 필요한 패키지 설치하기
+
 <InstallPackages lib=''/>
 
-#### Step 2 - Setup wrangler.toml
 
-You would need to have a `wrangler.toml` file for D1 database and will look something like this:
+#### 2단계 - wrangler.toml 설정하기
+
+D1 데이터베이스를 사용하려면 `wrangler.toml` 파일이 필요합니다. 이 파일은 다음과 같이 구성됩니다:
+
 ```toml
-name = "YOUR PROJECT NAME"
+name = "여러분의 프로젝트 이름"
 main = "src/index.ts"
 compatibility_date = "2022-11-07"
 node_compat = true
 
 [[ d1_databases ]]
 binding = "DB"
-database_name = "YOUR DB NAME"
-database_id = "YOUR DB ID"
+database_name = "여러분의 DB 이름"
+database_id = "여러분의 DB ID"
 migrations_dir = "drizzle"
 ```
 
-#### Step 3 - Connect Drizzle ORM to the database
 
-```typescript copy
+#### 3단계 - Drizzle ORM을 데이터베이스에 연결하기
+
+```typescript
 import { drizzle } from 'drizzle-orm/d1';
 
 export interface Env {
-  <BINDING_NAME>: D1Database;
+  DB: D1Database;
 }
+
 export default {
   async fetch(request: Request, env: Env) {
-    const db = drizzle(env.<BINDING_NAME>);
+    const db = drizzle(env.DB);
   },
 };
 ```
 
-#### Step 4 - Create a table
+위 코드는 Drizzle ORM을 사용하여 데이터베이스에 연결하는 기본적인 설정을 보여줍니다. `Env` 인터페이스는 `D1Database` 타입의 `DB` 속성을 정의하며, 이는 데이터베이스 연결을 위한 환경 변수를 나타냅니다. `fetch` 함수 내에서 `drizzle` 함수를 사용하여 데이터베이스 연결을 초기화합니다. 이렇게 하면 여러분의 애플리케이션에서 데이터베이스와 상호작용할 준비가 됩니다.
+
+
+#### 4단계 - 테이블 생성
 
 <CreateTable/>
 
-#### Step 5 - Setup Drizzle config file
 
-**Drizzle config** - a configuration file that is used by [Drizzle Kit](/docs/kit-overview) and contains all the information about your database connection, migration folder and schema files.
+#### 5단계 - Drizzle 설정 파일 설정하기
 
-Create a `drizzle.config.ts` file in the root of your project and add the following content:
+**Drizzle 설정 파일**은 [Drizzle Kit](/docs/kit-overview)에서 사용하는 설정 파일로, 데이터베이스 연결 정보, 마이그레이션 폴더, 스키마 파일 등에 대한 모든 정보를 포함합니다.
+
+프로젝트 루트에 `drizzle.config.ts` 파일을 생성하고 다음 내용을 추가하세요:
 
 ```typescript copy filename="drizzle.config.ts"
 import 'dotenv/config';
@@ -90,31 +100,68 @@ export default defineConfig({
   },
 });
 ```
-<Callout title='tips'>
-You can check [our tutorial](/docs/guides/d1-http-with-drizzle-kit) on how to get env variables from CloudFlare
+
+<Callout title='팁'>
+CloudFlare에서 환경 변수를 가져오는 방법은 [우리 튜토리얼](/docs/guides/d1-http-with-drizzle-kit)을 참고하세요.
 </Callout>
 
-#### Step 6 - Applying changes to the database
+
+#### 6단계 - 데이터베이스에 변경 사항 적용하기
 
 <ApplyChanges />
 
-#### Step 7 - Seed and Query the database
+```javascript
+// 데이터베이스 변경 사항을 적용하는 컴포넌트
+function ApplyChanges() {
+  const handleApplyChanges = async () => {
+    try {
+      // 데이터베이스 업데이트 요청
+      const response = await fetch('/api/apply-changes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ changes: 'your_changes_here' }),
+      });
 
-```typescript copy
+      if (!response.ok) {
+        throw new Error('변경 사항 적용 실패');
+      }
+
+      console.log('변경 사항이 성공적으로 적용되었습니다.');
+    } catch (error) {
+      console.error('오류 발생:', error);
+    }
+  };
+
+  return (
+    <button onClick={handleApplyChanges}>
+      변경 사항 적용
+    </button>
+  );
+}
+```
+
+
+#### 7단계 - 데이터베이스 시드 및 쿼리
+
+```typescript
 import { drizzle } from 'drizzle-orm/d1';
 
 export interface Env {
-  <BINDING_NAME>: D1Database;
+  DB: D1Database;
 }
+
 export default {
   async fetch(request: Request, env: Env) {
-    const db = drizzle(env.<BINDING_NAME>);
-    const result = await db.select().from(users).all()
+    const db = drizzle(env.DB);
+    const result = await db.select().from(users).all();
     return Response.json(result);
   },
 };
 ```
 
-#### Step 8 - Run index.ts file
+
+#### 8단계 - index.ts 파일 실행하기
 
 <RunFile/>

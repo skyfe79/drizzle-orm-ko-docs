@@ -1,5 +1,5 @@
 ---
-title: Point datatype in PostgreSQL
+title: PostgreSQL의 Point 데이터 타입
 slug: point-datatype-psql
 ---
 
@@ -9,14 +9,13 @@ import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
 
 <Prerequisites>
-- Get started with [PostgreSQL](/docs/get-started-postgresql)
-- [Point datatype](/docs/column-types/pg#point)
-- [Filtering in select statement](/docs/select#filtering)
-- [sql operator](/docs/sql)
+- [PostgreSQL 시작하기](/docs/get-started-postgresql)
+- [Point 데이터 타입](/docs/column-types/pg#point)
+- [SELECT 문에서 필터링하기](/docs/select#filtering)
+- [SQL 연산자](/docs/sql)
 </Prerequisites>
 
-PostgreSQL has a special datatype to store geometric data called `point`. It is used to represent a point in a two-dimensional space. The point datatype is represented as a pair of `(x, y)` coordinates.
-The point expects to receive longitude first, followed by latitude.
+PostgreSQL은 `point`라는 이름의 기하학적 데이터를 저장하기 위한 특별한 데이터 타입을 제공합니다. 이 데이터 타입은 2차원 공간에서의 점을 나타내며, `(x, y)` 좌표 쌍으로 표현됩니다. `point` 데이터 타입은 경도를 먼저, 그 다음에 위도를 받습니다.
 
 <Section>
 ```ts copy {6}
@@ -38,7 +37,7 @@ await db.execute(
 ```
 </Section>
 
-This is how you can create table with `point` datatype in Drizzle:
+Drizzle에서 `point` 데이터 타입을 사용하여 테이블을 생성하는 방법은 다음과 같습니다:
 
 ```ts {6}
 import { pgTable, point, serial, text } from 'drizzle-orm/pg-core';
@@ -50,7 +49,7 @@ export const stores = pgTable('stores', {
 });
 ```
 
-This is how you can insert point data into the table in Drizzle:
+Drizzle에서 `point` 데이터를 테이블에 삽입하는 방법은 다음과 같습니다:
 
 ```ts {4, 10, 16}
 // mode: 'xy'
@@ -72,7 +71,7 @@ await db.insert(stores).values({
 });
 ```
 
-To compute the distance between the objects you can use `<->` operator. This is how you can query for the nearest location by coordinates in Drizzle:
+객체 간의 거리를 계산하려면 `<->` 연산자를 사용할 수 있습니다. Drizzle에서 좌표를 기준으로 가장 가까운 위치를 쿼리하는 방법은 다음과 같습니다:
 
 <Section>
 ```ts {9, 14, 17}
@@ -84,7 +83,7 @@ const point = {
   y: 40.730_61,
 };
 
-const sqlDistance = sql`location <-> point(${point.x}, ${point.y})`;
+const sqlDistance = sql`location  point(${point.x}, ${point.y})`;
 
 await db
   .select({
@@ -97,13 +96,13 @@ await db
 ```
 
 ```sql
-select *, round((location <-> point(-73.935242, 40.73061))::numeric, 2)
-from stores order by location <-> point(-73.935242, 40.73061)
+select *, round((location  point(-73.935242, 40.73061))::numeric, 2)
+from stores order by location  point(-73.935242, 40.73061)
 limit 1;
 ```
 </Section>
 
-To filter rows to include only those where a `point` type `location` falls within a specified rectangular boundary defined by two diagonal points you can user `<@` operator. It checks if the first object is contained in or on the second object:
+`point` 타입의 `location`이 두 대각선 점으로 정의된 특정 직사각형 경계 내에 있는 행만 포함하도록 필터링하려면 `<@` 연산자를 사용할 수 있습니다. 이 연산자는 첫 번째 객체가 두 번째 객체 내부 또는 위에 있는지 확인합니다:
 
 <Section>
 ```ts {12}
@@ -126,6 +125,5 @@ await db
 select * from stores where location <@ box(point(-88, 40), point(-73, 43));
 ```
 </Section>
-
 
 

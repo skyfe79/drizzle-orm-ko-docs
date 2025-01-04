@@ -9,59 +9,66 @@ import CodeTabs from "@mdx/CodeTabs.astro";
 # Drizzle \<\> Cloudflare D1
 
 <Prerequisites>
-- Database [connection basics](/docs/connect-overview) with Drizzle
-- D1 Database - [website](https://developers.cloudflare.com/d1/)
-- D1 driver - [website](https://developers.cloudflare.com/d1/build-with-d1/d1-client-api/)
+- Drizzle를 사용한 데이터베이스 [연결 기본 사항](/docs/connect-overview)
+- D1 데이터베이스 - [웹사이트](https://developers.cloudflare.com/d1/)
+- D1 드라이버 - [웹사이트](https://developers.cloudflare.com/d1/build-with-d1/d1-client-api/)
 </Prerequisites>
 
-According to the **[official website](https://developers.cloudflare.com/d1/)**, 
-D1 is Cloudflare's first queryable relational database.  
-  
-Drizzle ORM fully supports the Cloudflare D1 database and Cloudflare Workers environment.
-We embrace SQL dialects and dialect specific drivers and syntax and mirror most popular 
-SQLite-like `all`, `get`, `values` and `run` query methods syntax.
+**[공식 웹사이트](https://developers.cloudflare.com/d1/)**에 따르면,  
+D1은 Cloudflare의 첫 번째 쿼리 가능한 관계형 데이터베이스입니다.
 
-To setup project for your Cloudflare D1 please refer to **[official docs.](https://developers.cloudflare.com/d1/)**
+Drizzle ORM은 Cloudflare D1 데이터베이스와 Cloudflare Workers 환경을 완벽하게 지원합니다.  
+Drizzle는 SQL 방언과 방언별 드라이버 및 구문을 수용하며, SQLite와 유사한 `all`, `get`, `values`, `run` 쿼리 메서드 구문을 대부분 반영합니다.
 
-#### Step 1 - Install packages
+Cloudflare D1 프로젝트 설정은 **[공식 문서](https://developers.cloudflare.com/d1/)**를 참고하세요.
+
+
+#### 1단계 - 패키지 설치
+
 <Npm>
 drizzle-orm
 -D drizzle-kit
 </Npm>
 
-#### Step 2 - Initialize the driver and make a query
 
-You would need to have a `wrangler.toml` file for D1 database and will look something like this:
+#### 2단계 - 드라이버 초기화 및 쿼리 실행
+
+D1 데이터베이스를 사용하려면 `wrangler.toml` 파일이 필요합니다. 이 파일은 다음과 같이 구성됩니다:
+
 ```toml
-name = "YOUR PROJECT NAME"
+name = "여러분의 프로젝트 이름"
 main = "src/index.ts"
 compatibility_date = "2022-11-07"
 node_compat = true
 
 [[ d1_databases ]]
 binding = "DB"
-database_name = "YOUR DB NAME"
-database_id = "YOUR DB ID"
+database_name = "여러분의 DB 이름"
+database_id = "여러분의 DB ID"
 migrations_dir = "drizzle/migrations"
 ```
 
-Make your first D1 query:
-```typescript copy
+첫 번째 D1 쿼리를 실행해 보겠습니다:
+
+```typescript
 import { drizzle } from 'drizzle-orm/d1';
 
 export interface Env {
-  <BINDING_NAME>: D1Database;
+  DB: D1Database;
 }
 
 export default {
   async fetch(request: Request, env: Env) {
-    const db = drizzle(env.<BINDING_NAME>);
-    const result = await db.select().from(users).all()
+    const db = drizzle(env.DB);
+    const result = await db.select().from(users).all();
     return Response.json(result);
   },
 };
 ```
 
-#### What's next?
+
+#### 다음 단계는 무엇인가요?
 
 <WhatsNextPostgres/>
+
+

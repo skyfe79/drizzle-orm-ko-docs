@@ -4,7 +4,7 @@ import IsSupportedChipGroup from '@mdx/IsSupportedChipGroup.astro';
 import Section from '@mdx/Section.astro';
 import Callout from '@mdx/Callout.astro';
 
-# Table schemas
+# 테이블 스키마
 
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': false, 'SingleStore': true }} />
 
@@ -28,8 +28,6 @@ If you declare an entity within a schema, query builder will prepend schema name
       name: text('name'),
       color: colors('color').default('red'),
     });
-
-    
     ```
     ```sql
     CREATE SCHEMA "my_schema";
@@ -67,7 +65,7 @@ If you declare an entity within a schema, query builder will prepend schema name
     </Section>
   </Tab>
   <Tab>
-  SQLite does not have support for schemas 😕
+  SQLite는 스키마를 지원하지 않습니다 😕
   </Tab>
   <Tab>
     <Section>
@@ -94,6 +92,8 @@ If you declare an entity within a schema, query builder will prepend schema name
 </Tabs>
 
 {/* TODO: ??? example > **Warning**
-> If you will have tables with same names in different schemas then drizzle will respond with `never[]` error in result types and error from database
+> 다른 스키마에 동일한 이름의 테이블이 있는 경우, Drizzle은 결과 타입에서 `never[]` 오류를 반환하고 데이터베이스에서도 오류가 발생합니다.
 >
-> In this case you may use [alias syntax](./joins#join-aliases-and-self-joins) */}
+> 이 경우 [별칭 구문](./joins#join-aliases-and-self-joins)을 사용할 수 있습니다. */}
+
+

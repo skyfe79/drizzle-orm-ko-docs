@@ -1,130 +1,147 @@
 ---
-title: DrizzleORM v0.28.6 release
+title: DrizzleORM v0.28.6 릴리스
 pubDate: 2023-09-06
-description: Changed datetime mapping for MySQL, added LibSQL batch API support, added JSON mode for text in SQLite, added '.toSQL()' to Relational Query API calls, added new PostgreSQL operators for Arrays, added more SQL operators for the 'where' function in Relational Queries, and fixed bugs.
+description: MySQL의 날짜/시간 매핑 변경, LibSQL 배치 API 지원 추가, SQLite의 텍스트에 JSON 모드 추가, Relational Query API 호출에 '.toSQL()' 추가, PostgreSQL 배열 연산자 추가, Relational Queries의 'where' 함수에 더 많은 SQL 연산자 추가, 버그 수정
 ---
 import Section from "@mdx/Section.astro";
 
-## Changes
+## 변경 사항
 
-> **Note**:
-> MySQL `datetime` with `mode: 'date'` will now store dates in UTC strings and retrieve data in UTC as well to align with MySQL behavior for `datetime`. If you need a different behavior and want to handle `datetime` mapping in a different way, please use `mode: 'string'` or [Custom Types](/docs/custom-types) implementation
+> **참고**:
+> MySQL `datetime`에서 `mode: 'date'`를 사용할 경우, 이제 날짜를 UTC 문자열로 저장하고 데이터도 UTC로 가져옵니다. 이는 MySQL의 `datetime` 동작과 일치하도록 조정된 것입니다. 다른 동작이 필요하거나 `datetime` 매핑을 다르게 처리하려면 `mode: 'string'`을 사용하거나 [커스텀 타입](/docs/custom-types) 구현을 참고하세요.
 
-Check [Fix Datetime mapping for MySQL](https://github.com/drizzle-team/drizzle-orm/pull/1082) for implementation details
+구현 세부 사항은 [MySQL 날짜/시간 매핑 수정](https://github.com/drizzle-team/drizzle-orm/pull/1082)을 확인하세요.
+
 
 ## New Features
 
-### 🎉 `LibSQL` batch api support
 
-Reference: https://docs.turso.tech/reference/client-access/javascript-typescript-sdk#execute-a-batch-of-statements
 
-Batch API usage example:
+
+
+### 🎉 `LibSQL` 배치 API 지원
+
+참고: https://docs.turso.tech/reference/client-access/javascript-typescript-sdk#execute-a-batch-of-statements
+
+배치 API 사용 예제:
 
 <Section>
 ```ts copy {1}
 const batchResponse = await db.batch([
-	db.insert(usersTable).values({ id: 1, name: 'John' }).returning({
-		id: usersTable.id,
-	}),
-	db.update(usersTable).set({ name: 'Dan' }).where(eq(usersTable.id, 1)),
-	db.query.usersTable.findMany({}),
-	db.select().from(usersTable).where(eq(usersTable.id, 1)),
-	db.select({ id: usersTable.id, invitedBy: usersTable.invitedBy }).from(
-		usersTable,
-	),
+    db.insert(usersTable).values({ id: 1, name: 'John' }).returning({
+        id: usersTable.id,
+    }),
+    db.update(usersTable).set({ name: 'Dan' }).where(eq(usersTable.id, 1)),
+    db.query.usersTable.findMany({}),
+    db.select().from(usersTable).where(eq(usersTable.id, 1)),
+    db.select({ id: usersTable.id, invitedBy: usersTable.invitedBy }).from(
+        usersTable,
+    ),
 ]);
 ```
 
 ```ts
 type BatchResponse = [
-	{
-		id: number;
-	}[],
-	ResultSet,
-	{
-		id: number;
-		name: string;
-		verified: number;
-		invitedBy: number | null;
-	}[],
-	{
-		id: number;
-		name: string;
-		verified: number;
-		invitedBy: number | null;
-	}[],
-	{
-		id: number;
-		invitedBy: number | null;
-	}[],
+    {
+        id: number;
+    }[],
+    ResultSet,
+    {
+        id: number;
+        name: string;
+        verified: number;
+        invitedBy: number | null;
+    }[],
+    {
+        id: number;
+        name: string;
+        verified: number;
+        invitedBy: number | null;
+    }[],
+    {
+        id: number;
+        invitedBy: number | null;
+    }[],
 ];
 ```
 </Section>
 
-All possible builders that can be used inside `db.batch`:
+`db.batch` 내부에서 사용할 수 있는 모든 빌더:
 
 ```ts
 `db.all()`,
 `db.get()`,
 `db.values()`,
 `db.run()`,
-`db.query.<table>.findMany()`,
-`db.query.<table>.findFirst()`,
+`db.query..findMany()`,
+`db.query..findFirst()`,
 `db.select()...`,
 `db.update()...`,
 `db.delete()...`,
 `db.insert()...`,
 ```
 
-More usage examples here: [integration-tests/tests/libsql-batch.test.ts](https://github.com/drizzle-team/drizzle-orm/pull/1161/files#diff-17253895532e520545027dd48dcdbac2d69a5a49d594974e6d55d7502f89b838R248) and in [docs](/docs/batch-api)
+더 많은 사용 예제는 여기에서 확인할 수 있습니다: [integration-tests/tests/libsql-batch.test.ts](https://github.com/drizzle-team/drizzle-orm/pull/1161/files#diff-17253895532e520545027dd48dcdbac2d69a5a49d594974e6d55d7502f89b838R248) 및 [문서](/docs/batch-api)
 
-### 🎉 Add json mode for text in SQLite
 
-Read more in [docs](/docs/get-started-postgresql#http-proxy)
+### 🎉 SQLite에서 JSON 모드로 텍스트 추가하기
+
+자세한 내용은 [문서](/docs/get-started-postgresql#http-proxy)에서 확인할 수 있습니다.
 
 ```ts copy {2}
 const test = sqliteTable('test', {
-	dataTyped: text('data_typed', { mode: 'json' }).$type<{ a: 1 }>().notNull(),
+    dataTyped: text('data_typed', { mode: 'json' }).$type().notNull(),
 });
 ```
 
-### 🎉 Add `.toSQL()` to Relational Query API calls
+위 코드는 SQLite 테이블을 생성할 때, `data_typed` 컬럼을 JSON 모드로 설정하는 예제입니다. 이렇게 하면 해당 컬럼에 JSON 형식의 데이터를 저장할 수 있습니다.
+
+
+### 🎉 관계형 쿼리 API 호출에 `.toSQL()` 추가하기
 
 ```ts copy {1}
 const query = db.query.usersTable.findFirst().toSQL();
 ```
 
-### 🎉 Added new PostgreSQL operators for Arrays
+위 코드는 `usersTable`에서 첫 번째 레코드를 찾는 쿼리를 SQL 문으로 변환합니다. `.toSQL()` 메서드를 사용하면 실제로 실행되는 SQL 쿼리를 확인할 수 있습니다. 이 기능은 디버깅이나 쿼리 최적화에 유용하게 활용할 수 있습니다.
 
-List of operators and usage examples
+
+### 🎉 새로운 PostgreSQL 배열 연산자 추가
+
+새로 추가된 연산자와 사용 예제를 확인해 보세요.  
 `arrayContains`, `arrayContained`, `arrayOverlaps`
 
-Read more in [docs](/docs/get-started-postgresql#http-proxy)
+자세한 내용은 [문서](/docs/get-started-postgresql#http-proxy)에서 확인할 수 있습니다.
 
 ```ts copy {2,5,8,11,12,13,14}
+// 배열이 특정 값을 포함하는지 확인
 const contains = await db.select({ id: posts.id }).from(posts)
-	.where(arrayContains(posts.tags, ['Typescript', 'ORM']));
+    .where(arrayContains(posts.tags, ['Typescript', 'ORM']));
 
+// 배열이 특정 값에 포함되는지 확인
 const contained = await db.select({ id: posts.id }).from(posts)
-	.where(arrayContained(posts.tags, ['Typescript', 'ORM']));
+    .where(arrayContained(posts.tags, ['Typescript', 'ORM']));
 
+// 배열이 특정 값과 겹치는지 확인
 const overlaps = await db.select({ id: posts.id }).from(posts)
-	.where(arrayOverlaps(posts.tags, ['Typescript', 'ORM']));
+    .where(arrayOverlaps(posts.tags, ['Typescript', 'ORM']));
 
+// 서브쿼리를 사용하여 배열이 특정 값을 포함하는지 확인
 const withSubQuery = await db.select({ id: posts.id }).from(posts)
-	.where(arrayContains(
-		posts.tags,
-		db.select({ tags: posts.tags }).from(posts).where(eq(posts.id, 1)),
-	));
+    .where(arrayContains(
+        posts.tags,
+        db.select({ tags: posts.tags }).from(posts).where(eq(posts.id, 1)),
+    ));
 ```
 
-### 🎉 Add more SQL operators for where filter function in Relational Queries
 
-You can find more examples in [docs](/docs/rqb#select-filters)
+### 🎉 Relational Queries의 where 필터 함수에 더 많은 SQL 연산자 추가
+
+더 많은 예제는 [문서](/docs/rqb#select-filters)에서 확인할 수 있습니다.
 
 <Section>
 ```ts
-// Before
+// 이전
 import { inArray } from "drizzle-orm/pg-core";
 
 await db.users.findFirst({
@@ -133,17 +150,20 @@ await db.users.findFirst({
 ```
 
 ```ts copy {3}
-// After
+// 이후
 await db.users.findFirst({
   where: (table, { inArray }) => inArray(table.id, [ ... ])
 })
 ```
 </Section>
 
-## Fixes
 
-- Correct where in on conflict in sqlite ([#1076](https://github.com/drizzle-team/drizzle-orm/pull/1076))
-- Fix libsql/client type import ([#1122](https://github.com/drizzle-team/drizzle-orm/pull/1122))
-- Fix: raw sql query not being mapped properly on RDS ([#1071](https://github.com/drizzle-team/drizzle-orm/pull/1071))
-- Fix Datetime mapping for MySQL ([#1082](https://github.com/drizzle-team/drizzle-orm/pull/1082))
-- Fix smallserial generating as serial ([#1127](https://github.com/drizzle-team/drizzle-orm/pull/1127))
+## 수정 사항
+
+- SQLite에서 `on conflict` 구문의 위치 수정 ([#1076](https://github.com/drizzle-team/drizzle-orm/pull/1076))
+- libsql/client 타입 import 문제 해결 ([#1122](https://github.com/drizzle-team/drizzle-orm/pull/1122))
+- RDS에서 raw SQL 쿼리가 제대로 매핑되지 않는 문제 수정 ([#1071](https://github.com/drizzle-team/drizzle-orm/pull/1071))
+- MySQL에서 Datetime 매핑 문제 해결 ([#1082](https://github.com/drizzle-team/drizzle-orm/pull/1082))
+- smallserial이 serial로 생성되는 문제 수정 ([#1127](https://github.com/drizzle-team/drizzle-orm/pull/1127))
+
+

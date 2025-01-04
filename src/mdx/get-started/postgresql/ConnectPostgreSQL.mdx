@@ -1,6 +1,6 @@
 import CodeTabs from "@mdx/CodeTabs.astro";
 
-Create a `index.ts` file in the `src/db` directory and initialize the connection:
+`src/db` 디렉토리에 `index.ts` 파일을 생성하고 데이터베이스 연결을 초기화해 보겠습니다.
 
 <CodeTabs items={["node-postgres", "node-postgres with config", "your node-postgres driver"]}>
 ```typescript copy
@@ -13,7 +13,7 @@ const db = drizzle(process.env.DATABASE_URL!);
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/node-postgres';
 
-// You can specify any property from the node-postgres connection options
+// node-postgres 연결 옵션에서 원하는 속성을 지정할 수 있습니다.
 const db = drizzle({ 
   connection: { 
     connectionString: process.env.DATABASE_URL!,
@@ -33,3 +33,5 @@ const pool = new Pool({
 const db = drizzle({ client: pool });
 ```
 </CodeTabs>
+
+

@@ -1,37 +1,39 @@
 ---
-title: DrizzleORM v0.30.6 release
+title: DrizzleORM v0.30.6 릴리스
 pubDate: 2024-03-28
-description: Added support for PGlite driver.
+description: PGlite 드라이버 지원이 추가되었습니다.
 ---
 
-## New Features
+## 새로운 기능
 
-### PGlite driver Support
+### PGlite 드라이버 지원
 
-[PGlite](https://github.com/electric-sql/pglite) is a WASM Postgres build packaged into a TypeScript client library that enables you to run Postgres in the browser, Node.js and Bun, with no need to install any other dependencies. It is only 2.6mb gzipped.
+[PGlite](https://github.com/electric-sql/pglite)는 WASM으로 빌드된 Postgres를 TypeScript 클라이언트 라이브러리로 패키징한 것입니다. 이를 통해 브라우저, Node.js, Bun에서 추가적인 의존성 없이 Postgres를 실행할 수 있습니다. 압축된 크기는 단 2.6MB에 불과합니다.
 
-It can be used as an ephemeral in-memory database, or with persistence either to the file system (Node/Bun) or indexedDB (Browser).
+PGlite는 임시 메모리 내 데이터베이스로 사용하거나, 파일 시스템(Node/Bun) 또는 indexedDB(브라우저)에 지속적으로 저장할 수 있습니다.
 
-Unlike previous "Postgres in the browser" projects, PGlite does not use a Linux virtual machine - it is simply Postgres in WASM.
+이전의 "브라우저 내 Postgres" 프로젝트와 달리, PGlite는 리눅스 가상 머신을 사용하지 않습니다. 단순히 WASM으로 실행되는 Postgres입니다.
 
+Drizzle과 PGlite를 시작하는 방법은 [여기](/docs/get-started-postgresql#pglite)에서 확인할 수 있습니다.
 
-Read get started with Drizzle and PGlite guide [here](/docs/get-started-postgresql#pglite).
-
-Usage Example
+**사용 예제**
 ```ts copy {1,6}
 import { PGlite } from '@electric-sql/pglite';
 import { drizzle } from 'drizzle-orm/pglite';
 import { users } from './schema';
 
-// In-memory Postgres
+// 메모리 내 Postgres
 const client = new PGlite();
 const db = drizzle(client);
 
 await db.select().from(users);
 ```
+
 ---
-There are currently 2 limitations, that should be fixed on Pglite side:
+현재 PGlite 측에서 해결해야 할 두 가지 제한 사항이 있습니다:
 
-- [Attempting to refresh a materialised view throws error](https://github.com/electric-sql/pglite/issues/63)
+- [Materialized View를 새로 고침하려고 하면 오류가 발생함](https://github.com/electric-sql/pglite/issues/63)
 
-- [Attempting to SET TIME ZONE throws error](https://github.com/electric-sql/pglite/issues/62)
+- [TIME ZONE을 설정하려고 하면 오류가 발생함](https://github.com/electric-sql/pglite/issues/62)
+
+

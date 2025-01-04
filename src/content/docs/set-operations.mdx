@@ -4,30 +4,35 @@ import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
 import Callout from '@mdx/Callout.astro';
 
-# Set Operations
+# 집합 연산
 
-SQL set operations combine the results of multiple query blocks into a single result. 
-The SQL standard defines the following three set operations: `UNION`, `INTERSECT`, `EXCEPT`, `UNION ALL`, `INTERSECT ALL`, `EXCEPT ALL`.
+
+
+
+
+SQL 집합 연산은 여러 쿼리 블록의 결과를 하나로 합칩니다. SQL 표준은 다음과 같은 세 가지 집합 연산을 정의합니다: `UNION`, `INTERSECT`, `EXCEPT`, `UNION ALL`, `INTERSECT ALL`, `EXCEPT ALL`.
+
 
 ### Union
-Combine all results from two query blocks into a single result, omitting any duplicates.
 
-Get all names from customers and users tables without duplicates.
+두 쿼리 블록의 모든 결과를 하나로 합치고, 중복된 값을 제거합니다.
+
+`customers`와 `users` 테이블에서 중복 없이 모든 이름을 가져옵니다.
 
 <Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore"]}>
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
-	<CodeTab>
-	```typescript copy
+    <CodeTab>
+    ```typescript copy
     import { union } from 'drizzle-orm/pg-core'
     import { users, customers } from './schema'
 
     const allNamesForUserQuery = db.select({ name: users.name }).from(users);
 
     const result = await union(
-		allNamesForUserQuery,
-		db.select({ name: customers.name }).from(customers)
-	).limit(10);
+        allNamesForUserQuery,
+        db.select({ name: customers.name }).from(customers)
+    ).limit(10);
     ```
     ```sql
     (select "name" from "sellers")
@@ -52,9 +57,9 @@ Get all names from customers and users tables without duplicates.
     (select "name" from "customers")
     limit $1
     ```
-	</CodeTab>
+    </CodeTab>
     <CodeTab>
-	```typescript copy
+    ```typescript copy
     import { integer, pgTable, text, varchar } from "drizzle-orm/pg-core";
 
     const users = pgTable('sellers', {
@@ -75,17 +80,17 @@ Get all names from customers and users tables without duplicates.
   </Tab> 
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
-	<CodeTab>
-	```typescript copy
+    <CodeTab>
+    ```typescript copy
     import { union } from 'drizzle-orm/mysql-core'
     import { users, customers } from './schema'
 
     const allNamesForUserQuery = db.select({ name: users.name }).from(users);
 
     const result = await union(
-		allNamesForUserQuery,
-		db.select({ name: customers.name }).from(customers)
-	).limit(10);
+        allNamesForUserQuery,
+        db.select({ name: customers.name }).from(customers)
+    ).limit(10);
     ```
     ```sql
     (select `name` from `sellers`)
@@ -93,7 +98,7 @@ Get all names from customers and users tables without duplicates.
     (select `name` from `customers`)
     limit ?
     ```
-	</CodeTab>
+    </CodeTab>
     <CodeTab>
     ```ts copy
     import { users, customers } from './schema'
@@ -112,7 +117,7 @@ Get all names from customers and users tables without duplicates.
     ```
     </CodeTab>
     <CodeTab>
-	```typescript copy
+    ```typescript copy
     import { int, mysqlTable, text, varchar } from "drizzle-orm/mysql-core";
 
     const users = mysqlTable('sellers', {
@@ -133,17 +138,17 @@ Get all names from customers and users tables without duplicates.
   </Tab> 
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
-	<CodeTab>
-	```typescript copy
+    <CodeTab>
+    ```typescript copy
     import { union } from 'drizzle-orm/sqlite-core'
     import { users, customers } from './schema'
 
     const allNamesForUserQuery = db.select({ name: users.name }).from(users);
 
     const result = await union(
-		allNamesForUserQuery,
-		db.select({ name: customers.name }).from(customers)
-	).limit(10);
+        allNamesForUserQuery,
+        db.select({ name: customers.name }).from(customers)
+    ).limit(10);
     ```
     ```sql
     (select "name" from "sellers")
@@ -151,7 +156,7 @@ Get all names from customers and users tables without duplicates.
     (select "name" from "customers")
     limit ?
     ```
-	</CodeTab>
+    </CodeTab>
     <CodeTab>
     ```ts copy
     import { users, customers } from './schema'
@@ -167,7 +172,7 @@ Get all names from customers and users tables without duplicates.
     ```
     </CodeTab>
     <CodeTab>
-	```typescript copy
+    ```typescript copy
     import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
     const users = sqliteTable('sellers', {
@@ -188,17 +193,17 @@ Get all names from customers and users tables without duplicates.
   </Tab> 
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
-	<CodeTab>
-	```typescript copy
+    <CodeTab>
+    ```typescript copy
     import { union } from 'drizzle-orm/singlestore-core'
     import { users, customers } from './schema'
 
     const allNamesForUserQuery = db.select({ name: users.name }).from(users);
 
     const result = await union(
-		allNamesForUserQuery,
-		db.select({ name: customers.name }).from(customers)
-	).limit(10);
+        allNamesForUserQuery,
+        db.select({ name: customers.name }).from(customers)
+    ).limit(10);
     ```
     ```sql
     (select `name` from `sellers`)
@@ -206,7 +211,7 @@ Get all names from customers and users tables without duplicates.
     (select `name` from `customers`)
     limit ?
     ```
-	</CodeTab>
+    </CodeTab>
     <CodeTab>
     ```ts copy
     import { users, customers } from './schema'
@@ -225,7 +230,7 @@ Get all names from customers and users tables without duplicates.
     ```
     </CodeTab>
     <CodeTab>
-	```typescript copy
+    ```typescript copy
     import { int, mysqlTable, text, varchar } from "drizzle-orm/singlestore-core";
 
     const users = mysqlTable('sellers', {
@@ -246,19 +251,18 @@ Get all names from customers and users tables without duplicates.
   </Tab> 
 </Tabs>
 
-### Union All
-Combine all results from two query blocks into a single result, with duplicates.
 
-Let's consider a scenario where you have two tables, one representing online sales and the other 
-representing in-store sales. In this case, you want to combine the data from both tables into a
-single result set. Since there might be duplicate transactions, 
-you want to keep all the records and not eliminate duplicates.
+### UNION ALL
+
+두 쿼리 블록의 결과를 중복을 포함하여 하나의 결과로 합칩니다.
+
+온라인 판매와 매장 판매를 나타내는 두 개의 테이블이 있다고 가정해 봅시다. 이 경우, 두 테이블의 데이터를 하나의 결과 집합으로 합치고 싶을 수 있습니다. 중복된 거래가 있을 수 있으므로 모든 레코드를 유지하고 중복을 제거하지 않습니다.
 
 <Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore"]}>
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
-	<CodeTab>
-	```typescript copy
+    <CodeTab>
+    ```typescript copy
     import { unionAll } from 'drizzle-orm/pg-core'
     import { onlineSales, inStoreSales } from './schema'
 
@@ -289,9 +293,9 @@ you want to keep all the records and not eliminate duplicates.
     union all
     select "transaction_id" from "in_store_sales"
     ```
-	</CodeTab>
+    </CodeTab>
     <CodeTab>
-	```typescript copy
+    ```typescript copy
     import { integer, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 
     const onlineSales = pgTable('online_sales', {
@@ -311,10 +315,10 @@ you want to keep all the records and not eliminate duplicates.
     </CodeTab>
   </CodeTabs>
   </Tab> 
-<Tab>
+  <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
-	<CodeTab>
-	```typescript copy
+    <CodeTab>
+    ```typescript copy
     import { unionAll } from 'drizzle-orm/mysql-core'
     import { onlineSales, inStoreSales } from './schema'
 
@@ -345,9 +349,9 @@ you want to keep all the records and not eliminate duplicates.
     union all 
     (select `transaction_id` from `in_store_sales`)
     ```
-	</CodeTab>
+    </CodeTab>
     <CodeTab>
-	```typescript copy
+    ```typescript copy
     import { int, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
     const onlineSales = mysqlTable('online_sales', {
@@ -369,8 +373,8 @@ you want to keep all the records and not eliminate duplicates.
   </Tab> 
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
-	<CodeTab>
-	```typescript copy
+    <CodeTab>
+    ```typescript copy
     import { unionAll } from 'drizzle-orm/sqlite-core'
     import { onlineSales, inStoreSales } from './schema'
 
@@ -401,9 +405,9 @@ you want to keep all the records and not eliminate duplicates.
     union all 
     select "transaction_id" from "in_store_sales"
     ```
-	</CodeTab>
+    </CodeTab>
     <CodeTab>
-	```typescript copy
+    ```typescript copy
     import { int, sqliteTable } from "drizzle-orm/sqlite-core";
 
     const onlineSales = sqliteTable('online_sales', {
@@ -425,11 +429,11 @@ you want to keep all the records and not eliminate duplicates.
   </Tab> 
   <Tab>
   <Callout type='warning'>
-  UNION ALL with ORDER BY behavior inconsistent with MySQL: SingleStore parses UNION ALL followed by ORDER BY commands differently from MySQL. In SingleStore, the following query is valid. In MySQL, it is invalid.
+  UNION ALL과 ORDER BY의 동작이 MySQL과 일치하지 않음: SingleStore는 UNION ALL 뒤에 ORDER BY 명령어를 다르게 해석합니다. SingleStore에서는 다음 쿼리가 유효하지만, MySQL에서는 유효하지 않습니다.
   </Callout>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
-	<CodeTab>
-	```typescript copy
+    <CodeTab>
+    ```typescript copy
     import { unionAll } from 'drizzle-orm/singlestore-core'
     import { onlineSales, inStoreSales } from './schema'
 
@@ -460,9 +464,9 @@ you want to keep all the records and not eliminate duplicates.
     union all 
     (select `transaction_id` from `in_store_sales`)
     ```
-	</CodeTab>
+    </CodeTab>
     <CodeTab>
-	```typescript copy
+    ```typescript copy
     import { int, mysqlTable, text, timestamp, varchar } from "drizzle-orm/singlestore-core";
 
     const onlineSales = mysqlTable('online_sales', {
@@ -484,16 +488,17 @@ you want to keep all the records and not eliminate duplicates.
   </Tab> 
 </Tabs>
 
-### Intersect
-Combine only those rows which the results of two query blocks have in common, omitting any duplicates.
 
-Suppose you have two tables that store information about students' course enrollments. 
-You want to find the courses that are common between two different departments,
-but you want distinct course names, and you're not interested in counting multiple 
-enrollments of the same course by the same student.
+### 교집합(Intersect)
 
-In this scenario, you want to find courses that are common between the two departments but don't want 
-to count the same course multiple times even if multiple students from the same department are enrolled in it.
+두 쿼리 블록의 결과 중 공통된 행만 결합하고, 중복은 제거합니다.
+
+학생들의 수강 정보를 저장하는 두 테이블이 있다고 가정해 봅시다. 
+두 개의 다른 학과에서 공통으로 제공하는 강좌를 찾고 싶지만, 
+동일한 학생이 동일한 강좌를 여러 번 수강한 경우는 제외하고 싶습니다.
+
+이 시나리오에서는 두 학과에서 공통으로 제공하는 강좌를 찾되, 
+동일한 강좌가 여러 학생에 의해 수강된 경우에도 중복으로 계산하지 않기를 원합니다.
 
 <Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore"]}>
   <Tab>
@@ -698,17 +703,14 @@ to count the same course multiple times even if multiple students from the same 
   </Tab> 
 </Tabs>
 
+
 ### Intersect All
-Combine only those rows which the results of two query blocks have in common, with duplicates.
 
-Let's consider a scenario where you have two tables containing data about customer orders, and you want 
-to identify products that are ordered by both regular customers and VIP customers. In this case, 
-you want to keep track of the quantity of each product, even if it's ordered multiple times by 
-different customers.
+두 쿼리 블록의 결과에서 공통된 행만 결합하고, 중복된 값을 유지합니다.
 
-In this scenario, you want to find products that are ordered by both regular customers and VIP customers, 
-but you want to retain the quantity information, even if the same product is ordered multiple 
-times by different customers.
+예를 들어, 일반 고객과 VIP 고객의 주문 데이터가 담긴 두 테이블이 있다고 가정해봅시다. 이때, 일반 고객과 VIP 고객 모두가 주문한 제품을 식별하고자 합니다. 이 경우, 여러 고객이 동일한 제품을 여러 번 주문하더라도 각 제품의 수량 정보를 유지해야 합니다.
+
+이 시나리오에서는 일반 고객과 VIP 고객 모두가 주문한 제품을 찾되, 여러 고객이 동일한 제품을 여러 번 주문한 경우에도 수량 정보를 유지해야 합니다.
 
 <Tabs items={["PostgreSQL", "MySQL", "SingleStore"]}>
   <Tab>
@@ -848,20 +850,21 @@ times by different customers.
   </CodeTabs>
   </Tab>
   <Tab>
-  Not supported by SingleStore
+  SingleStore에서는 지원되지 않습니다.
   </Tab> 
 </Tabs>
 
+
 ### Except
-For two query blocks A and B, return all results from A which are not also present in B, omitting any duplicates.
 
-Suppose you have two tables that store information about employees' project assignments. 
-You want to find the projects that are unique to one department 
-and not shared with another department, excluding duplicates.
+두 개의 쿼리 블록 A와 B가 있을 때, A의 결과 중 B에도 존재하지 않는 결과만 반환하며, 중복은 제거합니다.
 
-In this scenario, you want to identify the projects that are exclusive to one department and
-not shared with the other department. You don't want to count the same project 
-multiple times, even if multiple employees from the same department are assigned to it.
+예를 들어, 직원들의 프로젝트 할당 정보를 저장하는 두 개의 테이블이 있다고 가정해 봅시다. 
+여러분은 한 부서에만 속하고 다른 부서와 공유되지 않는 프로젝트를 찾고 싶습니다. 
+이때 동일한 프로젝트가 여러 직원에게 할당되어 있어도 중복 없이 한 번만 카운트하고 싶습니다.
+
+이 시나리오에서는 한 부서에만 속하고 다른 부서와 공유되지 않는 프로젝트를 식별하려고 합니다. 
+동일한 프로젝트가 여러 번 카운트되지 않도록 중복을 제거합니다.
 
 <Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore"]}>
   <Tab>
@@ -1066,21 +1069,20 @@ multiple times, even if multiple employees from the same department are assigned
   </Tab> 
 </Tabs>
 
+
 ### Except All
-For two query blocks A and B, return all results from A which are not also present in B, with duplicates.
 
-Let's consider a scenario where you have two tables containing data about customer orders, and you want to 
-identify products that are exclusively ordered by regular customers (without VIP customers). 
-In this case, you want to keep track of the quantity of each product, even if it's ordered multiple times by different regular customers.
+두 쿼리 블록 A와 B가 있을 때, A의 결과 중 B에도 존재하지 않는 모든 결과를 반환합니다. 이때 중복된 결과도 포함됩니다.
 
-In this scenario, you want to find products that are exclusively ordered by regular customers and not 
-ordered by VIP customers. You want to retain the quantity information, even if the same product is ordered multiple times by different regular customers.
+예를 들어, 고객 주문 데이터를 담고 있는 두 테이블이 있고, 일반 고객만 주문한 제품을 찾고 싶은 경우를 생각해봅시다. VIP 고객이 주문하지 않은 제품을 찾고자 합니다. 이때, 동일한 제품이 여러 일반 고객에 의해 여러 번 주문된 경우에도 수량 정보를 유지하려고 합니다.
+
+이 시나리오에서는 일반 고객만 주문한 제품을 찾고, VIP 고객이 주문하지 않은 제품을 식별합니다. 동일한 제품이 여러 일반 고객에 의해 여러 번 주문된 경우에도 수량 정보를 유지합니다.
 
 <Tabs items={["PostgreSQL", "MySQL", "SingleStore"]}>
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
-	<CodeTab>
-	```typescript copy
+    <CodeTab>
+    ```typescript copy
     import { exceptAll } from 'drizzle-orm/pg-core'
     import { regularCustomerOrders, vipCustomerOrders } from './schema'
 
@@ -1101,7 +1103,7 @@ ordered by VIP customers. You want to retain the quantity information, even if t
     except all
     select "product_id", "quantity_ordered" from "vip_customer_orders"
     ```
-	</CodeTab>
+    </CodeTab>
     <CodeTab>
     ```ts copy
     import { regularCustomerOrders, vipCustomerOrders } from './schema'
@@ -1127,8 +1129,8 @@ ordered by VIP customers. You want to retain the quantity information, even if t
     select "product_id", "quantity_ordered" from "vip_customer_orders"
     ```
     </CodeTab>
-	<CodeTab>
-	```typescript copy
+    <CodeTab>
+    ```typescript copy
     import { integer, pgTable } from "drizzle-orm/pg-core";
 
     const regularCustomerOrders = pgTable('regular_customer_orders', {
@@ -1148,8 +1150,8 @@ ordered by VIP customers. You want to retain the quantity information, even if t
   </Tab> 
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
-	<CodeTab>
-	```typescript copy
+    <CodeTab>
+    ```typescript copy
     import { exceptAll } from 'drizzle-orm/mysql-core'
     import { regularCustomerOrders, vipCustomerOrders } from './schema'
 
@@ -1170,7 +1172,7 @@ ordered by VIP customers. You want to retain the quantity information, even if t
     except all
     select `product_id`, `quantity_ordered` from `vip_customer_orders`
     ```
-	</CodeTab>
+    </CodeTab>
     <CodeTab>
     ```ts copy
     import { regularCustomerOrders, vipCustomerOrders } from './schema'
@@ -1196,8 +1198,8 @@ ordered by VIP customers. You want to retain the quantity information, even if t
     select `product_id`, `quantity_ordered` from `vip_customer_orders`
     ```
     </CodeTab>
-	<CodeTab>
-	```typescript copy
+    <CodeTab>
+    ```typescript copy
     const regularCustomerOrders = mysqlTable('regular_customer_orders', {
         customerId: int('customer_id').primaryKey(),
         productId: int('product_id').notNull(),
@@ -1214,6 +1216,8 @@ ordered by VIP customers. You want to retain the quantity information, even if t
   </CodeTabs>
   </Tab> 
   <Tab>
-  Not supported by SingleStore
+  SingleStore에서는 지원되지 않습니다.
   </Tab>
 </Tabs>
+
+

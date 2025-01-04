@@ -1,8 +1,8 @@
-Create a `index.ts` file in the `src/db` directory and initialize the connection:
+`src/db` 디렉토리에 `index.ts` 파일을 생성하고 데이터베이스 연결을 초기화하는 코드를 작성해 보겠습니다.
 
-```typescript copy"
+```typescript
 import { drizzle } from 'drizzle-orm/xata-http';
-import { getXataClient } from './xata'; // Generated client
+import { getXataClient } from './xata'; // 자동 생성된 클라이언트
 
 async function main() {
     const xata = getXataClient();
@@ -11,3 +11,5 @@ async function main() {
 
 main();
 ```
+
+

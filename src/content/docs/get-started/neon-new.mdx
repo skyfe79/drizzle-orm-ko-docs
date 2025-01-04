@@ -17,51 +17,69 @@ import RunFile from '@mdx/get-started/RunFile.mdx';
 import QueryDatabase from '@mdx/get-started/QueryDatabase.mdx';
 import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 
+
 <Breadcrumbs/>
 
-# Get Started with Drizzle and Neon
+# Drizzle와 Neon 시작하기
 
 <Prerequisites>
-  - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
-  - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
-  - **Neon** - serverless Postgres platform - [read here](https://neon.tech/docs/introduction)
+  - **dotenv** - 환경 변수를 관리하기 위한 패키지 - [자세히 보기](https://www.npmjs.com/package/dotenv)
+  - **tsx** - TypeScript 파일을 실행하기 위한 패키지 - [자세히 보기](https://tsx.is/)
+  - **Neon** - 서버리스 Postgres 플랫폼 - [자세히 보기](https://neon.tech/docs/introduction)
 </Prerequisites>
 
-Drizzle has native support for Neon connections with the `neon-http` and `neon-websockets` drivers. These use the **neon-serverless** driver under the hood.  
-  
-With the `neon-http` and `neon-websockets` drivers, you can access a Neon database from serverless environments over HTTP or WebSockets instead of TCP. Querying over HTTP is faster for single, non-interactive transactions.  
-  
-If you need session or interactive transaction support, or a fully compatible drop-in replacement for the `pg` driver, you can use the WebSocket-based `neon-serverless` driver. You can connect to a Neon database directly using [Postgres](/docs/get-started/postgresql-new)
+Drizzle는 `neon-http`와 `neon-websockets` 드라이버를 통해 Neon 연결을 기본적으로 지원합니다. 이 드라이버들은 내부적으로 **neon-serverless** 드라이버를 사용합니다.
+
+`neon-http`와 `neon-websockets` 드라이버를 사용하면 서버리스 환경에서 TCP 대신 HTTP 또는 WebSockets를 통해 Neon 데이터베이스에 접근할 수 있습니다. 단일 비대화형 트랜잭션의 경우 HTTP를 통한 쿼리가 더 빠릅니다.
+
+세션 또는 대화형 트랜잭션 지원이 필요하거나 `pg` 드라이버와 완전히 호환되는 대체 드라이버가 필요하다면, WebSocket 기반의 `neon-serverless` 드라이버를 사용할 수 있습니다. [Postgres](/docs/get-started/postgresql-new)를 통해 Neon 데이터베이스에 직접 연결할 수도 있습니다.
 
 <FileStructure/>
 
-#### Step 1 - Install **@neondatabase/serverless** package
+
+#### 1단계 - **@neondatabase/serverless** 패키지 설치
+
 <InstallPackages lib='@neondatabase/serverless'/>
 
-#### Step 2 - Setup connection variables
+
+#### 2단계 - 연결 변수 설정
+
 
 <SetupEnv env_variable='DATABASE_URL' />
 
-#### Step 3 - Connect Drizzle ORM to the database
+
+
+#### 3단계 - Drizzle ORM을 데이터베이스에 연결하기
 
 <ConnectNeon/>
 
-#### Step 4 - Create a table
+
+#### 4단계 - 테이블 생성
 
 <CreateTable />
 
-#### Step 5 - Setup Drizzle config file
+
+#### 5단계 - Drizzle 설정 파일 설정하기
+
 
 <SetupConfig dialect='postgresql' env_variable='DATABASE_URL'/>
 
-#### Step 6 - Applying changes to the database
+
+
+#### 6단계 - 데이터베이스에 변경 사항 적용하기
+
 
 <ApplyChanges />
 
-#### Step 7 - Seed and Query the database
+
+
+#### 7단계 - 데이터베이스 시드 및 쿼리
+
 
 <QueryDatabase dialect='neon-http' env_variable='DATABASE_URL'/>
 
-#### Step 8 - Run index.ts file
+
+
+#### 8단계 - index.ts 파일 실행하기
 
 <RunFile/>

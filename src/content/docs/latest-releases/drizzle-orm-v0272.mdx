@@ -1,24 +1,25 @@
 ---
-title: DrizzleORM v0.27.2 release
+title: DrizzleORM v0.27.2 릴리스
 pubDate: 2023-07-12
-description: Added support for unique constraints in PostgreSQL, MySQL, SQLite.
+description: PostgreSQL, MySQL, SQLite에서 고유 제약 조건 지원이 추가되었습니다.
 ---
 
-## 🎉 Added support for `UNIQUE` constraints in PostgreSQL, MySQL, SQLite
+## 🎉 PostgreSQL, MySQL, SQLite에서 `UNIQUE` 제약 조건 지원 추가
 
-For PostgreSQL, unique constraints can be defined at the column level for single-column constraints, and in the third parameter for multi-column constraints. In both cases, it will be possible to define a custom name for the constraint. Additionally, PostgreSQL will receive the `NULLS NOT DISTINCT` option to restrict having more than one NULL value in a table. [Reference](https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-UNIQUE-CONSTRAINTS)
+PostgreSQL에서는 단일 컬럼에 대한 고유 제약 조건은 컬럼 레벨에서 정의할 수 있으며, 다중 컬럼 제약 조건은 세 번째 매개변수에서 정의할 수 있습니다. 두 경우 모두 제약 조건에 커스텀 이름을 지정할 수 있습니다. 또한 PostgreSQL은 `NULLS NOT DISTINCT` 옵션을 지원하여 테이블에서 하나 이상의 NULL 값을 허용하지 않도록 제한할 수 있습니다. [참고](https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-UNIQUE-CONSTRAINTS)
 
-Examples that just shows a different `unique` usage. Please don't search a real usage for those tables
+다음은 `unique` 사용법을 보여주는 예제입니다. 실제 사용 사례를 찾으려고 하지 마세요.
 
 ```ts copy
-// single column
+// 단일 컬럼
 const table = pgTable('table', {
   id: serial('id').primaryKey(),
   name: text('name').notNull().unique(),
   state: char('state', { length: 2 }).unique('custom'),
   field: char('field', { length: 2 }).unique('custom_field', { nulls: 'not distinct' }),
 });
-// multiple columns
+
+// 다중 컬럼
 const table = pgTable('table', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
@@ -29,19 +30,22 @@ const table = pgTable('table', {
 }));
 ```
 
-For MySQL, everything will be the same except for the `NULLS NOT DISTINCT` option. It appears that MySQL does not support it
+### MySQL
 
-Examples that just shows a different `unique` usage. Please don't search a real usage for those tables
+MySQL에서는 `NULLS NOT DISTINCT` 옵션을 제외하고 모든 것이 동일합니다. MySQL은 이 옵션을 지원하지 않는 것으로 보입니다.
+
+다음은 `unique` 사용법을 보여주는 예제입니다. 실제 사용 사례를 찾으려고 하지 마세요.
 
 ```ts copy
-// single column
+// 단일 컬럼
 const table = mysqlTable('table', {
     id: serial('id').primaryKey(),
     name: text('name').notNull().unique(),
     state: text('state').unique('custom'),
     field: text('field').unique('custom_field'),
 });
-// multiple columns
+
+// 다중 컬럼
 const table = mysqlTable('cities1', {
     id: serial('id').primaryKey(),
     name: text('name').notNull(),
@@ -52,17 +56,20 @@ const table = mysqlTable('cities1', {
 }));
 ```
 
-In SQLite unique constraints are the same as unique indexes. As long as you can specify a name for the unique index in SQLite - we will treat all unique constraints as unique indexes in internal implementation
+### SQLite
+
+SQLite에서 고유 제약 조건은 고유 인덱스와 동일합니다. SQLite에서 고유 인덱스에 이름을 지정할 수 있는 한, 내부 구현에서는 모든 고유 제약 조건을 고유 인덱스로 처리합니다.
 
 ```ts copy
-// single column
+// 단일 컬럼
 const table = sqliteTable('table', {
     id: int('id').primaryKey(),
     name: text('name').notNull().unique(),
     state: text('state').unique('custom'),
     field: text('field').unique(),
 });
-// multiple columns
+
+// 다중 컬럼
 const table = sqliteTable('table', {
     id: int('id').primaryKey(),
     name: text('name').notNull(),
@@ -72,3 +79,5 @@ const table = sqliteTable('table', {
     second: unique('custom').on(t.name, t.state),
 }));
 ```
+
+

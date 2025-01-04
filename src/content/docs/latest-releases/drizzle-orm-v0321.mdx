@@ -1,11 +1,13 @@
 ---
-title: DrizzleORM v0.32.1 release
+title: DrizzleORM v0.32.1 릴리스
 pubDate: 2024-07-23
-description: Bug fixes
+description: 버그 수정
 ---
 
-- Fix typings for indexes and allow creating indexes on 3+ columns mixing columns and expressions
-- Added support for "limit 0" in all dialects - closes [#2011](https://github.com/drizzle-team/drizzle-orm/issues/2011)
-- Make inArray and notInArray accept empty list, closes [#1295](https://github.com/drizzle-team/drizzle-orm/issues/1295)
-- fix typo in lt typedoc
-- fix wrong example in README.md
+- **인덱스 타입 수정 및 3개 이상의 컬럼과 표현식을 혼합한 인덱스 생성 지원**
+- 모든 SQL 방언에서 "limit 0" 지원 추가 - [#2011](https://github.com/drizzle-team/drizzle-orm/issues/2011) 이슈 해결
+- `inArray`와 `notInArray`가 빈 리스트를 허용하도록 수정 - [#1295](https://github.com/drizzle-team/drizzle-orm/issues/1295) 이슈 해결
+- `lt` 타입 문서의 오타 수정
+- README.md의 잘못된 예제 수정
+
+

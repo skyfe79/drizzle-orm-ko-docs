@@ -3,31 +3,24 @@ import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
 import Section from '@mdx/Section.astro';
 
-# Magical `sql` operator 🪄
 
-When working with an ORM library, there may be cases where you find it challenging to write a
-specific query using the provided ORM syntax. In such situations, you can resort to using
-raw queries, which involve constructing a query as a raw string. However, raw queries often
-lack the benefits of type safety and query parameterization.
+# 마법 같은 `sql` 연산자 🪄
 
-To address this, many libraries have introduced the concept of an `sql` template. This template 
-allows you to write more type-safe and parameterized queries, enhancing the overall safety and 
-flexibility of your code. Drizzle, being a powerful ORM library, also supports the sql template.
 
-With Drizzle's `sql` template, you can go even further in crafting queries. If you encounter 
-difficulties in writing an entire query using the library's query builder, you can selectively
-use the `sql` template within specific sections of the Drizzle query. This flexibility enables you 
-to employ the sql template in partial SELECT statements, WHERE clauses, ORDER BY clauses, HAVING
-clauses, GROUP BY clauses, and even in relational query builders.
 
-By leveraging the capabilities of the sql template in Drizzle, you can maintain the advantages 
-of type safety and query parameterization while achieving the desired query structure and complexity.
-This empowers you to create more robust and maintainable code within your application.
 
-## sql`` template
+ORM 라이브러리를 사용하다 보면, 제공된 ORM 문법으로 특정 쿼리를 작성하기 어려운 경우가 있습니다. 이런 상황에서는 보통 **raw 쿼리**를 사용하게 되는데, 이는 쿼리를 문자열로 직접 작성하는 방식을 의미합니다. 하지만 raw 쿼리는 타입 안전성과 쿼리 파라미터화의 이점을 누리기 어렵다는 단점이 있습니다.
 
-One of the most common usages you may encounter in other ORMs as well 
-is the ability to use `sql` queries as-is for raw queries.
+이 문제를 해결하기 위해 많은 라이브러리에서 `sql` 템플릿 개념을 도입했습니다. 이 템플릿을 사용하면 타입 안전성과 파라미터화된 쿼리를 더 쉽게 작성할 수 있어 코드의 안전성과 유연성을 높일 수 있습니다. 강력한 ORM 라이브러리인 Drizzle도 이 `sql` 템플릿을 지원합니다.
+
+Drizzle의 `sql` 템플릿을 활용하면 쿼리를 더욱 세밀하게 구성할 수 있습니다. 라이브러리의 쿼리 빌더로 전체 쿼리를 작성하기 어려운 경우, Drizzle 쿼리의 특정 부분에만 `sql` 템플릿을 선택적으로 사용할 수 있습니다. 이 유연성 덕분에 `sql` 템플릿을 SELECT 문의 일부, WHERE 절, ORDER BY 절, HAVING 절, GROUP BY 절, 심지어 관계형 쿼리 빌더에서도 활용할 수 있습니다.
+
+Drizzle의 `sql` 템플릿 기능을 활용하면 타입 안전성과 쿼리 파라미터화의 장점을 유지하면서도 원하는 쿼리 구조와 복잡성을 달성할 수 있습니다. 이를 통해 애플리케이션 내에서 더 견고하고 유지보수하기 쉬운 코드를 작성할 수 있습니다.
+
+
+## sql`` 템플릿
+
+다른 ORM에서도 자주 볼 수 있는 일반적인 사용법 중 하나는, `sql` 쿼리를 그대로 사용하여 원시 쿼리를 작성하는 것입니다.
 
 ```typescript copy
 import { sql } from 'drizzle-orm' 
@@ -36,52 +29,50 @@ const id = 69;
 await db.execute(sql`select * from ${usersTable} where ${usersTable.id} = ${id}`)
 ```
 
-It will generate the current query
+위 코드는 다음과 같은 쿼리를 생성합니다.
 
 ```sql
 select * from "users" where "users"."id" = $1; --> [69]
 ```
 
-Any tables and columns provided to the sql parameter are automatically mapped to their corresponding SQL 
-syntax with escaped names for tables, and the escaped table names are appended to column names. 
+`sql` 파라미터에 제공된 테이블과 컬럼은 자동으로 해당 SQL 구문에 매핑되며, 테이블 이름은 이스케이프 처리됩니다. 또한 컬럼 이름에는 이스케이프된 테이블 이름이 추가됩니다.
 
-Additionally, any dynamic parameters such as `${id}` will be mapped to the $1 placeholder, 
-and the corresponding values will be moved to an array of values that are passed separately to the database. 
+또한, `${id}`와 같은 동적 파라미터는 `$1` 플레이스홀더로 매핑되고, 해당 값은 데이터베이스에 별도로 전달되는 값 배열로 이동합니다.
 
-This approach effectively prevents any potential SQL Injection vulnerabilities.
+이 방식은 잠재적인 SQL Injection 취약점을 효과적으로 방지합니다.
+
 
 ## `sql<T>`
 
 <Callout type="info" emoji="ℹ️">
-    Please note that `sql<T>` does not perform any runtime mapping. The type you define using `sql<T>` is
-    purely a helper for Drizzle. It is important to understand that there is no feasible way to 
-    determine the exact type dynamically, as SQL queries can be highly versatile and customizable. 
+    `sql<T>`는 런타임 매핑을 수행하지 않습니다. `sql<T>`를 사용해 정의한 타입은 순전히 Drizzle을 위한 헬퍼 역할만 합니다. 
+    SQL 쿼리는 매우 다양하고 커스터마이징이 가능하기 때문에, 동적으로 정확한 타입을 결정하는 것은 불가능하다는 점을 이해하는 것이 중요합니다.
 </Callout>
 
-You can define a custom type in Drizzle to be used in places where fields require a specific type other than `unknown`.
+Drizzle에서 `unknown`이 아닌 특정 타입이 필요한 필드에 사용할 커스텀 타입을 정의할 수 있습니다.
 
-This feature is particularly useful in partial select queries, ensuring consistent typing for selected fields:
+이 기능은 부분 선택 쿼리에서 특히 유용하며, 선택된 필드에 대해 일관된 타입을 보장합니다:
 
 ```typescript
-// without sql<T> type defined
+// sql 타입이 정의되지 않은 경우
 const response: { id: unknown }[] = await db.select({
     lowerName: sql`lower(${usersTable.id})`
 }).from(usersTable);
 
-// with sql<T> type defined
+// sql 타입이 정의된 경우
 const response: { id: string }[] = await db.select({
     lowerName: sql<string>`lower(${usersTable.id})`
 }).from(usersTable);
 ```
 
+
 ## `sql``.mapWith()`
 
-For the cases you need to make a runtime mapping for values passed from database driver to drizzle you can use `.mapWith()`
+데이터베이스 드라이버에서 Drizzle로 전달되는 값을 런타임에 매핑해야 하는 경우 `.mapWith()`를 사용할 수 있습니다.
 
-This function accepts different values, that will map response in runtime.
+이 함수는 다양한 값을 받아들여 런타임에 응답을 매핑합니다.
 
-You can replicate a specific column mapping strategy as long as
-the interface inside mapWith is the same interface that is implemented by Column.
+`mapWith` 내부의 인터페이스가 `Column`에 의해 구현된 인터페이스와 동일하다면, 특정 컬럼 매핑 전략을 복제할 수 있습니다.
 
 ```typescript
 const usersTable = pgTable('users', {
@@ -89,34 +80,29 @@ const usersTable = pgTable('users', {
     name: text('name').notNull(),
 });
 
-//  at runtime this values will be mapped same as `text` column is mapped in drizzle
+// 런타임에 이 값들은 `text` 컬럼이 Drizzle에서 매핑되는 방식과 동일하게 매핑됩니다.
 sql`...`.mapWith(usersTable.name);
 ```
 
-You can also pass your own implementation for the `DriverValueDecoder` interface:
+또한 `DriverValueDecoder` 인터페이스에 대한 여러분만의 구현을 전달할 수도 있습니다:
 
-```ts 
+```typescript
 sql``.mapWith({
-	mapFromDriverValue: (value: any) => {
-		const mappedValue = value;
-		// mapping you want to apply
-		return mappedValue;
-	},
+    mapFromDriverValue: (value: any) => {
+        const mappedValue = value;
+        // 적용하려는 매핑
+        return mappedValue;
+    },
 });
     
-// or
+// 또는
 sql``.mapWith(Number);
 ```
 
+
 ## `sql``.as<T>()`
 
-In different cases, it can sometimes be challenging to determine how to name a custom field that you want to use.
-You may encounter situations where you need to explicitly specify an alias for a 
-field that will be selected. This can be particularly useful when dealing with complex queries. 
-
-To address these scenarios, we have introduced a helpful `.as('alias_name')` helper, which allows 
-you to define an alias explicitly. By utilizing this feature, you can provide a clear and meaningful 
-name for the field, making your queries more intuitive and readable.
+특정 상황에서는 커스텀 필드의 이름을 어떻게 지어야 할지 결정하기 어려울 때가 있습니다. 특히 복잡한 쿼리를 다룰 때, 선택할 필드에 대해 명시적으로 별칭(alias)을 지정해야 하는 경우가 종종 발생합니다. 이러한 상황을 해결하기 위해, `.as('alias_name')` 헬퍼를 도입했습니다. 이 기능을 사용하면 필드에 명확하고 의미 있는 이름을 부여할 수 있어, 쿼리를 더 직관적이고 읽기 쉽게 만들 수 있습니다.
 
 <Section>
 ```typescript
@@ -127,14 +113,12 @@ sql`lower(usersTable.name)`.as('lower_name')
 ```
 </Section>
 
+
 ## `sql.raw()`
 
-There are cases where you may not need to create parameterized values from input or map tables/columns to escaped ones. 
-Instead, you might simply want to generate queries as they are. For such situations, we provide the `sql.raw()` function.
+입력값에서 파라미터화된 값을 생성하거나 테이블/컬럼을 이스케이프 처리된 값으로 매핑할 필요가 없는 경우가 있습니다. 대신, 쿼리를 있는 그대로 생성하고 싶을 때가 있죠. 이런 상황을 위해 `sql.raw()` 함수를 제공합니다.
 
-The `sql.raw()` function allows you to include raw SQL statements within your queries without any additional processing or escaping.
-This can be useful when you have pre-constructed SQL statements or when you need to incorporate complex or dynamic 
-SQL code directly into your queries.
+`sql.raw()` 함수를 사용하면 추가적인 처리나 이스케이프 없이 쿼리 안에 원시 SQL 문을 포함할 수 있습니다. 이는 미리 구성된 SQL 문이 있거나 복잡하거나 동적인 SQL 코드를 직접 쿼리에 포함해야 할 때 유용합니다.
 
 <Section>
 ```typescript
@@ -149,12 +133,9 @@ select * from users where id = $1; --> [12]
 ```
 </Section>
 
-You can also utilize `sql.raw()` within the sql function, enabling you to include any raw string
-without escaping it through the main `sql` template function.
+또한, `sql.raw()`를 `sql` 함수 내에서 사용할 수 있습니다. 이를 통해 메인 `sql` 템플릿 함수를 통해 이스케이프 처리되지 않은 원시 문자열을 쿼리에 포함할 수 있습니다.
 
-By using `sql.raw()` inside the `sql` function, you can incorporate unescaped raw strings 
-directly into your queries. This can be particularly useful when you have specific
-SQL code or expressions that should remain untouched by the template function's automatic escaping or modification.
+`sql` 함수 내에서 `sql.raw()`를 사용하면, 템플릿 함수의 자동 이스케이프나 수정 없이 특정 SQL 코드나 표현식을 그대로 쿼리에 포함할 수 있습니다. 이는 특정 SQL 코드나 표현식이 템플릿 함수의 자동 처리에 의해 변경되지 않아야 할 때 특히 유용합니다.
 
 <Section>
 ```typescript
@@ -169,18 +150,14 @@ select * from "users" where id = 12;
 ```
 </Section>
 
+
 ## sql.fromList()
 
-The `sql` template generates sql chunks, which are arrays of SQL parts that will be concatenated 
-into the query and params after applying the SQL to the database or query in Drizzle.
+`sql` 템플릿은 SQL 조각을 생성합니다. 이 조각들은 데이터베이스나 Drizzle 쿼리에 SQL을 적용한 후 쿼리와 파라미터로 연결됩니다.
 
-In certain scenarios, you may need to aggregate these chunks into an array using custom business 
-logic and then concatenate them into a single SQL statement that can be passed to the database or query.
-For such cases, the fromList function can be quite useful.
+특정 상황에서는 커스텀 비즈니스 로직을 사용해 이러한 조각들을 배열로 모아야 할 수 있습니다. 그런 다음, 이를 하나의 SQL 문장으로 연결하여 데이터베이스나 쿼리에 전달할 수 있습니다. 이런 경우에 `fromList` 함수가 매우 유용합니다.
 
-The fromList function allows you to combine multiple SQL chunks into a single SQL statement. 
-You can use it to aggregate and concatenate the individual SQL parts according to your specific 
-requirements and then obtain a unified SQL query that can be executed.
+`fromList` 함수는 여러 SQL 조각을 하나의 SQL 문장으로 결합할 수 있게 해줍니다. 이를 통해 개별 SQL 부분을 특정 요구사항에 따라 모으고 연결한 후, 실행 가능한 통합 SQL 쿼리를 얻을 수 있습니다.
 
 <Section>
 ```typescript
@@ -188,11 +165,11 @@ const sqlChunks: SQL[] = [];
 
 sqlChunks.push(sql`select * from users`);
 
-// some logic
+// 일부 로직
 
 sqlChunks.push(sql` where `);
 
-// some logic
+// 일부 로직
 
 for (let i = 0; i < 5; i++) {
 	sqlChunks.push(sql`id = ${i}`);
@@ -208,18 +185,14 @@ select * from users where id = $1 or id = $2 or id = $3 or id = $4 or id = $5; -
 ```
 </Section>
 
+
 ## sql.join()
 
-Indeed, the `sql.join` function serves a similar purpose to the fromList helper. 
-However, it provides additional flexibility when it comes to handling spaces between
-SQL chunks or specifying custom separators for concatenating the SQL chunks.
+`sql.join` 함수는 `fromList` 헬퍼와 비슷한 역할을 합니다. 하지만 SQL 청크 사이의 공간을 처리하거나, SQL 청크를 연결할 때 커스텀 구분자를 지정하는 데 있어 더 많은 유연성을 제공합니다.
 
-With `sql.join`, you can concatenate SQL chunks together using a specified separator. 
-This separator can be any string or character that you want to insert between the chunks. 
+`sql.join`을 사용하면 지정된 구분자로 SQL 청크를 연결할 수 있습니다. 이 구분자는 청크 사이에 삽입하고 싶은 문자열이나 문자일 수 있습니다.
 
-This is particularly useful when you have specific requirements for formatting or delimiting 
-the SQL chunks. By specifying a custom separator, you can achieve the desired structure and formatting 
-in the final SQL query.
+이 기능은 SQL 청크를 특정 형식으로 포맷하거나 구분해야 할 때 특히 유용합니다. 커스텀 구분자를 지정함으로써 최종 SQL 쿼리에서 원하는 구조와 형식을 얻을 수 있습니다.
 
 <Section>
 ```typescript
@@ -227,16 +200,16 @@ const sqlChunks: SQL[] = [];
 
 sqlChunks.push(sql`select * from users`);
 
-// some logic
+// 일부 로직
 
 sqlChunks.push(sql`where`);
 
-// some logic
+// 일부 로직
 
 for (let i = 0; i < 5; i++) {
-	sqlChunks.push(sql`id = ${i}`);
+    sqlChunks.push(sql`id = ${i}`);
 
-if (i === 4) continue;
+    if (i === 4) continue;
     sqlChunks.push(sql`or`);
 }
 
@@ -247,30 +220,28 @@ select * from users where id = $1 or id = $2 or id = $3 or id = $4 or id = $5; -
 ```
 </Section>
 
+
 ## sql.append()
 
-If you have already generated SQL using the `sql` template, you can achieve the same behavior as `fromList`
-by using the append function to directly add a new chunk to the generated SQL.
+이미 `sql` 템플릿을 사용해 SQL을 생성했다면, `append` 함수를 사용해 새로운 SQL 청크를 직접 추가함으로써 `fromList`와 동일한 동작을 구현할 수 있습니다.
 
-By using the append function, you can dynamically add additional SQL chunks to the existing SQL string,
-effectively concatenating them together. This allows you to incorporate custom logic or business 
-rules for aggregating the chunks into the final SQL query.
+`append` 함수를 사용하면 기존 SQL 문자열에 동적으로 추가 SQL 청크를 덧붙일 수 있습니다. 이를 통해 여러 청크를 하나로 합쳐 최종 SQL 쿼리를 만들 수 있습니다. 이 방법은 커스텀 로직이나 비즈니스 규칙을 적용해 청크를 통합할 때 유용합니다.
 
 <Section>
-```typescript 
+```typescript
 const finalSql = sql`select * from users`;
 
-// some logic
+// 로직 처리
 
 finalSql.append(sql` where `);
 
-// some logic
+// 로직 처리
 
 for (let i = 0; i < 5; i++) {
-	finalSql.append(sql`id = ${i}`);
+    finalSql.append(sql`id = ${i}`);
 
-	if (i === 4) continue;
-	finalSql.append(sql` or `);
+    if (i === 4) continue;
+    finalSql.append(sql` or `);
 }
 ```
 ```sql
@@ -278,51 +249,46 @@ select * from users where id = $1 or id = $2 or id = $3 or id = $4 or id = $5; -
 ```
 </Section>
 
+
 ## sql.empty()
 
-By using sql.empty(), you can start with a blank SQL object and then dynamically append SQL chunks to it as needed. This allows you to construct the SQL query incrementally, applying custom logic or conditions to determine the contents of each chunk.
+`sql.empty()`를 사용하면 빈 SQL 객체로 시작한 후 필요에 따라 SQL 조각을 동적으로 추가할 수 있습니다. 이를 통해 SQL 쿼리를 점진적으로 구성하고, 각 조각의 내용을 결정하기 위해 커스텀 로직이나 조건을 적용할 수 있습니다.
 
-Once you have initialized the SQL object using sql.empty(), you can take advantage of the full range
-of sql template features such as parameterization, composition, and escaping. 
-This empowers you to construct the SQL query in a flexible and controlled manner, 
-adapting it to your specific requirements.
+`sql.empty()`로 SQL 객체를 초기화한 후에는 파라미터화, 합성, 이스케이핑과 같은 SQL 템플릿의 모든 기능을 활용할 수 있습니다. 이를 통해 특정 요구사항에 맞게 SQL 쿼리를 유연하고 제어된 방식으로 구성할 수 있습니다.
 
-```typescript 
+```typescript
 const finalSql = sql.empty();
 
-// some logic
+// 일부 로직
 
 finalSql.append(sql`select * from users`);
 
-// some logic
+// 일부 로직
 
 finalSql.append(sql` where `);
 
-// some logic
+// 일부 로직
 
 for (let i = 0; i < 5; i++) {
-	finalSql.append(sql`id = ${i}`);
+    finalSql.append(sql`id = ${i}`);
 
-	if (i === 4) continue;
-	finalSql.append(sql` or `);
+    if (i === 4) continue;
+    finalSql.append(sql` or `);
 }
 ```
+
 ```sql
 select * from users where id = $1 or id = $2 or id = $3 or id = $4 or id = $5; --> [0, 1, 2, 3, 4]
 ```
 
-## Convert `sql` to string and params
 
-In all the previous examples, you observed the usage of SQL template syntax in TypeScript along with 
-the generated SQL output.
+## SQL을 문자열과 파라미터로 변환하기
 
-If you need to obtain the query string and corresponding parameters generated from the SQL template, 
-you must specify the database dialect you intend to generate the query for. Different databases have
-varying syntax for parameterization and escaping, so selecting the appropriate dialect is crucial.
+이전 예제들에서 여러분은 TypeScript에서 SQL 템플릿 구문과 생성된 SQL 출력을 사용하는 것을 확인했습니다.
 
-Once you have chosen the dialect, you can utilize the corresponding implementation's functionality
-to convert the SQL template into the desired query string and parameter format. This ensures 
-compatibility with the specific database system you are working with.
+SQL 템플릿에서 생성된 쿼리 문자열과 해당 파라미터를 얻으려면, 쿼리를 생성할 데이터베이스 방언(dialect)을 지정해야 합니다. 각 데이터베이스는 파라미터화와 이스케이프에 대해 서로 다른 구문을 사용하기 때문에 적절한 방언을 선택하는 것이 중요합니다.
+
+방언을 선택한 후, 해당 구현체의 기능을 사용하여 SQL 템플릿을 원하는 쿼리 문자열과 파라미터 형식으로 변환할 수 있습니다. 이렇게 하면 작업 중인 특정 데이터베이스 시스템과의 호환성이 보장됩니다.
 
 <CodeTabs items={["PostgreSQL", "MySQL", "SQLite"]}>
 <CodeTab>
@@ -337,7 +303,6 @@ pgDialect.sqlToQuery(sql`select * from ${usersTable} where ${usersTable.id} = ${
 select * from "users" where "users"."id" = $1; --> [ 12 ]
 ```
 </Section>
-
 </CodeTab>
 <CodeTab>
 <Section>
@@ -367,17 +332,16 @@ select * from "users" where "users"."id" = ?; --> [ 12 ]
 </CodeTab>
 </CodeTabs>
 
+
 ## `sql` select
 
-You can use the sql functionality in partial select queries as well. Partial select queries allow you to 
-retrieve specific fields or columns from a table rather than fetching the entire row.
+SQL 기능은 부분 선택 쿼리에서도 사용할 수 있습니다. 부분 선택 쿼리를 사용하면 전체 행을 가져오는 대신 테이블에서 특정 필드나 컬럼만 조회할 수 있습니다.
 
-For more detailed information about partial select queries, you can refer to the Core API
-documentation available at **[Core API docs](/docs/select#basic-and-partial-select)**.
+부분 선택 쿼리에 대한 더 자세한 정보는 **[Core API 문서](/docs/select#basic-and-partial-select)**를 참고하세요.
 
-**Select different custom fields from table**
+**테이블에서 다양한 커스텀 필드 선택하기**
 
-Here you can see a usage for **[`sql<T>`](/docs/sql#sqlt)**, **[`sql``.mapWith()`](/docs/sql#sqlmapwith)**, **[`sql``.as<T>()`](/docs/sql#sqlast)**.
+여기서는 **[`sql<T>`](/docs/sql#sqlt)**, **[`sql``.mapWith()`](/docs/sql#sqlmapwith)**, **[`sql``.as<T>()`](/docs/sql#sqlast)**의 사용 예제를 확인할 수 있습니다.
 
 <Section>
 ```typescript copy
@@ -386,9 +350,9 @@ import { usersTable } from 'schema'
 
 await db.select({
     id: usersTable.id,
-    lowerName: sql<string>`lower(${usersTable.name})`,
-    aliasedName: sql<string>`lower(${usersTable.name})`.as('aliased_column'),
-    count: sql<number>`count(*)`.mapWith(Number) 
+    lowerName: sql`lower(${usersTable.name})`,
+    aliasedName: sql`lower(${usersTable.name})`.as('aliased_column'),
+    count: sql`count(*)`.mapWith(Number) 
 }).from(usersTable)
 ```
 ```sql
@@ -396,25 +360,20 @@ select `id`, lower(`name`), lower(`name`) as `aliased_column`, count(*) from `us
 ```
 </Section>
 
-## `sql` in where
 
-Indeed, Drizzle provides a set of available expressions that you can use within the sql template. 
-However, it is true that databases often have a wider range of expressions available, 
-including those provided through extensions or other means.
+## `sql`을 where 절에서 사용하기
 
-To ensure flexibility and enable you to utilize any expressions that are not natively
-supported by Drizzle, you have the freedom to write the SQL template
-directly using the sql function. This allows you to leverage the full power of
-SQL and incorporate any expressions or functionalities specific to your target database.
+Drizzle는 SQL 템플릿 내에서 사용할 수 있는 다양한 표현식을 제공합니다. 하지만 데이터베이스는 확장 기능 등을 통해 더 많은 표현식을 지원하는 경우가 많습니다.
 
-By using the sql template, you are not restricted to only the predefined expressions in Drizzle. 
-Instead, you can express complex queries and incorporate any supported expressions that 
-the underlying database system provides.
+Drizzle에서 기본적으로 지원하지 않는 표현식을 사용하려면, `sql` 함수를 직접 사용하여 SQL 템플릿을 작성할 수 있습니다. 이를 통해 SQL의 모든 기능을 활용하고, 특정 데이터베이스 시스템에서 제공하는 표현식이나 기능을 자유롭게 사용할 수 있습니다.
 
+`sql` 템플릿을 사용하면 Drizzle에서 미리 정의된 표현식에 제한되지 않고, 복잡한 쿼리를 작성하거나 데이터베이스 시스템이 지원하는 모든 표현식을 활용할 수 있습니다.
 
-**Filtering by `id` but with sql**
-<Section>
-```typescript copy
+---
+
+**`id`로 필터링하기 (SQL 사용)**
+
+```typescript
 import { sql } from 'drizzle-orm'
 import { usersTable } from 'schema'
 
@@ -424,14 +383,16 @@ await db.select()
         .from(usersTable)
         .where(sql`${usersTable.id} = ${id}`)
 ```
+
 ```sql
 select * from "users" where "users"."id" = $1; --> [ 77 ]
 ```
-</Section>
 
-**Advanced fulltext search where statement**
-<Section>
-```typescript copy
+---
+
+**고급 전체 텍스트 검색 where 절**
+
+```typescript
 import { sql } from 'drizzle-orm'
 import { usersTable } from 'schema'
 
@@ -441,46 +402,56 @@ await db.select()
         .from(usersTable)
         .where(sql`to_tsvector('simple', ${usersTable.name}) @@ to_tsquery('simple', ${searchParam})`)
 ```
+
 ```sql
 select * from "users" where to_tsvector('simple', "users"."name") @@ to_tsquery('simple', '$1'); --> [ "Ale" ]
 ```
-</Section>
 
-## `sql` in orderBy
 
-The `sql` template can indeed be used in the ORDER BY clause when you need specific functionality for ordering that is not
-available in Drizzle, but you prefer not to resort to raw SQL.
+## `sql`을 orderBy에서 사용하기
 
-<Section>
-```typescript copy
+Drizzle에서 제공하지 않는 특정 정렬 기능이 필요하지만, 완전히 raw SQL을 사용하고 싶지 않을 때 `sql` 템플릿을 ORDER BY 절에서 사용할 수 있습니다.
+
+```typescript
 import { sql } from 'drizzle-orm'
 import { usersTable } from 'schema'
 
-await db.select().from(usersTable).orderBy(sql`${usersTable.id} desc nulls first`)
+await db.select()
+  .from(usersTable)
+  .orderBy(sql`${usersTable.id} desc nulls first`)
 ```
+
+위 코드는 다음과 같은 SQL 쿼리로 변환됩니다.
+
 ```sql
 select * from "users" order by "users"."id" desc nulls first;
 ```
-</Section>
 
-## `sql` in having and groupBy
+이 방법을 사용하면 Drizzle의 타입 안전성을 유지하면서도 복잡한 정렬 로직을 구현할 수 있습니다.
 
-The `sql` template can indeed be used in the HAVING and GROUP BY clauses when you need specific functionality for ordering that is not
-available in Drizzle, but you prefer not to resort to raw SQL.
 
-<Section>
-```typescript copy
+## HAVING과 GROUP BY에서 `sql` 사용하기
+
+Drizzle에서 제공하지 않는 특정 기능을 사용해야 하지만, 완전히 raw SQL로 전환하고 싶지 않을 때 `sql` 템플릿을 HAVING 및 GROUP BY 절에서 사용할 수 있습니다.
+
+```typescript
 import { sql } from 'drizzle-orm'
 import { usersTable } from 'schema'
 
 await db.select({ 
     projectId: usersTable.projectId,
-    count: sql<number>`count(${usersTable.id})`.mapWith(Number)
+    count: sql`count(${usersTable.id})`.mapWith(Number)
 }).from(usersTable)
     .groupBy(sql`${usersTable.projectId}`)
     .having(sql`count(${usersTable.id}) > 300`)
 ```
+
+위 코드는 다음과 같은 SQL 쿼리로 변환됩니다.
+
 ```sql
-select "project_id", count("users"."id") from users group by "users"."project_id" having count("users"."id") > 300; 
+select "project_id", count("users"."id") from users group by "users"."project_id" having count("users"."id") > 300;
 ```
-</Section>
+
+이 예제에서는 `sql` 템플릿을 사용하여 GROUP BY와 HAVING 절에 필요한 조건을 직접 지정했습니다. 이를 통해 Drizzle의 기능을 확장하면서도 raw SQL을 최소화할 수 있습니다.
+
+

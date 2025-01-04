@@ -1,30 +1,34 @@
 ---
-title: "Migrate from Prisma to Drizzle"
+title: "Prisma에서 Drizzle로 마이그레이션하기"
 ---
+
 import Steps from "@mdx/Steps.astro";
 import Npm from "@mdx/Npm.astro";
 
-## Getting Started
+## 시작하기
 
-This guide provides a straightforward approach to migrating a basic **Prisma** project to **Drizzle ORM**. Although the example focuses on `PostgreSQL`, the process is similar for other supported databases.
 
-### Overview of the migration process
+이 가이드는 기본적인 **Prisma** 프로젝트를 **Drizzle ORM**으로 마이그레이션하는 간단한 방법을 제공합니다. 예제는 `PostgreSQL`을 중심으로 설명하지만, 다른 지원 데이터베이스에서도 비슷한 과정을 거칩니다.
 
-Regardless of your application type or API layer, the steps to transition from **Prisma** to **Drizzle ORM** remain consistent:
 
-1. Install **Drizzle ORM** & **Drizzle Kit**
-2. Setup **Drizzle config** file
-3. Introspect your database
-4. Connect **Drizzle ORM** to your database
-5. Transition your **Prisma** queries to **Drizzle ORM** queries
+### 마이그레이션 프로세스 개요
 
-These steps are applicable whether you're developing a REST API (for example, with Express, Koa, or NestJS) or any other type of application that utilizes **Prisma** for database interactions.
+여러분의 애플리케이션 타입이나 API 레이어에 상관없이, **Prisma**에서 **Drizzle ORM**으로 전환하는 과정은 동일합니다:
 
-## Overview of the Prisma project
+1. **Drizzle ORM**과 **Drizzle Kit** 설치
+2. **Drizzle config** 파일 설정
+3. 데이터베이스 구조 분석
+4. **Drizzle ORM**을 데이터베이스에 연결
+5. **Prisma** 쿼리를 **Drizzle ORM** 쿼리로 전환
 
-For this guide, we'll use a REST API built with `Express` as a sample project to migrate to **Drizzle ORM**. It has four entities:
+이 단계들은 REST API(예: Express, Koa, NestJS)를 개발하거나, **Prisma**를 사용해 데이터베이스와 상호작용하는 다른 타입의 애플리케이션을 개발할 때 모두 적용됩니다.
 
-```prisma  copy filename="prisma/schema.prisma" collapsable
+
+## Prisma 프로젝트 개요
+
+이 가이드에서는 **Drizzle ORM**으로 마이그레이션할 예제 프로젝트로 `Express`로 구축된 REST API를 사용합니다. 이 프로젝트에는 네 가지 엔티티가 있습니다:
+
+```prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -33,7 +37,6 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
 
 model Product {
   id              Int           @id @default(autoincrement())
@@ -85,17 +88,16 @@ model Order {
 }
 ```
 
-The models have the following relations:
+이 모델들은 다음과 같은 관계를 가지고 있습니다:
 
-1. `one-to-many` between `Supplier` and `Product`
-2. `many-to-many` between `Order` and `Product`
+1. `Supplier`와 `Product` 사이의 `일대다` 관계
+2. `Order`와 `Product` 사이의 `다대다` 관계
 
-For `many-to-many` relation we will create a join table `order_details`, so `Order` and `Product` entities will have `one-to-many` relations with `OrderDetail` entity.
+`다대다` 관계를 위해 조인 테이블인 `order_details`를 생성합니다. 따라서 `Order`와 `Product` 엔티티는 `OrderDetail` 엔티티와 `일대다` 관계를 갖게 됩니다.
 
-The corresponding tables have been created using a generated Prisma migration.
+해당 테이블들은 Prisma 마이그레이션을 통해 생성되었습니다.
 
-
-```sql copy filename="prisma/migrations/20240101200233_init/migration.sql" collapsable
+```sql
 -- CreateTable
 CREATE TABLE "products" (
     "id" SERIAL NOT NULL,
@@ -148,7 +150,7 @@ ALTER TABLE "order_details" ADD CONSTRAINT "order_details_orderId_fkey" FOREIGN 
 ALTER TABLE "order_details" ADD CONSTRAINT "order_details_productId_fkey" FOREIGN KEY ("productId") REFERENCES "products"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ```
 
-This guide uses the following file structure:
+이 가이드에서는 다음과 같은 파일 구조를 사용합니다:
 
 ```plaintext
 📦 <project root>
@@ -177,52 +179,55 @@ This guide uses the following file structure:
 
 <Steps>
 
-#### Install Drizzle ORM & Drizzle Kit
 
-The first step is to install **Drizzle ORM** and `pg` package which we will use as a driver. The second step is to install **Drizzle Kit** and types for `pg`. [Drizzle Kit](/docs/kit-overview) - CLI companion for automatic SQL migrations generation and rapid prototyping. 
+#### Drizzle ORM과 Drizzle Kit 설치하기
+
+먼저 **Drizzle ORM**과 드라이버로 사용할 `pg` 패키지를 설치합니다. 그다음으로 **Drizzle Kit**과 `pg`의 타입 정의를 설치합니다. [Drizzle Kit](/docs/kit-overview)은 자동 SQL 마이그레이션 생성과 빠른 프로토타이핑을 위한 CLI 도구입니다.
 
 <Npm>
 drizzle-orm pg
 -D drizzle-kit @types/pg
 </Npm>
 
-#### Setup Drizzle config file
 
-**Drizzle config** - a configuration file that is used by **Drizzle Kit** and contains all the information about your database connection, migration folder and schema files.
+#### Drizzle 설정 파일 구성하기
 
-Create a `drizzle.config.ts` file in the root of your project and add the following content:
+**Drizzle 설정 파일**은 **Drizzle Kit**에서 사용하는 파일로, 데이터베이스 연결 정보, 마이그레이션 폴더, 스키마 파일 등 모든 정보를 담고 있습니다.
+
+프로젝트 루트에 `drizzle.config.ts` 파일을 생성하고 다음 내용을 추가하세요:
 
 ```typescript copy filename="drizzle.config.ts"
-import 'dotenv/config'; // make sure to install dotenv package
+import 'dotenv/config'; // dotenv 패키지 설치 필요
 import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({
-  dialect: 'postgresql',
-  out: './src/drizzle',
-  schema: './src/drizzle/schema.ts',
+  dialect: 'postgresql', // 데이터베이스 종류
+  out: './src/drizzle', // 출력 디렉토리
+  schema: './src/drizzle/schema.ts', // 스키마 파일 경로
   dbCredentials: {
-    host: process.env.DB_HOST!,
-    port: Number(process.env.DB_PORT!),
-    user: process.env.DB_USERNAME!,
-    password: process.env.DB_PASSWORD!,
-    database: process.env.DB_NAME!,
+    host: process.env.DB_HOST!, // 데이터베이스 호스트
+    port: Number(process.env.DB_PORT!), // 데이터베이스 포트
+    user: process.env.DB_USERNAME!, // 사용자 이름
+    password: process.env.DB_PASSWORD!, // 비밀번호
+    database: process.env.DB_NAME!, // 데이터베이스 이름
   },
-  // Print all statements
-  verbose: true,
-  // Always ask for confirmation
-  strict: true,
+  verbose: true, // 모든 명령문 출력
+  strict: true, // 항상 확인 요청
 });
 ```
 
-#### Introspect your database
+이 설정 파일은 Drizzle Kit이 데이터베이스와 상호작용하는 데 필요한 정보를 제공합니다. `dotenv` 패키지를 사용해 환경 변수를 로드하고, 데이터베이스 연결 정보를 설정합니다. `verbose`와 `strict` 옵션을 통해 명령문 출력과 확인 요청을 활성화할 수 있습니다.
 
-**Drizzle Kit** provides a CLI command to introspect your database and generate a schema file. The schema file contains all the information about your database tables, columns, relations, and indices.
+
+#### 데이터베이스 내부 구조 확인하기
+
+**Drizzle Kit**은 데이터베이스의 내부 구조를 확인하고 스키마 파일을 생성하는 CLI 커맨드를 제공합니다. 이 스키마 파일은 데이터베이스 테이블, 컬럼, 관계, 인덱스에 대한 모든 정보를 포함합니다.
 
 ```bash
 npx drizzle-kit introspect
 ```
 
-This command will generate a schema.ts file, along with snapshots and migrations in the src/drizzle folder.
+이 커맨드를 실행하면 `src/drizzle` 폴더에 `schema.ts` 파일과 스냅샷, 마이그레이션 파일이 생성됩니다.
 
 ```typescript collapsable copy filename="src/drizzle/schema.ts"
 import {
@@ -357,13 +362,13 @@ EXCEPTION
 END $$;
 ```
 
-Also, if you want to use relational queries, you have to update your schema file with relational tables:
+관계형 쿼리를 사용하려면 스키마 파일에 관계형 테이블을 추가해야 합니다:
 
 ```typescript copy filename="src/drizzle/schema.ts"
-// ...other imports
+// ...다른 import
 import { relations } from 'drizzle-orm';
 
-// ...other tables
+// ...다른 테이블
 export const suppliersRelations = relations(suppliers, ({ many }) => ({
   products: many(products),
 }));
@@ -383,7 +388,7 @@ export const orderDetailsRelations = relations(orderDetails, ({ one }) => ({
 }));
 ```
 
-Now we have the following file structure:
+이제 다음과 같은 파일 구조가 생성됩니다:
 
 ```plaintext
 📦 <project root>
@@ -409,11 +414,12 @@ Now we have the following file structure:
  └ 📜 tsconfig.json
 ```
 
-#### Connect Drizzle ORM to your database
 
-Create a `db.ts` file in the `src/drizzle` folder and set up your database configuration:
+#### Drizzle ORM을 데이터베이스에 연결하기
 
-```typescript copy filename="src/drizzle/db.ts"
+`src/drizzle` 폴더 안에 `db.ts` 파일을 생성하고 데이터베이스 설정을 구성합니다:
+
+```typescript
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Client } from 'pg';
 import * as schema from './schema';
@@ -426,37 +432,41 @@ export const client = new Client({
   database: process.env.DB_NAME!,
 });
 
-// { schema } is used for relational queries
+// { schema }는 관계형 쿼리를 위해 사용됩니다
 export const db = drizzle({ client, schema });
 ```
 
-```typescript copy filename="src/index.ts"
+```typescript
 import 'dotenv/config';
 import { client, db } from './drizzle/db';
 import { resolve } from 'node:path';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 
-
 (async () => {
   await client.connect();
 
-  // This command run all migrations from the migrations folder and apply changes to the database
+  // 이 커맨드는 migrations 폴더의 모든 마이그레이션을 실행하고 데이터베이스에 변경 사항을 적용합니다
   await migrate(db, { migrationsFolder: resolve(__dirname, './drizzle') });
 
-  // ... start your application
+  // ... 애플리케이션 시작
 })();
 ```
 
-#### Transition your Prisma queries to Drizzle ORM queries
 
-In this section, we will show you how to replace several queries from **Prisma** with **Drizzle ORM**.
+#### Prisma 쿼리를 Drizzle ORM 쿼리로 전환하기
 
-##### Replace insert queries
+이번 섹션에서는 **Prisma**에서 사용하던 여러 쿼리를 **Drizzle ORM**으로 대체하는 방법을 설명합니다.
 
-We will show how to insert new rows into `suppliers` and `products` tables.
 
-1. `POST /suppliers`
-```typescript copy filename="src/controllers/supplier.controller.ts"
+### 데이터 삽입 쿼리 변경하기
+
+`suppliers`와 `products` 테이블에 새로운 행을 삽입하는 방법을 알아보겠습니다.
+
+#### 1. `POST /suppliers`
+
+**Prisma**를 사용한 쿼리는 다음과 같습니다:
+
+```typescript
 import { prisma } from '../db/db';
 
 await prisma.supplier.createMany({
@@ -467,9 +477,9 @@ await prisma.supplier.createMany({
 });
 ```
 
-With **Drizzle ORM**, the query is implemented as follows:
+**Drizzle ORM**을 사용하면 다음과 같이 구현할 수 있습니다:
 
-```typescript copy filename="src/controllers/supplier.controller.ts"
+```typescript
 import { db } from '../drizzle/db';
 import { suppliers } from '../drizzle/schema';
 
@@ -487,9 +497,11 @@ await db.insert(suppliers).values([
 ]);
 ```
 
-2. `POST /products`
+#### 2. `POST /products`
 
-```typescript copy filename="src/controllers/product.controller.ts"
+**Prisma**를 사용한 쿼리는 다음과 같습니다:
+
+```typescript
 import { prisma } from '../db/db';
 
 await prisma.product.createMany({
@@ -522,11 +534,11 @@ await prisma.product.createMany({
 });
 ```
 
-With **Drizzle ORM**, the query is implemented as follows:
+**Drizzle ORM**을 사용하면 다음과 같이 구현할 수 있습니다:
 
-Be careful with the `unitPrice` field. In **Prisma** it's a `number` type, but in **Drizzle ORM** it's a `string` type, which can handle more than 16383 digits after the decimal point, unlike the `number` type.
+`unitPrice` 필드에 주의해야 합니다. **Prisma**에서는 `number` 타입이지만, **Drizzle ORM**에서는 `string` 타입으로 처리됩니다. 이는 소수점 이하 16383자리 이상의 숫자를 처리할 수 있기 때문입니다.
 
-```typescript copy filename="src/controllers/product.controller.ts"
+```typescript
 await db.insert(products).values([
   {
     name: 'TestProductName1',
@@ -555,9 +567,10 @@ await db.insert(products).values([
 ]);
 ```
 
-##### Replace select queries
 
-In this section we will show how to select one row, multiple rows, count rows, filter rows, join tables and paginate results.
+##### 쿼리 선택하기
+
+이번 섹션에서는 단일 행 선택, 여러 행 선택, 행 개수 세기, 행 필터링, 테이블 조인, 결과 페이징 방법을 살펴보겠습니다.
 
 1. `GET /products/:id`
 
@@ -574,7 +587,7 @@ const response = await prisma.product.findUnique({
 });
 ```
 
-In **Drizzle ORM**, the query is implemented as follows:
+**Drizzle ORM**에서는 다음과 같이 구현됩니다:
 
 ```typescript copy filename="src/controllers/product.controller.ts"
 import { eq } from 'drizzle-orm';
@@ -592,7 +605,7 @@ const response = await db
   .where(eq(products.id, id))
   .leftJoin(suppliers, eq(suppliers.id, products.supplierId));
 
-// or you can use relational queries
+// 또는 관계형 쿼리를 사용할 수 있습니다
 const response = await db.query.products.findFirst({
   where: (products, { eq }) => eq(products.id, id),
   with: {
@@ -601,10 +614,10 @@ const response = await db.query.products.findFirst({
 });
 ```
 
-Response will be type-safe with both ORMs.
+두 ORM 모두 타입 안전한 응답을 반환합니다.
 
 ```typescript
-// response type for Drizzle ORM
+// Drizzle ORM의 응답 타입
 const response: {
   product: {
     name: string;
@@ -648,7 +661,7 @@ const [response, count] = await Promise.all([
 ]);
 ```
 
-In **Drizzle ORM**, the query is implemented as follows:
+**Drizzle ORM**에서는 다음과 같이 구현됩니다:
 
 ```typescript collapsable copy filename="src/controllers/product.controller.ts"
 import { ilike, sql } from 'drizzle-orm';
@@ -670,12 +683,12 @@ const [response, count] = await Promise.all([
     .offset(0)
     .limit(10),
   db
-    .select({ count: sql<number>`cast(count(${products.id}) as integer)` })
+    .select({ count: sql`cast(count(${products.id}) as integer)` })
     .from(products)
     .where(whereOptions),
 ]);
 
-// or you can use relational queries
+// 또는 관계형 쿼리를 사용할 수 있습니다
 const whereOptions = ilike(products.name, `%test%`);
 
 const [response, count] = await Promise.all([
@@ -691,16 +704,16 @@ const [response, count] = await Promise.all([
     limit: 10,
   }),
   db
-    .select({ count: sql<number>`cast(count(${products.id}) as integer)` })
+    .select({ count: sql`cast(count(${products.id}) as integer)` })
     .from(products)
     .where(whereOptions),
 ]);
 ```
 
-Response will be type-safe with both ORMs.
+두 ORM 모두 타입 안전한 응답을 반환합니다.
 
 ```typescript
-// response type for Drizzle ORM
+// Drizzle ORM의 응답 타입
 const response: {
   id: number;
   name: string;
@@ -711,9 +724,9 @@ const response: {
 
 3. `GET /orders/:id`
 
-In **Prisma**, aggregate functions require using the `aggregate` method. For complex queries, the `$queryRaw` method is used, which is not type-safe.
+**Prisma**에서는 집계 함수를 사용하려면 `aggregate` 메서드를 사용해야 합니다. 복잡한 쿼리의 경우 타입 안전하지 않은 `$queryRaw` 메서드를 사용합니다.
 
-We want to select `id`, `orderDate` and `shipCountry` fields from `orders` table and by using `aggregation functions` sum `totalPrice` of order, `totalQuantity` of products in the order and count `totalProducts` in the order.
+`orders` 테이블에서 `id`, `orderDate`, `shipCountry` 필드를 선택하고, `aggregation functions`를 사용해 주문의 `totalPrice` 합계, 주문 내 제품의 `totalQuantity` 합계, 주문 내 제품 개수 `totalProducts`를 세어야 합니다.
 
 ```typescript copy filename="src/controllers/order.controller.ts"
 import { prisma } from '../db/db';
@@ -742,7 +755,7 @@ const { _count, _sum } = await prisma.orderDetail.aggregate({
   },
 });
 
-const totalPrice: Array<{ totalPrice: number }> = await prisma.$queryRaw<number>`
+const totalPrice: Array = await prisma.$queryRaw`
   SELECT SUM(unitPrice * quantity) as "totalPrice"
   FROM order_details
   WHERE "orderId" = ${id}
@@ -756,7 +769,7 @@ const response = {
 };
 ```
 
-In **Drizzle ORM**, the query is implemented as follows:
+**Drizzle ORM**에서는 다음과 같이 구현됩니다:
 
 ```typescript copy filename="src/controllers/order.controller.ts"
 import { eq, sql } from 'drizzle-orm';
@@ -770,9 +783,9 @@ const response = await db
         id: orders.id,
         shipCountry: orders.shipCountry,
         orderDate: orders.orderDate,
-        totalPrice: sql<number>`cast(sum(${orderDetails.quantity} * ${products.unitPrice}) as float)`,
-        totalQuantity: sql<number>`cast(sum(${orderDetails.quantity}) as int)`,
-        totalProducts: sql<number>`cast(count(${orderDetails.productId}) as int)`,
+        totalPrice: sql`cast(sum(${orderDetails.quantity} * ${products.unitPrice}) as float)`,
+        totalQuantity: sql`cast(sum(${orderDetails.quantity}) as int)`,
+        totalProducts: sql`cast(count(${orderDetails.productId}) as int)`,
       })
       .from(orders)
       .where(eq(orders.id, id))
@@ -781,10 +794,10 @@ const response = await db
       .leftJoin(products, eq(products.id, orderDetails.productId));
 ```
 
-In **Drizzle ORM**, the result will be type-safe with aggregations too.
+**Drizzle ORM**에서는 집계 결과도 타입 안전합니다.
 
 ```typescript
-// response type
+// 응답 타입
 const response: {
   id: number;
   shipCountry: string;
@@ -795,14 +808,15 @@ const response: {
 }[]
 ```
 
-**Note:** as of now aggregations are not supported in relational queries, so you have to use `core queries`.
+**참고:** 현재 관계형 쿼리에서는 집계를 지원하지 않으므로 `core queries`를 사용해야 합니다.
 
-##### Replace update queries
 
-In this section, we will show you how to update multiple rows.
+##### 여러 행 업데이트하기
+
+이번 섹션에서는 여러 행을 업데이트하는 방법을 알아보겠습니다.
 
 1. `PATCH /suppliers/:id`
-  
+
 ```typescript copy filename="src/controllers/supplier.controller.ts"
 import { prisma } from '../db/db';
 
@@ -814,7 +828,7 @@ const supplier = await prisma.supplier.update({
 });
 ```
 
-In **Drizzle ORM**, the query is implemented as follows:
+**Drizzle ORM**에서는 다음과 같이 쿼리를 구현할 수 있습니다:
 
 ```typescript copy filename="src/controllers/supplier.controller.ts"
 import { eq } from 'drizzle-orm';
@@ -832,9 +846,10 @@ await db
     .where(eq(suppliers.id, id));
 ```
 
-##### Replace delete queries
 
-In this section, we will show you how to delete a single row and multiple rows using transactions.
+##### 삭제 쿼리 대체하기
+
+이번 섹션에서는 트랜잭션을 사용하여 단일 행과 여러 행을 삭제하는 방법을 알아보겠습니다.
 
 1. `DELETE /orders/:id`
 
@@ -854,7 +869,7 @@ const orderQuery = prisma.order.deleteMany({
 await prisma.$transaction([orderDetailQuery, orderQuery]);
 ```
 
-In **Drizzle ORM**, the query is implemented as follows:
+**Drizzle ORM**에서는 다음과 같이 쿼리를 구현할 수 있습니다:
 
 ```typescript copy filename="src/controllers/order.controller.ts"
 import { eq } from 'drizzle-orm';
@@ -873,4 +888,6 @@ try {
   console.error(e);
 }
 ```
+
+
 </Steps>

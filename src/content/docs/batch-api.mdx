@@ -3,126 +3,126 @@ import Tabs from '@mdx/Tabs.astro';
 
 # Batch API
 
-**LibSQL Batch API explanation**:
-_[source](https://docs.turso.tech/sdk/ts/reference#batch-transactions)_
+**LibSQL Batch API 설명**:
+_[출처](https://docs.turso.tech/sdk/ts/reference#batch-transactions)_
 
-> With the libSQL client library, a batch is one or more SQL statements executed in order in an implicit transaction. 
-The transaction is controlled by the libSQL backend. If all of the statements are successful, 
-the transaction is committed. If any of the statements fail, the entire transaction is rolled back and no changes are made.
+> libSQL 클라이언트 라이브러리에서 배치는 하나 이상의 SQL 문을 순서대로 실행하는 암시적 트랜잭션입니다. 
+트랜잭션은 libSQL 백엔드에 의해 제어됩니다. 모든 문이 성공하면 트랜잭션이 커밋됩니다. 
+어떤 문이라도 실패하면 전체 트랜잭션이 롤백되고 변경 사항이 적용되지 않습니다.
 
-**D1 Batch API explanation**:
-_[source](https://developers.cloudflare.com/d1/platform/client-api/#batch-statements)_
+**D1 Batch API 설명**:
+_[출처](https://developers.cloudflare.com/d1/platform/client-api/#batch-statements)_
 
-> Batching sends multiple SQL statements inside a single call to the database. 
-This can have a huge performance impact as it reduces latency from network round trips to D1. 
-D1 operates in auto-commit. Our implementation guarantees that each statement in the list will execute and commit,
-sequentially, non-concurrently.
-Batched statements are SQL transactions. If a statement in the sequence fails, 
-then an error is returned for that specific statement, and it aborts or rolls back the entire sequence.
+> 배치는 여러 SQL 문을 데이터베이스에 한 번의 호출로 보냅니다. 
+이렇게 하면 네트워크 왕복으로 인한 지연 시간이 줄어들어 성능에 큰 영향을 미칠 수 있습니다. 
+D1은 자동 커밋 모드로 동작합니다. 우리의 구현은 목록에 있는 각 문이 순차적이고 동시에 실행되지 않도록 보장합니다.
+배치된 문은 SQL 트랜잭션입니다. 시퀀스 중 하나의 문이 실패하면 해당 문에 대한 오류가 반환되고 전체 시퀀스가 중단되거나 롤백됩니다.
 
-Drizzle ORM provides APIs to run SQL statements in batch for `LibSQL`, `Neon` and `D1`:
+Drizzle ORM은 `LibSQL`, `Neon`, `D1`에 대해 SQL 문을 배치로 실행할 수 있는 API를 제공합니다:
 ```ts
 const batchResponse: BatchResponse = await db.batch([
-	db.insert(usersTable).values({ id: 1, name: 'John' }).returning({ id: usersTable.id }),
-	db.update(usersTable).set({ name: 'Dan' }).where(eq(usersTable.id, 1)),
-	db.query.usersTable.findMany({}),
-	db.select().from(usersTable).where(eq(usersTable.id, 1)),
-	db.select({ id: usersTable.id, invitedBy: usersTable.invitedBy }).from(usersTable),
+    db.insert(usersTable).values({ id: 1, name: 'John' }).returning({ id: usersTable.id }),
+    db.update(usersTable).set({ name: 'Dan' }).where(eq(usersTable.id, 1)),
+    db.query.usersTable.findMany({}),
+    db.select().from(usersTable).where(eq(usersTable.id, 1)),
+    db.select({ id: usersTable.id, invitedBy: usersTable.invitedBy }).from(usersTable),
 ]);
 ```
-Type for `batchResponse` in this example would be:
+이 예제에서 `batchResponse`의 타입은 다음과 같습니다:
 <Tabs items={["libSQL", "Neon", "D1"]}>
 <Tab>
 ```ts
 type BatchResponse = [
-	{
-		id: number;
-	}[],
-	ResultSet,
-	{
-		id: number;
-		name: string;
-		verified: number;
-		invitedBy: number | null;
-	}[],
-	{
-		id: number;
-		name: string;
-		verified: number;
-		invitedBy: number | null;
-	}[],
-	{
-		id: number;
-		invitedBy: number | null;
-	}[],
+    {
+        id: number;
+    }[],
+    ResultSet,
+    {
+        id: number;
+        name: string;
+        verified: number;
+        invitedBy: number | null;
+    }[],
+    {
+        id: number;
+        name: string;
+        verified: number;
+        invitedBy: number | null;
+    }[],
+    {
+        id: number;
+        invitedBy: number | null;
+    }[],
 ]
 ```
 </Tab>
 <Tab>
 ```ts
 type BatchResponse = [
-	{
-		id: number;
-	}[],
-	NeonHttpQueryResult,
-	{
-		id: number;
-		name: string;
-		verified: number;
-		invitedBy: number | null;
-	}[],
-	{
-		id: number;
-		name: string;
-		verified: number;
-		invitedBy: number | null;
-	}[],
-	{
-		id: number;
-		invitedBy: number | null;
-	}[],
+    {
+        id: number;
+    }[],
+    NeonHttpQueryResult,
+    {
+        id: number;
+        name: string;
+        verified: number;
+        invitedBy: number | null;
+    }[],
+    {
+        id: number;
+        name: string;
+        verified: number;
+        invitedBy: number | null;
+    }[],
+    {
+        id: number;
+        invitedBy: number | null;
+    }[],
 ]
 ```
 </Tab>
 <Tab>
 ```ts
 type BatchResponse = [
-  {
-    id: number;
-  }[],
-  D1Result,
-  {
-    id: number;
-    name: string;
-    verified: number;
-    invitedBy: number | null;
-  }[],
-  {
-    id: number;
-    name: string;
-    verified: number;
-    invitedBy: number | null;
-  }[],
-  {
-    id: number;
-    invitedBy: number | null;
-  }[],
+    {
+        id: number;
+    }[],
+    D1Result,
+    {
+        id: number;
+        name: string;
+        verified: number;
+        invitedBy: number | null;
+    }[],
+    {
+        id: number;
+        name: string;
+        verified: number;
+        invitedBy: number | null;
+    }[],
+    {
+        id: number;
+        invitedBy: number | null;
+    }[],
 ]
 ```
 </Tab>
 </Tabs>
 
-All possible builders that can be used inside `db.batch`:
+`db.batch` 내부에서 사용할 수 있는 모든 빌더:
 ```ts
 db.all(),
 db.get(),
 db.values(),
 db.run(),
 db.execute(),
-db.query.<table>.findMany(),
-db.query.<table>.findFirst(),
+db.query..findMany(),
+db.query..findFirst(),
 db.select()...,
 db.update()...,
 db.delete()...,
 db.insert()...,
 ```
+
+

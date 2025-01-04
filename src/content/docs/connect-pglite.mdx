@@ -11,26 +11,29 @@ import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
 # Drizzle \<\> PGlite
 
 <Prerequisites>
-- Database [connection basics](/docs/connect-overview) with Drizzle
-- ElectricSQL - [website](https://electric-sql.com/)
-- PgLite driver - [docs](https://pglite.dev/) & [GitHub](https://github.com/electric-sql/pglite)
+- Drizzle를 사용한 데이터베이스 [연결 기본 사항](/docs/connect-overview)
+- ElectricSQL - [웹사이트](https://electric-sql.com/)
+- PgLite 드라이버 - [문서](https://pglite.dev/) & [GitHub](https://github.com/electric-sql/pglite)
 </Prerequisites>
 
-According to the **[official repo](https://github.com/electric-sql/pglite)**, PGlite is a WASM Postgres build packaged into a TypeScript client library that enables you to run Postgres in the browser, Node.js and Bun, with no need to install any other dependencies. It is only 2.6mb gzipped.
+**[공식 저장소](https://github.com/electric-sql/pglite)**에 따르면, PGlite는 WASM으로 빌드된 Postgres를 TypeScript 클라이언트 라이브러리로 패키징한 것입니다. 이를 통해 브라우저, Node.js, Bun에서 추가적인 의존성 없이 Postgres를 실행할 수 있습니다. 압축 시 크기는 단 2.6MB입니다.
 
-It can be used as an ephemeral in-memory database, or with persistence either to the file system (Node/Bun) or indexedDB (Browser).
+PGlite는 임시 메모리 내 데이터베이스로 사용하거나, 파일 시스템(Node/Bun) 또는 indexedDB(브라우저)에 지속적으로 저장할 수 있습니다.
 
-Unlike previous "Postgres in the browser" projects, PGlite does not use a Linux virtual machine - it is simply Postgres in WASM.
+이전의 "브라우저 내 Postgres" 프로젝트와 달리, PGlite는 리눅스 가상 머신을 사용하지 않습니다. 단순히 WASM으로 실행되는 Postgres입니다.
 
-#### Step 1 - Install packages
+
+#### 1단계 - 패키지 설치
 
 <Npm>
 drizzle-orm @electric-sql/pglite
 -D drizzle-kit
 </Npm>
 
-#### Step 2 - Initialize the driver and make a query
-<CodeTabs items={["In-Memory", "In directory", "With extra config options"]}>
+
+#### 2단계 - 드라이버 초기화 및 쿼리 실행
+
+<CodeTabs items={["메모리 내", "디렉토리 내", "추가 설정 옵션 포함"]}>
 ```typescript copy"
 import { drizzle } from 'drizzle-orm/pglite';
 
@@ -41,33 +44,36 @@ await db.select().from(...);
 ```typescript copy"
 import { drizzle } from 'drizzle-orm/pglite';
 
-const db = drizzle('path-to-dir');
+const db = drizzle('디렉토리-경로');
 
 await db.select().from(...);
 ```
 ```typescript copy"
 import { drizzle } from 'drizzle-orm/pglite';
 
-// connection is a native PGLite configuration
-const db = drizzle({ connection: { dataDir: 'path-to-dir' }});
+// connection은 기본 PGLite 설정입니다
+const db = drizzle({ connection: { dataDir: '디렉토리-경로' }});
 
 await db.select().from(...);
 ```
 </CodeTabs>
 
-If you need to provide your existing driver:
+기존 드라이버를 제공해야 하는 경우:
 
 ```typescript copy"
 import { PGlite } from '@electric-sql/pglite';
 import { drizzle } from 'drizzle-orm/pglite';
 
-// In-memory Postgres
+// 메모리 내 Postgres
 const client = new PGlite();
 const db = drizzle({ client });
 
 await db.select().from(users);
 ```
 
-#### What's next?
+
+#### 다음 단계는 무엇인가요?
 
 <WhatsNextPostgres/>
+
+

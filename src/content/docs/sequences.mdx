@@ -1,52 +1,60 @@
 import IsSupportedChipGroup from '@mdx/IsSupportedChipGroup.astro';
 import Callout from '@mdx/Callout.astro';
 
-# Sequences
+# 시퀀스(Sequences)
+
+
+
+
 
 <Callout type="info">
-To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `drizzle-kit@0.23.0` or higher
+이 기능을 사용하려면 `drizzle-orm@0.32.0` 이상과 `drizzle-kit@0.23.0` 이상이 필요합니다.
 </Callout>
 
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': false, 'MySQL': false, 'SingleStore': false }} />
 
-Sequences in PostgreSQL are special single-row tables created to generate unique identifiers, often used for auto-incrementing primary key values. They provide a thread-safe way to generate unique sequential values across multiple sessions.
+PostgreSQL에서 시퀀스는 고유 식별자를 생성하기 위해 만들어진 특수한 단일 행 테이블입니다. 주로 자동 증가하는 기본 키 값을 생성하는 데 사용됩니다. 시퀀스는 여러 세션에서 고유한 순차 값을 생성하는 스레드 안전한 방법을 제공합니다.
+
 <br/>
 
-**Key Features**
-- Creation and Initialization: Use CREATE SEQUENCE to create a new sequence. Parameters such as increment value, start value, min/max values, and cache size can be specified.
+**주요 기능**
+- 생성 및 초기화: `CREATE SEQUENCE`를 사용해 새로운 시퀀스를 생성합니다. 증가 값, 시작 값, 최소/최대 값, 캐시 크기 등의 매개변수를 지정할 수 있습니다.
 
-- Manipulation Functions
-    - `nextval('sequence_name')`: Advances the sequence and returns the next value.
-    - `currval('sequence_name')`: Returns the current value of the sequence for the current session.
-    - `setval('sequence_name', value)`: Sets the sequence's current value.
-    - `lastval()`: Returns the last value returned by nextval in the current session.
+- 조작 함수
+    - `nextval('sequence_name')`: 시퀀스를 진행하고 다음 값을 반환합니다.
+    - `currval('sequence_name')`: 현재 세션에서 시퀀스의 현재 값을 반환합니다.
+    - `setval('sequence_name', value)`: 시퀀스의 현재 값을 설정합니다.
+    - `lastval()`: 현재 세션에서 `nextval`로 반환된 마지막 값을 반환합니다.
 
-- Ownership: Sequences can be linked to table columns using the OWNED BY clause. Dropping the table or column will automatically drop the associated sequence.
-- Cycling: Sequences can be set to cycle when they reach their maximum or minimum value using the CYCLE option. The default is NO CYCLE.
-- Caching: Sequence values can be preallocated using the CACHE option for improved performance.
+- 소유권: 시퀀스는 `OWNED BY` 절을 사용해 테이블 컬럼과 연결할 수 있습니다. 테이블이나 컬럼을 삭제하면 연결된 시퀀스도 자동으로 삭제됩니다.
+- 순환: 시퀀스는 최대 또는 최소 값에 도달했을 때 순환하도록 설정할 수 있습니다. 기본값은 `NO CYCLE`입니다.
+- 캐싱: 시퀀스 값은 `CACHE` 옵션을 사용해 미리 할당할 수 있으며, 이는 성능 향상에 도움이 됩니다.
+
 <br/>
 
-**Limitations**
-- Gaps: Sequences are not gapless. Aborted transactions or crashes can lead to gaps in the sequence values.
-- Concurrency: While sequences provide unique values across sessions, the values may be out of order when considering all sessions.
-- No Rollback: Changes to sequences are not rolled back if a transaction fails. This ensures unique values but can lead to gaps.
-- Crash Recovery: Unlogged sequences or sequences modified before a crash might not be properly restored to their previous state.
+**제한 사항**
+- 간격: 시퀀스는 연속적이지 않습니다. 중단된 트랜잭션이나 충돌로 인해 시퀀스 값에 간격이 생길 수 있습니다.
+- 동시성: 시퀀스는 여러 세션에서 고유한 값을 제공하지만, 모든 세션을 고려할 때 값의 순서가 뒤섞일 수 있습니다.
+- 롤백 없음: 시퀀스의 변경 사항은 트랜잭션이 실패해도 롤백되지 않습니다. 이는 고유한 값을 보장하지만 간격을 유발할 수 있습니다.
+- 충돌 복구: 로그가 없는 시퀀스나 충돌 전에 수정된 시퀀스는 이전 상태로 제대로 복구되지 않을 수 있습니다.
+
 <br/>
 
-**Practical Use**
-- Default Behavior: By default, sequences increment by 1 and start at 1.
-- Custom Behavior: Custom start points, increments, min/max values, and cycling can be specified.
-- Associations: Commonly associated with table columns for auto-incrementing fields, making management of unique identifiers seamless.
+**실제 사용**
+- 기본 동작: 기본적으로 시퀀스는 1씩 증가하며 1에서 시작합니다.
+- 커스텀 동작: 시작점, 증가량, 최소/최대 값, 순환 여부 등을 커스텀하게 지정할 수 있습니다.
+- 연관성: 주로 테이블 컬럼과 연결되어 자동 증가 필드로 사용되며, 고유 식별자를 쉽게 관리할 수 있습니다.
+
 <br/>
 
-**Usage Example**
+**사용 예제**
 ```ts
 import { pgSchema, pgSequence } from "drizzle-orm/pg-core";
 
-// No params specified
+// 매개변수 없이 시퀀스 생성
 export const customSequence = pgSequence("name");
 
-// Sequence with params
+// 매개변수와 함께 시퀀스 생성
 export const customSequence = pgSequence("name", {
       startWith: 100,
       maxValue: 10000,
@@ -56,7 +64,9 @@ export const customSequence = pgSequence("name", {
       increment: 2
 });
 
-// Sequence in custom schema
+// 커스텀 스키마에서 시퀀스 생성
 export const customSchema = pgSchema('custom_schema');
 export const customSequence = customSchema.sequence("name");
 ```
+
+

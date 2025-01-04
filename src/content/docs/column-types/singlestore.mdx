@@ -1,22 +1,22 @@
 ---
-title: SingleStore column types
+title: SingleStore 컬럼 타입
 ---
 import Section from '@mdx/Section.astro';
 import Callout from '@mdx/Callout.astro';
 
-We have native support for all of them, yet if that's not enough for you, feel free to create **[custom types](/docs/custom-types)**.
+### 정수(integer)
 
-<Callout title='important' type='warning'>
-All examples in this part of the documentation do not use database column name aliases, and column names are generated from TypeScript keys. 
+SingleStore는 모든 컬럼 타입을 기본적으로 지원합니다. 하지만 그렇지 않다면 **[커스텀 타입](/docs/custom-types)**을 자유롭게 생성할 수 있습니다.
 
-You can use database aliases in column names if you want, and you can also use the `casing` parameter to define a mapping strategy for Drizzle. 
+<Callout title='중요' type='warning'>
+이 문서의 모든 예제는 데이터베이스 컬럼 이름 별칭을 사용하지 않으며, 컬럼 이름은 TypeScript 키에서 생성됩니다.
 
-You can read more about it [here](/docs/sql-schema-declaration#shape-your-data-schema)
+원한다면 데이터베이스 별칭을 컬럼 이름에 사용할 수 있으며, `casing` 매개변수를 사용해 Drizzle의 매핑 전략을 정의할 수도 있습니다.
+
+자세한 내용은 [여기](/docs/sql-schema-declaration#shape-your-data-schema)에서 확인할 수 있습니다.
 </Callout>
 
-### integer
-
-A signed integer, stored in `0`, `1`, `2`, `3`, `4`, `6`, or `8` bytes depending on the magnitude of the value.
+부호 있는 정수로, 값의 크기에 따라 `0`, `1`, `2`, `3`, `4`, `6`, 또는 `8` 바이트로 저장됩니다.
 
 <Section>
 ```typescript
@@ -34,23 +34,25 @@ CREATE TABLE `table` (
 ```
 </Section>
 
+
 ### tinyint
 
-<Section>
 ```typescript
 import { tinyint, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-	tinyint: tinyint()
+    tinyint: tinyint()
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`tinyint` tinyint,
+    `tinyint` tinyint
 );
 ```
-</Section>
+
+위 코드는 `tinyint` 타입을 사용하여 MySQL 테이블을 생성하는 예제입니다. `drizzle-orm/mysql-core` 모듈에서 `tinyint`와 `singlestoreTable`을 가져와서 테이블을 정의합니다. SQL 쿼리에서는 `tinyint` 컬럼을 생성합니다.
+
 
 ### smallint
 
@@ -59,16 +61,17 @@ CREATE TABLE `table` (
 import { smallint, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-	smallint: smallint()
+    smallint: smallint()
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`smallint` smallint,
+    `smallint` smallint
 );
 ```
 </Section>
+
 
 ### mediumint
 
@@ -77,47 +80,53 @@ CREATE TABLE `table` (
 import { mediumint, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-	mediumint: mediumint()
+    mediumint: mediumint()
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`mediumint` mediumint,
+    `mediumint` mediumint
 );
 ```
 </Section>
 
+위 코드는 `mediumint` 타입을 사용하여 MySQL 테이블을 생성하는 예제입니다. `drizzle-orm/mysql-core` 모듈에서 `mediumint`와 `singlestoreTable`을 가져와서 테이블을 정의합니다. 이 테이블은 `mediumint`라는 컬럼을 가지며, 이 컬럼은 MySQL의 `mediumint` 타입을 사용합니다. SQL 문으로는 `CREATE TABLE`을 사용하여 동일한 구조의 테이블을 생성합니다.
+
+
 ### bigint
 
-<Section>
 ```typescript
 import { bigint, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-	bigint: bigint({ mode: 'number' })
-	bigintUnsigned: bigint({ mode: 'number', unsigned: true })
+    bigint: bigint({ mode: 'number' }),
+    bigintUnsigned: bigint({ mode: 'number', unsigned: true })
 });
 
 bigint('...', { mode: 'number' | 'bigint' });
 
-// You can also specify unsigned option for bigint
-bigint('...', { mode: 'number' | 'bigint', unsigned: true })
+// bigint에 unsigned 옵션도 지정할 수 있습니다.
+bigint('...', { mode: 'number' | 'bigint', unsigned: true });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`bigint` bigint,
-	`bigintUnsigned` bigint unsigned,
+    `bigint` bigint,
+    `bigintUnsigned` bigint unsigned,
 );
 ```
-</Section>
 
-We've omitted config of `M` in `bigint(M)`, since it indicates the display width of the numeric type 
+`bigint(M)`에서 `M` 설정은 숫자 타입의 표시 너비를 나타내므로 생략했습니다.
+
 
 ## ---
 
-### real
+
+
+
+
+### 실수 타입(real)
 
 <Section>
 ```typescript
@@ -153,7 +162,8 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-### decimal
+
+### decimal 타입
 
 <Section>
 ```typescript
@@ -189,20 +199,21 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-### double
+
+### double 타입
 
 <Section>
 ```typescript
 import { double, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-	double: double('double')
+    double: double('double')
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`double` double,
+    `double` double,
 );
 ```
 </Section>
@@ -212,44 +223,50 @@ CREATE TABLE `table` (
 import { double, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-	doublePrecision: double({ precision: 1,}),
-	doublePrecisionScale: double({ precision: 1, scale: 1,}),
+    doublePrecision: double({ precision: 1,}),
+    doublePrecisionScale: double({ precision: 1, scale: 1,}),
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`doublePrecision` double(1),
-	`doublePrecisionScale` double(1, 1),
+    `doublePrecision` double(1),
+    `doublePrecisionScale` double(1, 1),
 );
 ```
 </Section>
+
 
 ### float
 
-<Section>
 ```typescript
 import { float, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-	float: float()
+    float: float()
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`float` float,
+    `float` float
 );
 ```
-</Section>
 
-## ---
+위 코드는 `drizzle-orm` 라이브러리를 사용하여 MySQL 데이터베이스에 `float` 타입의 컬럼을 생성하는 예제입니다. `singlestoreTable` 함수를 통해 테이블을 정의하고, `float` 함수를 사용하여 `float` 타입의 컬럼을 추가합니다. 이렇게 정의된 테이블은 SQL 쿼리로 변환되어 데이터베이스에 생성됩니다.
 
-### serial
+
+## ---_W9ehdUdGF4moQQekyQYU8x
+
+
+
+
+
+### SERIAL
 
 <Section>
 
-`SERIAL` is an alias for `BIGINT UNSIGNED NOT NULL AUTO_INCREMENT UNIQUE`.
+`SERIAL`은 `BIGINT UNSIGNED NOT NULL AUTO_INCREMENT UNIQUE`의 별칭입니다.
 
 ```typescript
 import { serial, singlestoreTable } from "drizzle-orm/mysql-core";
@@ -266,9 +283,14 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-## ---
 
-### binary
+## ---_nW5ogkZ9Fv5vMD3QLDnAYq
+
+
+
+
+
+### 바이너리
 
 <Section>
 ```typescript
@@ -286,6 +308,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
+
 ### varbinary
 
 <Section>
@@ -293,61 +316,72 @@ CREATE TABLE `table` (
 import { varbinary, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-	varbinary: varbinary({ length: 2}),
+    varbinary: varbinary({ length: 2 }),
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`varbinary` varbinary(2),
+    `varbinary` varbinary(2)
 );
 ```
 </Section>
 
-## ---
 
-### char
+## ---_hpMhNAuEYhKNBnpJryFUde
+
+
+
+
+
+### char 타입
 
 <Section>
 ```typescript
 import { char, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-	char: char(),
+    char: char(),
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`char` char,
+    `char` char,
 );
 ```
 </Section>
 
-### varchar
-You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values.
-<Section>
+위 코드는 `char` 타입을 사용하여 테이블을 생성하는 예제입니다. `drizzle-orm/mysql-core` 모듈에서 `char` 함수를 가져와서 테이블의 컬럼을 정의합니다. 이렇게 정의된 컬럼은 SQL에서 `char` 타입으로 생성됩니다.
+
+
+### varchar 타입
+
+`{ enum: ["value1", "value2"] }` 설정을 통해 `insert`와 `select` 타입을 추론할 수 있습니다. 하지만 이 설정은 **런타임 값**을 검사하지 않습니다.
+
 ```typescript
 import { varchar, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-	varchar: varchar({ length: 2 }),
+    varchar: varchar({ length: 2 }),
 });
 
-// will be inferred as text: "value1" | "value2" | null
+// 타입이 "value1" | "value2" | null로 추론됨
 varchar: varchar({ length: 6, enum: ["value1", "value2"] })
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`varchar` varchar(2),
+    `varchar` varchar(2)
 );
 ```
-</Section>
 
-### text
+위 예제에서 `varchar` 컬럼은 길이가 2인 문자열로 정의되었습니다. `enum` 설정을 통해 타입을 추론할 수 있지만, 실제 데이터베이스에서는 이 설정이 적용되지 않습니다.
 
-You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values.
+
+### 텍스트
+
+`{ enum: ["value1", "value2"] }` 설정을 정의하여 `insert`와 `select` 타입을 추론할 수 있습니다. 하지만 이 설정은 **런타임 값**을 검사하지 않습니다.
 
 <Section>
 ```typescript
@@ -357,7 +391,7 @@ const table = singlestoreTable('table', {
 	text: text(),
 });
 
-// will be inferred as text: "value1" | "value2" | null
+// text는 "value1" | "value2" | null로 추론됩니다.
 text: text({ enum: ["value1", "value2"] });
 ```
 
@@ -368,45 +402,58 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-## ---
 
-### boolean
+## ---_jLD9pQprEXvJbFd4yi5QEM
 
-<Section>
-```typescript
-import { boolean, singlestoreTable } from "drizzle-orm/mysql-core";
 
-const table = singlestoreTable('table', {
-	boolean: boolean(),
-});
-```
 
-```sql
-CREATE TABLE `table` (
-	`boolean` boolean,
-);
-```
-</Section>
 
-## ---
 
-### date
+### 불리언(Boolean)
 
 <Section>
 ```typescript
 import { boolean, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-	date: date(),
+    boolean: boolean(),
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`date` date,
+    `boolean` boolean,
 );
 ```
 </Section>
+
+위 예제는 `drizzle-orm` 라이브러리를 사용하여 MySQL 데이터베이스에 불리언 타입의 컬럼을 정의하는 방법을 보여줍니다. `boolean()` 함수는 테이블 스키마에서 불리언 타입의 컬럼을 생성합니다. 이 컬럼은 `true` 또는 `false` 값을 저장할 수 있습니다. SQL 문에서는 `boolean` 타입으로 직접 정의됩니다.
+
+
+## ---_VGoWgus49EmPqCqqGKYBAV
+
+
+
+
+
+### 날짜
+
+<Section>
+```typescript
+import { boolean, singlestoreTable } from "drizzle-orm/mysql-core";
+
+const table = singlestoreTable('table', {
+    date: date(),
+});
+```
+
+```sql
+CREATE TABLE `table` (
+    `date` date,
+);
+```
+</Section>
+
 
 ### datetime
 
@@ -415,7 +462,7 @@ CREATE TABLE `table` (
 import { datetime, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-	datetime: datetime(),
+    datetime: datetime(),
 });
 
 datetime('...', { mode: 'date' | "string"}),
@@ -423,28 +470,42 @@ datetime('...', { mode: 'date' | "string"}),
 
 ```sql
 CREATE TABLE `table` (
-	`datetime` datetime,
+    `datetime` datetime,
 );
 ```
 </Section>
 
-### time 
+이 코드는 `drizzle-orm/mysql-core` 모듈에서 `datetime`과 `singlestoreTable`을 가져와 사용하는 예제입니다. `singlestoreTable` 함수를 사용해 'table'이라는 이름의 테이블을 생성하고, 그 안에 `datetime` 컬럼을 정의합니다. `datetime` 함수는 날짜와 시간을 저장하는 컬럼을 생성하며, `mode` 옵션을 통해 'date' 또는 'string' 타입으로 설정할 수 있습니다.
+
+SQL 쿼리 부분에서는 `CREATE TABLE` 문을 사용해 동일한 구조의 테이블을 생성합니다. 여기서 `datetime` 컬럼은 MySQL의 `datetime` 타입으로 정의됩니다.
+
+
+### 시간(time) 타입
 
 <Section>
 ```typescript
 import { time, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-	time: time(),
+    time: time(),
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`time` time
+    `time` time
 );
 ```
 </Section>
+
+위 예제는 Drizzle ORM을 사용하여 MySQL 데이터베이스에 `time` 타입의 컬럼을 정의하는 방법을 보여줍니다. `time()` 함수는 시간을 저장하는 컬럼을 생성합니다. 이 컬럼은 SQL의 `time` 타입에 해당하며, 시간 정보만을 저장합니다. 
+
+- `singlestoreTable` 함수는 테이블을 정의하는 데 사용됩니다.
+- `time()` 함수는 시간 타입의 컬럼을 생성합니다.
+- 생성된 SQL 쿼리는 `time` 타입의 컬럼을 포함하는 테이블을 생성합니다.
+
+이렇게 정의된 테이블은 시간 데이터를 효율적으로 저장하고 관리할 수 있습니다.
+
 
 ### year
 
@@ -453,18 +514,23 @@ CREATE TABLE `table` (
 import { year, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-	year: year(),
+    year: year(),
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`year` year,
+    `year` year,
 );
 ```
 </Section>
 
-### timestamp
+위 코드는 `year` 타입을 사용하여 데이터베이스 테이블을 생성하는 예제입니다. `drizzle-orm/mysql-core` 모듈에서 `year`와 `singlestoreTable`을 가져와서 테이블을 정의합니다. 이 테이블은 `year` 컬럼을 포함하며, 이 컬럼은 MySQL의 `year` 타입을 사용합니다. 
+
+SQL 문법으로는 `CREATE TABLE`을 사용하여 동일한 구조의 테이블을 생성합니다. 이 테이블은 `year` 컬럼을 가지며, 이 컬럼은 MySQL의 `year` 타입을 사용합니다.
+
+
+### 타임스탬프
 
 <Section>
 ```typescript
@@ -500,65 +566,82 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-## ---
 
-### json
+## ---_G7QhwMhYCqNyJmYJ5ibC5N
+
+
+
+
+
+### JSON 타입 사용하기
 
 <Section>
 ```typescript
 import { json, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-	json: json(),
+    json: json(),
 });
-
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`json` json,
+    `json` json,
 );
 ```
 </Section>
 
-You can specify `.$type<..>()` for json object inference, it **won't** check runtime values. 
-It provides compile time protection for default values, insert and select schemas.
+JSON 객체의 타입 추론을 위해 `.$type<..>()`를 지정할 수 있습니다. 이는 **런타임 값**을 검사하지 않습니다.  
+기본값, 삽입 및 선택 스키마에 대해 컴파일 타임 보호 기능을 제공합니다.
+
 ```typescript
-// will be inferred as { foo: string }
+// { foo: string } 타입으로 추론됨
 json: json().$type<{ foo: string }>();
 
-// will be inferred as string[]
+// string[] 타입으로 추론됨
 json: json().$type<string[]>();
 
-// won't compile
-json: json().$type<string[]>().default({});
+// 컴파일 오류 발생 (기본값 타입 불일치)
+json: json().$type<{ foo: string }>().default({});
 ```
 
-## ---
 
-### enum
+## ---_4FAh3bb4kgmAbPxTUEwV2G
+
+
+
+
+
+### enum 타입
 
 <Section>
 ```typescript
 import { mysqlEnum, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-	mysqlEnum: mysqlEnum(['unknown', 'known', 'popular']),
+    mysqlEnum: mysqlEnum(['unknown', 'known', 'popular']),
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`popularity` enum('unknown','known','popular'),
+    `popularity` enum('unknown','known','popular'),
 );
 ```
 </Section>
 
-## ---
+위 코드는 `enum` 타입을 사용하는 예제입니다. TypeScript에서는 `mysqlEnum`을 통해 `enum` 타입을 정의하고, SQL에서는 `enum` 타입으로 컬럼을 생성합니다. `enum` 타입은 특정 값들 중 하나만 선택할 수 있도록 제한하는 데 유용합니다.
 
-### Customizing data type
 
-Every column builder has a `.$type()` method, which allows you to customize the data type of the column. This is useful, for example, with unknown or branded types.
+## ---_U8rXhr48CjX53AZQpwCixM
+
+
+
+
+
+### 데이터 타입 커스터마이징
+
+모든 컬럼 빌더는 `.$type()` 메서드를 제공합니다. 이 메서드를 사용하면 컬럼의 데이터 타입을 커스터마이징할 수 있습니다. 이 기능은 알려지지 않은 타입이나 브랜드 타입을 다룰 때 유용합니다.
 
 ```ts
 type UserId = number & { __brand: 'user_id' };
@@ -568,62 +651,57 @@ type Data = {
 };
 
 const users = singlestoreTable('users', {
-  id: int().$type<UserId>().primaryKey(),
-  jsonField: json().$type<Data>(),
+  id: int().$type().primaryKey(),
+  jsonField: json().$type(),
 });
 ```
 
-### Not null
-`NOT NULL` constraint dictates that the associated column may not contain a `NULL` value.
+
+### NOT NULL 제약 조건
+
+`NOT NULL` 제약 조건은 해당 컬럼이 `NULL` 값을 포함할 수 없음을 의미합니다.
 
 <Section>
 ```typescript
 import { int, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-	int: int().notNull(),
+    int: int().notNull(),
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`int` int NOT NULL,
+    `int` int NOT NULL,
 );
 ```
 </Section>
 
-### Default value
 
-The `DEFAULT` clause specifies a default value to use for the column if no value
-is explicitly provided by the user when doing an `INSERT`.
-If there is no explicit `DEFAULT` clause attached to a column definition,
-then the default value of the column is `NULL`.
+### 기본값 설정
 
-An explicit `DEFAULT` clause may specify that the default value is `NULL`,
-a string constant, a blob constant, a signed-number, or any constant expression enclosed in parentheses.
+`DEFAULT` 절은 사용자가 `INSERT`를 수행할 때 명시적으로 값을 제공하지 않았을 경우, 컬럼에 사용할 기본값을 지정합니다. 컬럼 정의에 명시적인 `DEFAULT` 절이 없으면, 해당 컬럼의 기본값은 `NULL`이 됩니다.
 
-<Section>
+명시적인 `DEFAULT` 절은 기본값을 `NULL`, 문자열 상수, 블롭 상수, 부호 있는 숫자, 또는 괄호로 둘러싸인 상수 표현식으로 지정할 수 있습니다.
+
 ```typescript
 import { int, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-	int: int().default(3),
+    int: int().default(3),
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`int` int DEFAULT 3,
+    `int` int DEFAULT 3,
 );
 ```
-</Section>
 
-When using `$default()` or `$defaultFn()`, which are simply different aliases for the same function, 
-you can generate defaults at runtime and use these values in all insert queries. 
-These functions can assist you in utilizing various implementations such as `uuid`, `cuid`, `cuid2`, and many more.
+`$default()` 또는 `$defaultFn()`을 사용하면 런타임에 기본값을 생성하고, 이 값을 모든 삽입 쿼리에서 사용할 수 있습니다. 이 함수들은 `uuid`, `cuid`, `cuid2` 등 다양한 구현을 활용하는 데 도움을 줄 수 있습니다.
 
 <Callout type="info" emoji="ℹ️">
-	Note: This value does not affect the `drizzle-kit` behavior, it is only used at runtime in `drizzle-orm`
+    참고: 이 값은 `drizzle-kit` 동작에 영향을 미치지 않으며, `drizzle-orm`에서만 런타임에 사용됩니다.
 </Callout>
 
 ```ts
@@ -631,62 +709,69 @@ import { varchar, singlestoreTable } from "drizzle-orm/mysql-core";
 import { createId } from '@paralleldrive/cuid2';
 
 const table = singlestoreTable('table', {
-	id: varchar({ length: 128 }).$defaultFn(() => createId()),
+    id: varchar({ length: 128 }).$defaultFn(() => createId()),
 });
 ```
 
-When using `$onUpdate()` or `$onUpdateFn()`, which are simply different aliases for the same function, 
-you can generate defaults at runtime and use these values in all update queries. 
-
-Adds a dynamic update value to the column. The function will be called when the row is updated, 
-and the returned value will be used as the column value if none is provided.
-If no default (or $defaultFn) value is provided, the function will be called
-when the row is inserted as well, and the returned value will be used as the column value.
+`$onUpdate()` 또는 `$onUpdateFn()`을 사용하면 런타임에 기본값을 생성하고, 이 값을 모든 업데이트 쿼리에서 사용할 수 있습니다. 이 함수는 행이 업데이트될 때 호출되며, 반환된 값이 컬럼 값으로 사용됩니다. 만약 기본값(또는 `$defaultFn`)이 제공되지 않았다면, 이 함수는 행이 삽입될 때도 호출되고, 반환된 값이 컬럼 값으로 사용됩니다.
 
 <Callout type="info" emoji="ℹ️">
-	Note: This value does not affect the `drizzle-kit` behavior, it is only used at runtime in `drizzle-orm`
+    참고: 이 값은 `drizzle-kit` 동작에 영향을 미치지 않으며, `drizzle-orm`에서만 런타임에 사용됩니다.
 </Callout>
 
 ```ts
 import { text, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-    alwaysNull: text().$type<string | null>().$onUpdate(() => null),
+    alwaysNull: text().$type().$onUpdate(() => null),
 });
 ```
 
-### Primary key 
+
+### 기본 키(Primary Key)
 
 <Section>
 ```typescript
 import { int, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-	int: int().primaryKey(),
+    int: int().primaryKey(),
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`int` int PRIMARY KEY NOT NULL,
+    `int` int PRIMARY KEY NOT NULL,
 );
 ```
 </Section>
 
-### Auto increment
+위 코드는 Drizzle ORM과 SQL을 사용하여 기본 키를 정의하는 예제입니다. 
+
+- **Drizzle ORM**에서는 `int().primaryKey()`를 사용해 `int` 컬럼을 기본 키로 설정합니다.
+- **SQL**에서는 `PRIMARY KEY` 키워드를 사용해 동일한 작업을 수행합니다.
+
+두 방식 모두 `int` 컬럼을 기본 키로 지정하며, 이 컬럼은 NULL 값을 허용하지 않습니다.
+
+
+### 자동 증가(Auto Increment)
 
 <Section>
 ```typescript
 import { int, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-	int: int().autoincrement(),
+    int: int().autoincrement(),
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`int` int AUTO_INCREMENT
+    `int` int AUTO_INCREMENT
 );
 ```
 </Section>
+
+위 예제는 데이터베이스 테이블에서 자동으로 증가하는 정수 값을 생성하는 방법을 보여줍니다. `drizzle-orm` 라이브러리를 사용하여 MySQL 테이블을 정의할 때, `int().autoincrement()`를 사용하면 해당 컬럼이 자동 증가 기능을 갖게 됩니다. 이는 SQL에서 `AUTO_INCREMENT` 키워드를 사용하는 것과 동일한 효과를 가집니다.
+
+

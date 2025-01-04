@@ -1,5 +1,5 @@
 ---
-title: "Drizzle with Turso"
+title: "Drizzle와 Turso 사용하기"
 date: "2024-02-17"
 svgs: ['<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 43.4805 67.3037)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 76.9395 46.5342)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 128.424 46.5352)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 94.957 67.3037)" fill="currentColor"></rect></svg>', '<svg width="241" height="240" viewBox="0 0 241 240" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M220.035 83.61C215.365 55.67 190.875 35 190.875 35V65.78L176.335 69.53L167.225 58.56L162.415 68.02C152.495 65.32 138.835 63.58 120.045 63.58C101.255 63.58 87.5949 65.33 77.6749 68.02L72.8649 58.56L63.7549 69.53L49.2149 65.78V35C49.2149 35 24.7249 55.67 20.0549 83.61L52.1949 94.73C53.2449 114.16 61.9849 166.61 64.4849 171.37C67.1449 176.44 81.2649 190.93 92.3149 196.5C92.3149 196.5 96.3149 192.27 98.7549 188.54C101.855 192.19 117.865 204.99 120.055 204.99C122.245 204.99 138.255 192.2 141.355 188.54C143.795 192.27 147.795 196.5 147.795 196.5C158.845 190.93 172.965 176.44 175.625 171.37C178.125 166.61 186.865 114.16 187.915 94.73L220.055 83.61H220.035ZM173.845 128.35L152.095 130.29L154.005 156.96C154.005 156.96 140.775 167.91 120.045 167.91C99.3149 167.91 86.0849 156.96 86.0849 156.96L87.9949 130.29L66.2449 128.35L62.5249 98.31L98.5749 110.79L95.7749 148.18C102.475 149.88 109.525 151.57 120.055 151.57C130.585 151.57 137.625 149.88 144.325 148.18L141.525 110.79L177.575 98.31L173.855 128.35H173.845Z" fill="currentColor"/></svg>']
 ---
@@ -10,168 +10,193 @@ import Steps from '@mdx/Steps.astro';
 import Section from "@mdx/Section.astro";
 import Callout from '@mdx/Callout.astro';
 
-This tutorial demonstrates how to use Drizzle ORM with [Turso](https://docs.turso.tech/introduction).
+## Turso와 Drizzle ORM 설정하기
+
+이 튜토리얼에서는 [Turso](https://docs.turso.tech/introduction)와 함께 Drizzle ORM을 사용하는 방법을 설명합니다.
 
 <Prerequisites>
-- You should have installed Drizzle ORM and [Drizzle kit](/docs/kit-overview). You can do this by running the following command:
+- Drizzle ORM과 [Drizzle kit](/docs/kit-overview)을 설치해야 합니다. 다음 명령어를 실행하여 설치할 수 있습니다:
 <Npm>
 drizzle-orm
 -D drizzle-kit
 </Npm>
-- You should have installed `dotenv` package for managing environment variables. Read more about this package [here](https://www.npmjs.com/package/dotenv)
+- 환경 변수를 관리하기 위해 `dotenv` 패키지를 설치해야 합니다. 이 패키지에 대한 자세한 내용은 [여기](https://www.npmjs.com/package/dotenv)에서 확인할 수 있습니다.
 <Npm>
   dotenv
 </Npm>
-- You should have installed `@libsql/client` package. Read more about this package [here](https://www.npmjs.com/package/@libsql/client).
+- `@libsql/client` 패키지를 설치해야 합니다. 이 패키지에 대한 자세한 내용은 [여기](https://www.npmjs.com/package/@libsql/client)에서 확인할 수 있습니다.
 <Npm>
   @libsql/client
 </Npm>
-- You should have installed Turso CLI. Check [documentation](https://docs.turso.tech/cli/introduction) for more information
+- Turso CLI를 설치해야 합니다. 자세한 내용은 [문서](https://docs.turso.tech/cli/introduction)를 참고하세요.
 </Prerequisites>
 
-[Turso](https://docs.turso.tech/concepts) is a SQLite-compatible database built on [libSQL](https://docs.turso.tech/libsql), the Open Contribution fork of SQLite. It enables scaling to hundreds of thousands of databases per organization and supports replication to any location, including your own servers, for microsecond-latency access. You can read more about Turso’s concepts [here](https://docs.turso.tech/concepts).
+[Turso](https://docs.turso.tech/concepts)는 [libSQL](https://docs.turso.tech/libsql)을 기반으로 한 SQLite 호환 데이터베이스입니다. libSQL은 SQLite의 오픈 소스 포크입니다. Turso는 조직당 수십만 개의 데이터베이스로 확장할 수 있으며, 마이크로초 단위의 지연 시간으로 접근할 수 있도록 자체 서버를 포함한 모든 위치로의 복제를 지원합니다. Turso의 개념에 대해 더 자세히 알아보려면 [여기](https://docs.turso.tech/concepts)를 참고하세요.
 
-Drizzle ORM natively supports libSQL driver, we embrace SQL dialects and dialect specific drivers and syntax and mirror most popular SQLite-like `all`, `get`, `values` and `run` query methods syntax.
+Drizzle ORM은 libSQL 드라이버를 기본적으로 지원합니다. SQL 방언과 방언별 드라이버 및 구문을 수용하며, 가장 많이 사용되는 SQLite 스타일의 `all`, `get`, `values`, `run` 쿼리 메서드 구문을 대부분 반영합니다.
 
-Check [official documentation](https://docs.turso.tech/quickstart) to setup Turso database.
-
-## Setup Turso and Drizzle ORM
+Turso 데이터베이스를 설정하는 방법은 [공식 문서](https://docs.turso.tech/quickstart)를 참고하세요.
 
 <Steps>
-#### Signup or login to Turso
 
-Signup:
 
-```bash copy
+#### Turso 회원가입 또는 로그인
+
+회원가입:
+
+```bash
 turso auth signup
 ```
 
-Login:
+로그인:
 
-```bash copy
+```bash
 turso auth login
 ```
 
-#### Create new database
 
-Create new database by running the `turso db create <DATABASE_NAME>` command:
+#### 새로운 데이터베이스 생성
 
-```bash copy
+`turso db create <DATABASE_NAME>` 명령어를 실행하여 새로운 데이터베이스를 생성합니다:
+
+```bash
 turso db create drizzle-turso-db
 ```
 
-To see information about the database, run the following command:
+생성된 데이터베이스 정보를 확인하려면 다음 명령어를 실행하세요:
 
-```bash copy
+```bash
 turso db show drizzle-turso-db
 ```
 
-#### Create an authentication token
 
-To create an authentication token for your database, run the following command:
+#### 인증 토큰 생성하기
 
-```bash copy
+데이터베이스용 인증 토큰을 생성하려면 다음 커맨드를 실행하세요:
+
+```bash
 turso db tokens create drizzle-turso-db
 ```
 
-Learn more about this command and its options in the [documentation](https://docs.turso.tech/cli/db/tokens/create).
+이 커맨드와 관련된 옵션에 대해 더 자세히 알아보려면 [공식 문서](https://docs.turso.tech/cli/db/tokens/create)를 참고하세요.
 
-#### Update environment variables
 
-Update your `.env` or `.env.local` file with connection url and authentication token.
+#### 환경 변수 업데이트
+
+`.env` 또는 `.env.local` 파일에 연결 URL과 인증 토큰을 추가하세요.
 
 ```text copy
 TURSO_CONNECTION_URL=
 TURSO_AUTH_TOKEN=
 ```
 
-#### Connect Drizzle ORM to your database
 
-Create a `index.ts` file in the `src/db` directory and set up your database configuration:
+#### Drizzle ORM을 데이터베이스에 연결하기
 
-```typescript copy filename="src/db/index.ts"
+`src/db` 디렉토리에 `index.ts` 파일을 생성하고 데이터베이스 설정을 구성합니다:
+
+```typescript
 import { config } from 'dotenv';
 import { drizzle } from 'drizzle-orm/libsql';
 
-config({ path: '.env' }); // or .env.local
+// .env 또는 .env.local 파일에서 환경 변수 로드
+config({ path: '.env' });
 
-export const db = drizzle({ connection: {
-  url: process.env.TURSO_CONNECTION_URL!,
-  authToken: process.env.TURSO_AUTH_TOKEN!,
-}});
+// Drizzle ORM을 사용해 데이터베이스 연결 설정
+export const db = drizzle({
+  connection: {
+    url: process.env.TURSO_CONNECTION_URL!, // TURSO 데이터베이스 연결 URL
+    authToken: process.env.TURSO_AUTH_TOKEN!, // TURSO 인증 토큰
+  },
+});
 ```
 
-#### Create tables
+이 코드는 Drizzle ORM을 사용해 데이터베이스에 연결하는 기본 설정을 보여줍니다. 환경 변수 파일(`.env` 또는 `.env.local`)에서 `TURSO_CONNECTION_URL`과 `TURSO_AUTH_TOKEN`을 읽어와 데이터베이스 연결을 구성합니다.
 
-Create a `schema.ts` file in the `src/db` directory and declare your tables:
 
-```typescript copy filename="src/db/schema.ts"
+#### 테이블 생성하기
+
+`src/db` 디렉토리에 `schema.ts` 파일을 생성하고 테이블을 선언합니다:
+
+```typescript
 import { sql } from 'drizzle-orm';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
+// 사용자 테이블 정의
 export const usersTable = sqliteTable('users', {
-  id: integer('id').primaryKey(),
-  name: text('name').notNull(),
-  age: integer('age').notNull(),
-  email: text('email').unique().notNull(),
+  id: integer('id').primaryKey(), // 기본 키
+  name: text('name').notNull(), // 이름 (필수)
+  age: integer('age').notNull(), // 나이 (필수)
+  email: text('email').unique().notNull(), // 이메일 (고유, 필수)
 });
 
+// 게시물 테이블 정의
 export const postsTable = sqliteTable('posts', {
-  id: integer('id').primaryKey(),
-  title: text('title').notNull(),
-  content: text('content').notNull(),
-  userId: integer('user_id')
+  id: integer('id').primaryKey(), // 기본 키
+  title: text('title').notNull(), // 제목 (필수)
+  content: text('content').notNull(), // 내용 (필수)
+  userId: integer('user_id') // 사용자 ID (외래 키)
     .notNull()
-    .references(() => usersTable.id, { onDelete: 'cascade' }),
-  createdAt: text('created_at')
-    .default(sql`(CURRENT_TIMESTAMP)`)
+    .references(() => usersTable.id, { onDelete: 'cascade' }), // 사용자 삭제 시 연쇄 삭제
+  createdAt: text('created_at') // 생성일
+    .default(sql`(CURRENT_TIMESTAMP)`) // 기본값: 현재 시간
     .notNull(),
-  updateAt: integer('updated_at', { mode: 'timestamp' }).$onUpdate(() => new Date()),
+  updateAt: integer('updated_at', { mode: 'timestamp' }) // 수정일
+    .$onUpdate(() => new Date()), // 업데이트 시 현재 시간으로 자동 설정
 });
 
+// 사용자 삽입 타입
 export type InsertUser = typeof usersTable.$inferInsert;
+// 사용자 선택 타입
 export type SelectUser = typeof usersTable.$inferSelect;
 
+// 게시물 삽입 타입
 export type InsertPost = typeof postsTable.$inferInsert;
+// 게시물 선택 타입
 export type SelectPost = typeof postsTable.$inferSelect;
 ```
 
-#### Setup Drizzle config file
 
-**Drizzle config** - a configuration file that is used by [Drizzle Kit](/docs/kit-overview) and contains all the information about your database connection, migration folder and schema files.
+#### Drizzle 설정 파일 설정하기
 
-Create a `drizzle.config.ts` file in the root of your project and add the following content:
+**Drizzle 설정 파일**은 [Drizzle Kit](/docs/kit-overview)에서 사용되는 파일로, 데이터베이스 연결 정보, 마이그레이션 폴더, 스키마 파일 등에 대한 모든 정보를 포함합니다.
+
+프로젝트 루트에 `drizzle.config.ts` 파일을 생성하고 다음 내용을 추가하세요:
 
 ```typescript copy filename="drizzle.config.ts"
 import { config } from 'dotenv';
 import { defineConfig } from 'drizzle-kit';
 
+// .env 파일에서 환경 변수 로드
 config({ path: '.env' });
 
 export default defineConfig({
-  schema: './src/db/schema.ts',
-  out: './migrations',
-  dialect: 'turso',
+  schema: './src/db/schema.ts', // 스키마 파일 경로
+  out: './migrations',          // 마이그레이션 파일이 생성될 경로
+  dialect: 'turso',             // 사용할 데이터베이스 dialect
   dbCredentials: {
-    url: process.env.TURSO_CONNECTION_URL!,
-    authToken: process.env.TURSO_AUTH_TOKEN!,
+    url: process.env.TURSO_CONNECTION_URL!, // Turso 연결 URL
+    authToken: process.env.TURSO_AUTH_TOKEN!, // Turso 인증 토큰
   },
 });
 ```
 
-#### Applying changes to the database
+이 설정 파일은 Drizzle Kit이 데이터베이스와 상호작용하는 데 필요한 정보를 제공합니다. `schema`는 데이터베이스 스키마를 정의한 파일의 경로를, `out`은 마이그레이션 파일이 저장될 경로를 지정합니다. `dialect`는 사용할 데이터베이스의 종류를 나타내며, `dbCredentials`에는 데이터베이스 연결에 필요한 자격 증명이 포함됩니다.
 
-You can generate migrations using `drizzle-kit generate` command and then run them using the `drizzle-kit migrate` command.
 
-Generate migrations:
+#### 데이터베이스에 변경 사항 적용하기
 
-```bash copy
+`drizzle-kit generate` 명령어를 사용해 마이그레이션을 생성하고, `drizzle-kit migrate` 명령어로 실행할 수 있습니다.
+
+마이그레이션 생성:
+
+```bash
 npx drizzle-kit generate
 ```
 
-These migrations are stored in the `migrations`  directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
+생성된 마이그레이션은 `drizzle.config.ts`에 지정된 `migrations` 디렉토리에 저장됩니다. 이 디렉토리에는 데이터베이스 스키마를 업데이트하는 데 필요한 SQL 파일과, 다양한 마이그레이션 단계에서의 스키마 스냅샷을 저장하는 `meta` 폴더가 포함됩니다.
 
-Example of a generated migration:
+생성된 마이그레이션 예제:
 
 ```sql
 CREATE TABLE `posts` (
@@ -194,24 +219,27 @@ CREATE TABLE `users` (
 CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);
 ```
 
-Run migrations:
+마이그레이션 실행:
 
-```bash copy
+```bash
 npx drizzle-kit migrate
 ```
 
-Alternatively, you can push changes directly to the database using [Drizzle kit push command](/docs/kit-overview#prototyping-with-db-push):
+또는, [Drizzle kit push 명령어](/docs/kit-overview#prototyping-with-db-push)를 사용해 데이터베이스에 직접 변경 사항을 적용할 수도 있습니다:
 
-```bash copy
+```bash
 npx drizzle-kit push
 ```
 
-<Callout type="warning">Push command is good for situations where you need to quickly test new schema designs or changes in a local development environment, allowing for fast iterations without the overhead of managing migration files.</Callout>
+<Callout type="warning">
+푸시 명령어는 로컬 개발 환경에서 새로운 스키마 디자인이나 변경 사항을 빠르게 테스트해야 할 때 유용합니다. 마이그레이션 파일을 관리하는 오버헤드 없이 빠르게 반복 작업을 할 수 있습니다.
+</Callout>
 </Steps>
 
-### Basic file structure
 
-This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `index.ts` and schema definitions in `schema.ts`.
+### 기본 파일 구조
+
+이 프로젝트의 기본 파일 구조입니다. `src/db` 디렉토리에는 데이터베이스 관련 파일들이 위치하며, `index.ts` 파일에는 데이터베이스 연결 설정이, `schema.ts` 파일에는 스키마 정의가 포함되어 있습니다.
 
 ```plaintext
 📦 <project root>
@@ -230,13 +258,15 @@ This is the basic file structure of the project. In the `src/db` directory, we h
  └ 📜 tsconfig.json
 ```
 
-## Query examples
 
-For instance, we create `src/db/queries` folder and separate files for each operation: insert, select, update, delete.
+## 쿼리 예제
 
-#### Insert data
+예를 들어, `src/db/queries` 폴더를 만들고 각 작업(삽입, 선택, 업데이트, 삭제)별로 파일을 분리합니다.
 
-Read more about insert query in the [documentation](/docs/insert).
+
+#### 데이터 삽입
+
+데이터 삽입 쿼리에 대한 자세한 내용은 [문서](/docs/insert)를 참고하세요.
 
 ```typescript copy filename="src/db/queries/insert.ts" {4, 8}
 import { db } from '../index';
@@ -251,9 +281,10 @@ export async function createPost(data: InsertPost) {
 }
 ```
 
-#### Select data
 
-Read more about select query in the [documentation](/docs/select).
+#### 데이터 선택하기
+
+선택 쿼리에 대해 더 알아보려면 [문서](/docs/select)를 참고하세요.
 
 ```typescript copy filename="src/db/queries/select.ts" {5, 16, 41}
 import { asc, count, eq, getTableColumns, gt, sql } from 'drizzle-orm';
@@ -318,25 +349,27 @@ export async function getPostsForLast24Hours(
 }
 ```
 
-Alternatively, you can use [relational query syntax](/docs/rqb).
+또는 [관계형 쿼리 구문](/docs/rqb)을 사용할 수도 있습니다.
 
-#### Update data
 
-Read more about update query in the [documentation](/docs/update).
+#### 데이터 업데이트
+
+데이터 업데이트 쿼리에 대해 더 알아보려면 [문서](/docs/update)를 참고하세요.
 
 ```typescript copy filename="src/db/queries/update.ts" {5}
 import { eq } from 'drizzle-orm';
 import { db } from '../index';
 import { SelectPost, postsTable } from '../schema';
 
-export async function updatePost(id: SelectPost['id'], data: Partial<Omit<SelectPost, 'id'>>) {
+export async function updatePost(id: SelectPost['id'], data: Partial<SelectPost>) {
   await db.update(postsTable).set(data).where(eq(postsTable.id, id));
 }
 ```
 
-#### Delete data
 
-Read more about delete query in the [documentation](/docs/delete).
+#### 데이터 삭제
+
+삭제 쿼리에 대한 자세한 내용은 [문서](/docs/delete)에서 확인할 수 있습니다.
 
 ```typescript copy filename="src/db/queries/delete.ts" {5}
 import { eq } from 'drizzle-orm';
@@ -347,3 +380,5 @@ export async function deleteUser(id: SelectUser['id']) {
   await db.delete(usersTable).where(eq(usersTable.id, id));
 }
 ```
+
+

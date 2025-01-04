@@ -1,27 +1,30 @@
+
 import Npm from '@mdx/Npm.astro';
 import Callout from '@mdx/Callout.astro';
 
 # drizzle-valibot
 
-`drizzle-valibot` is a plugin for **[Drizzle ORM](https://github.com/drizzle-team/drizzle-orm)** that allows you to generate **[Valibot](https://valibot.dev/)** schemas from Drizzle ORM schemas.
+`drizzle-valibot`는 **[Drizzle ORM](https://github.com/drizzle-team/drizzle-orm)**을 위한 플러그인으로, Drizzle ORM 스키마에서 **[Valibot](https://valibot.dev/)** 스키마를 생성할 수 있게 해줍니다.
 
-### Install the dependencies
+
+### 의존성 설치하기
 
 <Npm>
 drizzle-valibot
 </Npm>
 
 <Callout type="warning">
-This documentation is for `drizzle-valibot@0.3.0` and higher
+이 문서는 `drizzle-valibot@0.3.0` 이상 버전을 기준으로 작성되었습니다.
 
-You must also have Drizzle ORM v0.36.0 or greater and Valibot v1.0.0-beta.7 or greater installed.
+Drizzle ORM v0.36.0 이상과 Valibot v1.0.0-beta.7 이상 버전도 함께 설치해야 합니다.
 </Callout>
 
-### Select schema
 
-Defines the shape of data queried from the database - can be used to validate API responses.
+### 데이터 선택 스키마 정의
 
-```ts copy
+데이터베이스에서 쿼리한 데이터의 형태를 정의합니다. 이를 통해 API 응답을 검증할 수 있습니다.
+
+```ts
 import { pgTable, text, integer } from 'drizzle-orm/pg-core';
 import { createSelectSchema } from 'drizzle-valibot';
 import { parse } from 'valibot';
@@ -35,15 +38,15 @@ const users = pgTable('users', {
 const userSelectSchema = createSelectSchema(users);
 
 const rows = await db.select({ id: users.id, name: users.name }).from(users).limit(1);
-const parsed: { id: number; name: string; age: number } = parse(userSelectSchema, rows[0]); // Error: `age` is not returned in the above query
+const parsed: { id: number; name: string; age: number } = parse(userSelectSchema, rows[0]); // 오류: 위 쿼리에서 `age`가 반환되지 않음
 
 const rows = await db.select().from(users).limit(1);
-const parsed: { id: number; name: string; age: number } = parse(userSelectSchema, rows[0]); // Will parse successfully
+const parsed: { id: number; name: string; age: number } = parse(userSelectSchema, rows[0]); // 성공적으로 파싱됨
 ```
 
-Views and enums are also supported.
+뷰와 열거형도 지원됩니다.
 
-```ts copy
+```ts
 import { pgEnum } from 'drizzle-orm/pg-core';
 import { createSelectSchema } from 'drizzle-valibot';
 import { parse } from 'valibot';
@@ -57,34 +60,42 @@ const usersViewSchema = createSelectSchema(usersView);
 const parsed: { id: number; name: string; age: number } = parse(usersViewSchema, ...);
 ```
 
-### Insert schema
 
-Defines the shape of data to be inserted into the database - can be used to validate API requests.
+### 데이터 삽입 스키마 정의
+
+데이터베이스에 삽입할 데이터의 구조를 정의합니다. 이 스키마는 API 요청을 검증하는 데 사용할 수 있습니다.
 
 ```ts copy
 import { pgTable, text, integer } from 'drizzle-orm/pg-core';
 import { createInsertSchema } from 'drizzle-valibot';
 import { parse } from 'valibot';
 
+// 사용자 테이블 정의
 const users = pgTable('users', {
-  id: integer().generatedAlwaysAsIdentity().primaryKey(),
-  name: text().notNull(),
-  age: integer().notNull()
+  id: integer().generatedAlwaysAsIdentity().primaryKey(), // 자동 생성되는 기본 키
+  name: text().notNull(), // 필수 이름 필드
+  age: integer().notNull() // 필수 나이 필드
 });
 
+// 삽입 스키마 생성
 const userInsertSchema = createInsertSchema(users);
 
+// 잘못된 데이터 예제
 const user = { name: 'John' };
-const parsed: { name: string, age: number } = parse(userInsertSchema, user); // Error: `age` is not defined
+const parsed: { name: string, age: number } = parse(userInsertSchema, user); // 오류: `age`가 정의되지 않음
 
+// 올바른 데이터 예제
 const user = { name: 'Jane', age: 30 };
-const parsed: { name: string, age: number } = parse(userInsertSchema, user); // Will parse successfully
-await db.insert(users).values(parsed);
+const parsed: { name: string, age: number } = parse(userInsertSchema, user); // 성공적으로 파싱됨
+await db.insert(users).values(parsed); // 데이터베이스에 삽입
 ```
 
-### Update schema
+이 코드는 사용자 데이터를 데이터베이스에 삽입하기 전에 스키마를 통해 검증하는 과정을 보여줍니다. `createInsertSchema`를 사용해 스키마를 생성하고, `parse` 함수로 데이터를 검증합니다. 필수 필드가 누락된 경우 오류가 발생하며, 모든 필드가 올바르게 정의된 경우 데이터베이스에 삽입됩니다.
 
-Defines the shape of data to be updated in the database - can be used to validate API requests.
+
+### 스키마 업데이트
+
+데이터베이스에서 업데이트할 데이터의 구조를 정의합니다. 이를 통해 API 요청을 검증할 수 있습니다.
 
 ```ts copy
 import { pgTable, text, integer } from 'drizzle-orm/pg-core';
@@ -100,16 +111,17 @@ const users = pgTable('users', {
 const userUpdateSchema = createUpdateSchema(users);
 
 const user = { id: 5, name: 'John' };
-const parsed: { name?: string | undefined, age?: number | undefined } = parse(userUpdateSchema, user); // Error: `id` is a generated column, it can't be updated
+const parsed: { name?: string | undefined, age?: number | undefined } = parse(userUpdateSchema, user); // 오류: `id`는 자동 생성 컬럼이므로 업데이트할 수 없음
 
 const user = { age: 35 };
-const parsed: { name?: string | undefined, age?: number | undefined } = parse(userUpdateSchema, user); // Will parse successfully
+const parsed: { name?: string | undefined, age?: number | undefined } = parse(userUpdateSchema, user); // 성공적으로 파싱됨
 await db.update(users).set(parsed).where(eq(users.name, 'Jane'));
 ```
 
-### Refinements
 
-Each create schema function accepts an additional optional parameter that you can used to extend, modify or completely overwite a field's schema. Defining a callback function will extend or modify while providing a Valibot schema will overwrite it.
+### 개선 사항
+
+각 `create schema` 함수는 필드의 스키마를 확장하거나 수정, 완전히 덮어쓸 수 있는 추가적인 선택적 매개변수를 받습니다. 콜백 함수를 정의하면 스키마를 확장하거나 수정할 수 있고, Valibot 스키마를 제공하면 해당 필드를 완전히 덮어씁니다.
 
 ```ts copy
 import { pgTable, text, integer, json } from 'drizzle-orm/pg-core';
@@ -124,9 +136,9 @@ const users = pgTable('users', {
 });
 
 const userSelectSchema = createSelectSchema(users, {
-  name: (schema) => pipe(schema, maxLength(20)), // Extends schema
-  bio: (schema) => pipe(schema, maxLength(1000)), // Extends schema before becoming nullable/optional
-  preferences: object({ theme: string() }) // Overwrites the field, including its nullability
+  name: (schema) => pipe(schema, maxLength(20)), // 스키마 확장
+  bio: (schema) => pipe(schema, maxLength(1000)), // 스키마 확장 후 nullable/optional로 변경
+  preferences: object({ theme: string() }) // 필드 덮어쓰기 (nullability 포함)
 });
 
 const parsed: {
@@ -139,7 +151,8 @@ const parsed: {
 } = parse(userSelectSchema, ...);
 ```
 
-### Data type reference
+
+### 데이터 타입 참조
 
 ```ts
 pg.boolean();
@@ -148,7 +161,7 @@ mysql.boolean();
 
 sqlite.integer({ mode: 'boolean' });
 
-// Schema
+// 스키마
 boolean();
 ```
 
@@ -163,7 +176,7 @@ mysql.timestamp({ mode: 'date' });
 sqlite.integer({ mode: 'timestamp' });
 sqlite.integer({ mode: 'timestamp_ms' });
 
-// Schema
+// 스키마
 date();
 ```
 
@@ -191,21 +204,21 @@ mysql.varbinary();
 sqlite.numeric();
 sqlite.text({ mode: 'text' });
 
-// Schema
+// 스키마
 string();
 ```
 
 ```ts
 pg.bit({ dimensions: ... });
 
-// Schema
+// 스키마
 pipe(string(), regex(/^[01]+$/), maxLength(dimensions));
 ```
 
 ```ts
 pg.uuid();
 
-// Schema
+// 스키마
 pipe(string(), uuid());
 ```
 
@@ -214,7 +227,7 @@ pg.char({ length: ... });
 
 mysql.char({ length: ... });
 
-// Schema
+// 스키마
 pipe(string(), length(length));
 ```
 
@@ -225,36 +238,36 @@ mysql.varchar({ length: ... });
 
 sqlite.text({ mode: 'text', length: ... });
 
-// Schema
+// 스키마
 pipe(string(), maxLength(length));
 ```
 
 ```ts
 mysql.tinytext();
 
-// Schema
-pipe(string(), maxLength(255)); // unsigned 8-bit integer limit
+// 스키마
+pipe(string(), maxLength(255)); // 부호 없는 8비트 정수 한계
 ```
 
 ```ts
 mysql.text();
 
-// Schema
-pipe(string(), maxLength(65_535)); // unsigned 16-bit integer limit
+// 스키마
+pipe(string(), maxLength(65_535)); // 부호 없는 16비트 정수 한계
 ```
 
 ```ts
 mysql.mediumtext();
 
-// Schema
-pipe(string(), maxLength(16_777_215)); // unsigned 24-bit integer limit
+// 스키마
+pipe(string(), maxLength(16_777_215)); // 부호 없는 24비트 정수 한계
 ```
 
 ```ts
 mysql.longtext();
 
-// Schema
-pipe(string(), maxLength(4_294_967_295)); // unsigned 32-bit integer limit
+// 스키마
+pipe(string(), maxLength(4_294_967_295)); // 부호 없는 32비트 정수 한계
 ```
 
 ```ts
@@ -272,22 +285,22 @@ mysql.mysqlEnum(..., ...);
 
 sqlite.text({ mode: 'text', enum: ... });
 
-// Schema
+// 스키마
 enum(enum);
 ```
 
 ```ts
 mysql.tinyint();
 
-// Schema
-pipe(number(), minValue(-128), maxValue(127), integer()); // 8-bit integer lower and upper limit
+// 스키마
+pipe(number(), minValue(-128), maxValue(127), integer()); // 8비트 정수 하한 및 상한
 ```
 
 ```ts
 mysql.tinyint({ unsigned: true });
 
-// Schema
-pipe(number(), minValue(0), maxValue(255), integer()); // unsigned 8-bit integer lower and upper limit
+// 스키마
+pipe(number(), minValue(0), maxValue(255), integer()); // 부호 없는 8비트 정수 하한 및 상한
 ```
 
 ```ts
@@ -296,15 +309,15 @@ pg.smallserial();
 
 mysql.smallint();
 
-// Schema
-pipe(number(), minValue(-32_768), maxValue(32_767), integer()); // 16-bit integer lower and upper limit
+// 스키마
+pipe(number(), minValue(-32_768), maxValue(32_767), integer()); // 16비트 정수 하한 및 상한
 ```
 
 ```ts
 mysql.smallint({ unsigned: true });
 
-// Schema
-pipe(number(), minValue(0), maxValue(65_535), integer()); // unsigned 16-bit integer lower and upper limit
+// 스키마
+pipe(number(), minValue(0), maxValue(65_535), integer()); // 부호 없는 16비트 정수 하한 및 상한
 ```
 
 ```ts
@@ -312,29 +325,29 @@ pg.real();
 
 mysql.float();
 
-// Schema
-pipe(number(), minValue(-8_388_608), maxValue(8_388_607)); // 24-bit integer lower and upper limit
+// 스키마
+pipe(number(), minValue(-8_388_608), maxValue(8_388_607)); // 24비트 정수 하한 및 상한
 ```
 
 ```ts
 mysql.mediumint();
 
-// Schema
-pipe(number(), minValue(-8_388_608), maxValue(8_388_607), integer()); // 24-bit integer lower and upper limit
+// 스키마
+pipe(number(), minValue(-8_388_608), maxValue(8_388_607), integer()); // 24비트 정수 하한 및 상한
 ```
 
 ```ts
 mysql.float({ unsigned: true });
 
-// Schema
-pipe(number(), minValue(0), maxValue(16_777_215)); // unsigned 24-bit integer lower and upper limit
+// 스키마
+pipe(number(), minValue(0), maxValue(16_777_215)); // 부호 없는 24비트 정수 하한 및 상한
 ```
 
 ```ts
 mysql.mediumint({ unsigned: true });
 
-// Schema
-pipe(number(), minValue(0), maxValue(16_777_215), integer()); // unsigned 24-bit integer lower and upper limit
+// 스키마
+pipe(number(), minValue(0), maxValue(16_777_215), integer()); // 부호 없는 24비트 정수 하한 및 상한
 ```
 
 ```ts
@@ -343,15 +356,15 @@ pg.serial();
 
 mysql.int();
 
-// Schema
-pipe(number(), minValue(-2_147_483_648), maxValue(2_147_483_647), integer()); // 32-bit integer lower and upper limit
+// 스키마
+pipe(number(), minValue(-2_147_483_648), maxValue(2_147_483_647), integer()); // 32비트 정수 하한 및 상한
 ```
 
 ```ts
 mysql.int({ unsigned: true });
 
-// Schema
-pipe(number(), minValue(0), maxValue(4_294_967_295), integer()); // unsgined 32-bit integer lower and upper limit
+// 스키마
+pipe(number(), minValue(0), maxValue(4_294_967_295), integer()); // 부호 없는 32비트 정수 하한 및 상한
 ```
 
 ```ts
@@ -362,15 +375,15 @@ mysql.real();
 
 sqlite.real();
 
-// Schema
-pipe(number(), minValue(-140_737_488_355_328), maxValue(140_737_488_355_327)); // 48-bit integer lower and upper limit
+// 스키마
+pipe(number(), minValue(-140_737_488_355_328), maxValue(140_737_488_355_327)); // 48비트 정수 하한 및 상한
 ```
 
 ```ts
 mysql.double({ unsigned: true });
 
-// Schema
-pipe(number(), minValue(0), maxValue(281_474_976_710_655)); // unsigned 48-bit integer lower and upper limit
+// 스키마
+pipe(number(), minValue(0), maxValue(281_474_976_710_655)); // 부호 없는 48비트 정수 하한 및 상한
 ```
 
 ```ts
@@ -382,15 +395,15 @@ mysql.bigserial({ mode: 'number' });
 
 sqlite.integer({ mode: 'number' });
 
-// Schema
-pipe(number(), minValue(-9_007_199_254_740_991), maxValue(9_007_199_254_740_991), integer()); // Javascript min. and max. safe integers
+// 스키마
+pipe(number(), minValue(-9_007_199_254_740_991), maxValue(9_007_199_254_740_991), integer()); // 자바스크립트 최소 및 최대 안전 정수
 ```
 
 ```ts
 mysql.serial();
 
-// Schema
-pipe(number(), minValue(0), maxValue(9_007_199_254_740_991), integer()); // Javascript max. safe integer
+// 스키마
+pipe(number(), minValue(0), maxValue(9_007_199_254_740_991), integer()); // 자바스크립트 최대 안전 정수
 ```
 
 ```ts
@@ -401,21 +414,21 @@ mysql.bigint({ mode: 'bigint' });
 
 sqlite.blob({ mode: 'bigint' });
 
-// Schema
-pipe(bigint(), minValue(-9_223_372_036_854_775_808n), maxValue(9_223_372_036_854_775_807n)); // 64-bit integer lower and upper limit
+// 스키마
+pipe(bigint(), minValue(-9_223_372_036_854_775_808n), maxValue(9_223_372_036_854_775_807n)); // 64비트 정수 하한 및 상한
 ```
 
 ```ts
 mysql.bigint({ mode: 'bigint', unsigned: true });
 
-// Schema
-pipe(bigint(), minValue(0), maxValue(18_446_744_073_709_551_615n)); // unsigned 64-bit integer lower and upper limit
+// 스키마
+pipe(bigint(), minValue(0), maxValue(18_446_744_073_709_551_615n)); // 부호 없는 64비트 정수 하한 및 상한
 ```
 
 ```ts
 mysql.year();
 
-// Schema
+// 스키마
 pipe(number(), minValue(1_901), maxValue(2_155), integer());
 ```
 
@@ -423,7 +436,7 @@ pipe(number(), minValue(1_901), maxValue(2_155), integer());
 pg.geometry({ type: 'point', mode: 'tuple' });
 pg.point({ mode: 'tuple' });
 
-// Schema
+// 스키마
 tuple([number(), number()]);
 ```
 
@@ -431,7 +444,7 @@ tuple([number(), number()]);
 pg.geometry({ type: 'point', mode: 'xy' });
 pg.point({ mode: 'xy' });
 
-// Schema
+// 스키마
 object({ x: number(), y: number() });
 ```
 
@@ -439,21 +452,21 @@ object({ x: number(), y: number() });
 pg.halfvec({ dimensions: ... });
 pg.vector({ dimensions: ... });
 
-// Schema
+// 스키마
 pipe(array(number()), length(dimensions));
 ```
 
 ```ts
 pg.line({ mode: 'abc' });
 
-// Schema
+// 스키마
 object({ a: number(), b: number(), c: number() });
 ```
 
 ```ts
 pg.line({ mode: 'tuple' });
 
-// Schema
+// 스키마
 tuple([number(), number(), number()]);
 ```
 
@@ -466,20 +479,22 @@ mysql.json();
 sqlite.blob({ mode: 'json' });
 sqlite.text({ mode: 'json' });
 
-// Schema
+// 스키마
 const self = union([union([string(), number(), boolean(), null()]), array(lazy(() => self)), record(string(), lazy(() => self))]);
 ```
 
 ```ts
 sqlite.blob({ mode: 'buffer' });
 
-// Schema
-custom<Buffer>((v) => v instanceof Buffer);
+// 스키마
+custom((v) => v instanceof Buffer);
 ```
 
 ```ts
 pg.dataType().array(...);
 
-// Schema
+// 스키마
 pipe(array(baseDataTypeSchema), length(size));
 ```
+
+

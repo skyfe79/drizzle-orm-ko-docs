@@ -17,65 +17,88 @@ import RunFile from '@mdx/get-started/RunFile.mdx';
 import SetupConfig from '@mdx/get-started/SetupConfig.mdx';
 import TransferCode from '@mdx/get-started/TransferCode.mdx';
 
+
 <Breadcrumbs/>
 
-# Get Started with Drizzle and PlanetScale in existing project
+# 기존 프로젝트에 Drizzle과 PlanetScale 시작하기
 
 <Prerequisites>  
-  - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
-  - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
-  - **PlanetScale** - MySQL database platform - [read here](https://planetscale.com/)
-  - **database-js** - PlanetScale serverless driver - [read here](https://github.com/planetscale/database-js)
+  - **dotenv** - 환경 변수를 관리하기 위한 패키지 - [여기서 읽기](https://www.npmjs.com/package/dotenv)
+  - **tsx** - TypeScript 파일을 실행하기 위한 패키지 - [여기서 읽기](https://tsx.is/)
+  - **PlanetScale** - MySQL 데이터베이스 플랫폼 - [여기서 읽기](https://planetscale.com/)
+  - **database-js** - PlanetScale 서버리스 드라이버 - [여기서 읽기](https://github.com/planetscale/database-js)
 </Prerequisites>
 
-<Callout title='important' type='warning'>
-For this tutorial, we will use the `database-js` driver to make **HTTP** calls to the PlanetScale database. If you need to
-connect to PlanetScale through TCP, you can refer to our [MySQL Get Started](/docs/get-started/mysql-new) page
+<Callout title='중요' type='warning'>
+이 튜토리얼에서는 PlanetScale 데이터베이스에 **HTTP** 호출을 하기 위해 `database-js` 드라이버를 사용합니다. TCP를 통해 PlanetScale에 연결해야 한다면 [MySQL 시작하기](/docs/get-started/mysql-new) 페이지를 참고하세요.
 </Callout>
 
 <FileStructure/>
 
-#### Step 1 - Install **@planetscale/database** package
+
+#### 1단계 - **@planetscale/database** 패키지 설치
 
 <InstallPackages lib='@planetscale/database'/>
 
-#### Step 2 - Setup connection variables
+
+#### 2단계 - 연결 변수 설정
+
 
 <SetupEnv env_variable='DATABASE_URL' />
 
-#### Step 3 - Setup Drizzle config file
+
+
+
+
+#### 3단계 - Drizzle 설정 파일 설정하기
+
 
 <SetupConfig dialect='mysql' env_variable='DATABASE_URL'/>
 
-#### Step 4 - Introspect your database
+
+
+
+
+#### 4단계 - 데이터베이스 내부 구조 확인하기
 
 <IntrospectMySQL/>
 
-#### Step 5 - Transfer code to your actual schema file
+
+
+#### 5단계 - 실제 스키마 파일로 코드 옮기기
 
 <TransferCode/>
 
-#### Step 6 - Connect Drizzle ORM to the database
+
+#### 6단계 - Drizzle ORM을 데이터베이스에 연결하기
 
 <ConnectPlanetScale/>
 
-#### Step 7 - Query the database
+
+
+#### 7단계 - 데이터베이스 쿼리하기
 
 <QueryPlanetScale />
 
-#### Step 8 - Run index.ts file
+
+
+#### 8단계 - index.ts 파일 실행하기
 
 <RunFile/>
 
-#### Step 9 - Update your table schema (optional)
+
+#### 9단계 - 테이블 스키마 업데이트 (선택 사항)
 
 <UpdateSchema/>
 
-#### Step 10 - Applying changes to the database (optional)
+
+#### 10단계 - 데이터베이스에 변경 사항 적용하기 (선택 사항)
 
 <ApplyChanges/>
 
-#### Step 11 - Query the database with a new field (optional)
+
+
+#### 11단계 - 새로운 필드로 데이터베이스 쿼리하기 (선택 사항)
 
 ```typescript copy filename="src/index.ts"
 import 'dotenv/config';
@@ -84,11 +107,13 @@ import { drizzle } from 'drizzle-orm/planetscale-serverless';
 import { usersTable } from './db/schema';
 
 async function main() {
-  const db = drizzle({ connection: {
+  const db = drizzle({ 
+    connection: {
       host: process.env.DATABASE_HOST!,
       username: process.env.DATABASE_USERNAME!,
       password: process.env.DATABASE_PASSWORD!,
-    }});
+    }
+  });
 
   const user: typeof usersTable.$inferInsert = {
     name: 'John',
@@ -98,10 +123,10 @@ async function main() {
   };
 
   await db.insert(usersTable).values(user);
-  console.log('New user created!')
+  console.log('새로운 사용자가 생성되었습니다!');
 
   const users = await db.select().from(usersTable);
-  console.log('Getting all users from the database: ', users)
+  console.log('데이터베이스에서 모든 사용자 가져오기: ', users);
   /*
   const users: {
     id: number;
@@ -118,11 +143,13 @@ async function main() {
       age: 31,
     })
     .where(eq(usersTable.email, user.email));
-  console.log('User info updated!')
+  console.log('사용자 정보가 업데이트되었습니다!');
 
   await db.delete(usersTable).where(eq(usersTable.email, user.email));
-  console.log('User deleted!')
+  console.log('사용자가 삭제되었습니다!');
 }
 
 main();
 ```
+
+

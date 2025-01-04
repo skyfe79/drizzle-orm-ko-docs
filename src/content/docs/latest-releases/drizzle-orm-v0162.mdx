@@ -1,17 +1,17 @@
 ---
-title: DrizzleORM v0.16.2 release
+title: DrizzleORM v0.16.2 릴리스
 pubDate: 2023-01-21
-description: Drizzle ORM - is an idiomatic TypeScript ORM which can be used as query builder and as an ORM being the source of truth for SQL schema and CLI for automatic migrations generation.
+description: Drizzle ORM은 SQL 스키마와 자동 마이그레이션 생성을 위한 CLI의 진실의 원천으로 사용할 수 있는 타입스크립트 ORM이자 쿼리 빌더입니다.
 ---
 import Section from "@mdx/Section.astro";
 
-Drizzle ORM - is an idiomatic TypeScript ORM which can be used as query builder and as an ORM being the source of truth for SQL schema and CLI for automatic migrations generation.
+Drizzle ORM은 SQL 스키마와 자동 마이그레이션 생성을 위한 CLI의 진실의 원천으로 사용할 수 있는 타입스크립트 ORM이자 쿼리 빌더입니다.
 
-Since last major update we've added numerous requested features 🚀
+지난 주요 업데이트 이후로 많은 요청된 기능들이 추가되었습니다 🚀
 
-### 🎉 PostgreSQL schemas
+### 🎉 PostgreSQL 스키마
 
-You can now declare [PostgreSQL schemas](https://www.postgresql.org/docs/current/ddl-schemas.html) and tables to be created within this schema
+이제 [PostgreSQL 스키마](https://www.postgresql.org/docs/current/ddl-schemas.html)를 선언하고, 해당 스키마 내에 생성될 테이블을 정의할 수 있습니다.
 
 <Section>
 ```ts copy
@@ -37,15 +37,16 @@ CREATE TABLE IF NOT EXISTS "my_schema"."users" (
 ```
 </Section>
 
-[drizzle-kit](https://driz.link/kit) will automatically generate all needed SQL migrations
+[drizzle-kit](https://driz.link/kit)은 필요한 모든 SQL 마이그레이션을 자동으로 생성합니다.
 
- ```shell 
+```shell 
 drizzle-kit generate:pg --schema=src/schema.ts --out=migrations/ 
- ```
+```
 
-### 🎉 MySQL databases/schemas
 
-You can now declare [MySQL databases/schemas](https://dev.mysql.com/doc/refman/8.0/en/create-database.html) and tables to be created within it
+### 🎉 MySQL 데이터베이스/스키마
+
+이제 [MySQL 데이터베이스/스키마](https://dev.mysql.com/doc/refman/8.0/en/create-database.html)와 그 안에 생성할 테이블을 선언할 수 있습니다.
 
 ```ts copy
 // schema.ts
@@ -60,10 +61,13 @@ const users = mySchema("users", {
 });
 ```
 
-[drizzle-kit](https://driz.link/kit) will automatically generate all needed SQL migrations ```shell drizzle-kit
-generate:mysql --schema=src/schema.ts --out=migrations/ ```
+[drizzle-kit](https://driz.link/kit)은 필요한 모든 SQL 마이그레이션을 자동으로 생성합니다.
 
-which will automatically generate you SQL migration
+```shell
+drizzle-kit generate:mysql --schema=src/schema.ts --out=migrations/
+```
+
+이 명령어는 자동으로 SQL 마이그레이션을 생성합니다.
 
 ```sql
 CREATE DATABASE `my_schema`;
@@ -75,24 +79,24 @@ CREATE TABLE `my_schema`.`users` (
 );
 ```
 
-### 🎉 PostgreSQL introspect
 
-You can now pull database schema from your existing PostgreSQL database within seconds with [drizzle-kit](https://driz.link/kit), this vanishes mostly any friction for you to switch from any existing orm or vanilla SQL.
-It supports:
+### 🎉 PostgreSQL 스키마 추출 기능 소개
 
-- enums
-- tables with all native and non-native columns
-- indexes
-- foreign keys, self references and cyclic fks
-- schemas
+이제 [drizzle-kit](https://driz.link/kit)을 사용해 기존 PostgreSQL 데이터베이스의 스키마를 몇 초 만에 추출할 수 있습니다. 이 기능은 기존 ORM이나 일반 SQL에서 전환할 때 발생하는 대부분의 번거로움을 없애줍니다. 지원하는 기능은 다음과 같습니다:
+
+- 열거형(enum)
+- 모든 기본 및 비기본 컬럼을 포함한 테이블
+- 인덱스
+- 외래 키, 자기 참조 및 순환 외래 키
+- 스키마
 
 ```shell
 drizzle-kit introspect:pg --out=migrations/ --connectionString=postgresql://user:pass@host:port/db_name
 ```
 
-it will print you `schema.ts`
+위 명령어를 실행하면 `schema.ts` 파일이 생성됩니다.
 
-```ts copy
+```ts
 export const myEnum = pgEnum("my_enum", ["one", "two", "three"]);
 export const mySchema = pgSchema("my_schema");
 
@@ -136,10 +140,10 @@ export const allColumns = pgTable("all_columns", {
   doublePrecisiondef: doublePrecision("decimaldef").default(100.0),
   real: real("real"),
   realdef: real("decimaldef").default(100.0),
-  json: json<{ attr: string }>("json"),
-  jsondef: json<{ attr: string }>("jsondef").default({ attr: "value" }),
-  jsonb: jsonb<{ attr: string }>("jsonb"),
-  jsonbdef: jsonb<{ attr: string }>("jsonbdef").default({ attr: "value" }),
+  json: json("json"),
+  jsondef: json("jsondef").default({ attr: "value" }),
+  jsonb: jsonb("jsonb"),
+  jsonbdef: jsonb("jsonbdef").default({ attr: "value" }),
   time: time("time"),
   time2: time("time2", { precision: 6, withTimezone: true }),
   timedefnow: time("timedefnow").defaultNow(),
@@ -181,9 +185,10 @@ export const example = pgTable(
 );
 ```
 
-### 🎉 Postgres.js driver support
 
-We've added full support for [postgres.js](https://github.com/porsager/postgres), it is lightweight and it is fast 🚀
+### 🎉 Postgres.js 드라이버 지원 추가
+
+이제 [postgres.js](https://github.com/porsager/postgres)를 완벽하게 지원합니다. 가볍고 빠른 드라이버입니다 🚀
 
 ```ts copy
 // schema.ts
@@ -205,15 +210,16 @@ const db: PostgresJsDatabase = drizzle(client);
 const allUsers = await db.select(users);
 ```
 
-Full PostgreSQL docs see [here](https://github.com/drizzle-team/drizzle-orm/tree/main/drizzle-orm-pg)
+PostgreSQL 전체 문서는 [여기](https://github.com/drizzle-team/drizzle-orm/tree/main/drizzle-orm-pg)에서 확인할 수 있습니다.
 
-### 🎉 PostgreSQL and MySQL types
 
-We've added useful operators for you to create any needed non-native PostgreSQL or MySQL types
+### 🎉 PostgreSQL과 MySQL 타입
+
+여러분이 필요한 비네이티브 PostgreSQL 또는 MySQL 타입을 생성할 수 있도록 유용한 연산자를 추가했습니다.
 
 ```ts copy
 // PostgreSQL
-const customText = customType<{ data: string }>({
+const customText = customType({
   dataType() {
     return "text";
   },
@@ -224,7 +230,7 @@ const usersTable = pgTable("users", {
 });
 
 // MySQL
-const customText = customType<{ data: string }>({
+const customText = customType({
   dataType() {
     return "text";
   },
@@ -234,3 +240,5 @@ const usersTable = mysqlTable("users", {
   name: customText("name").notNull(),
 });
 ```
+
+

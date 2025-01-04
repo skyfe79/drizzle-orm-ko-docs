@@ -1,15 +1,16 @@
 ---
-title: DrizzleORM v0.28.0 release
+title: DrizzleORM v0.28.0 릴리스
 pubDate: 2023-08-06
-description: Removed support for filtering by nested relations, Added Relational Queries mode config for mysql2 driver, improved IntelliSense performance for large schemas, improved Relational Queries Permormance and Read Usage. Added possibility to insert rows with default values for all columns.
+description: 중첩된 관계를 통한 필터링 지원 제거, mysql2 드라이버를 위한 Relational Queries 모드 설정 추가, 대규모 스키마에 대한 IntelliSense 성능 개선, Relational Queries 성능 및 사용성 향상. 모든 컬럼에 기본값을 사용하여 행을 삽입하는 기능 추가.
 ---
 import Section from "@mdx/Section.astro";
 
-## Breaking changes
+## 주요 변경 사항
 
-### Removed support for filtering by nested relations
 
-Current example won't work in `0.28.0`:
+### 중첩 관계 필터링 지원 중단
+
+`0.28.0` 버전부터는 아래 예제가 동작하지 않습니다:
 
 ```ts
 const usersWithPosts = await db.query.users.findMany({
@@ -20,21 +21,22 @@ const usersWithPosts = await db.query.users.findMany({
 });
 ```
 
-The `table` object in the `where` callback won't have fields from `with` and `extras`. We removed them to be able to build more efficient relational queries, which improved row reads and performance.
+`where` 콜백 내의 `table` 객체는 더 이상 `with`와 `extras`로부터 필드를 포함하지 않습니다. 이를 제거함으로써 더 효율적인 관계형 쿼리를 구축할 수 있게 되었고, 이는 행 읽기와 성능을 개선했습니다.
 
-If you have used those fields in the `where` callback before, there are several workarounds:
+이전에 `where` 콜백에서 해당 필드를 사용했다면, 다음과 같은 해결 방법을 고려할 수 있습니다:
 
-1. Applying those filters manually on the code level after the rows are fetched;
-2. Using the core API.
+1. 행을 가져온 후 코드 레벨에서 필터를 직접 적용하기
+2. 코어 API 사용하기
 
-### Added Relational Queries `mode` config for `mysql2` driver
 
-Drizzle relational queries always generate exactly one SQL statement to run on the database and it has certain caveats. To have best in class support for every database out there we've introduced modes.
+### `mysql2` 드라이버에 관계형 쿼리 `mode` 설정 추가
 
-Drizzle relational queries use lateral joins of subqueries under the hood and for now PlanetScale does not support them.
+Drizzle의 관계형 쿼리는 항상 하나의 SQL 문을 생성하여 데이터베이스에서 실행합니다. 하지만 이 방식에는 몇 가지 주의사항이 있습니다. 모든 데이터베이스에 최적의 지원을 제공하기 위해 모드 설정을 도입했습니다.
 
-When using `mysql2` driver with regular MySQL database - you should specify mode: "default".
-When using `mysql2` driver with PlanetScale - you need to specify mode: "planetscale".
+Drizzle의 관계형 쿼리는 내부적으로 서브쿼리의 **Lateral Join**을 사용합니다. 현재 PlanetScale은 이 기능을 지원하지 않습니다.
+
+- 일반 MySQL 데이터베이스에서 `mysql2` 드라이버를 사용할 때는 `mode: "default"`를 지정해야 합니다.
+- PlanetScale에서 `mysql2` 드라이버를 사용할 때는 `mode: "planetscale"`을 지정해야 합니다.
 
 ```ts copy {9}
 import { drizzle } from 'drizzle-orm/mysql2';
@@ -48,28 +50,27 @@ const client = await mysql.createConnection({
 const db = drizzle({ client, schema, mode: 'planetscale' });
 ```
 
-## Improved IntelliSense performance for large schemas
 
-We've run the diagnostics on a database schema with 85 tables, 666 columns, 26 enums, 172 indexes and 133 foreign keys. We've optimized internal types which resulted in **430%** speed up in IntelliSense.
+## 대규모 스키마에서 IntelliSense 성능 개선
 
-## Improved Relational Queries Permormance and Read Usage
+85개의 테이블, 666개의 컬럼, 26개의 열거형, 172개의 인덱스, 133개의 외래 키로 구성된 데이터베이스 스키마에 대해 진단을 수행했습니다. 내부 타입을 최적화하여 IntelliSense 속도가 **430%** 빨라졌습니다.
 
-In this release we've fully changed a way query is generated for Relational Queri API.
 
-As a summary we've made current set of changes in query generation startegy:
+## 관계형 쿼리 성능 및 읽기 사용성 개선
 
-1. Lateral Joins: In the new version we're utilizing lateral joins, denoted by the "LEFT JOIN LATERAL" clauses, to retrieve specific data from related tables efficiently For MySQL in PlanetScale and SQLite, we've used simple subquery selects, which improved a query plan and overall performance
+이번 릴리스에서는 관계형 쿼리 API를 위한 쿼리 생성 방식을 완전히 변경했습니다. 주요 변경 사항은 다음과 같습니다:
 
-2. Selective Data Retrieval: In the new version we're retrieving only the necessary data from tables. This targeted data retrieval reduces the amount of unnecessary information fetched, resulting in a smaller dataset to process and faster execution.
+1. **Lateral 조인**: 새 버전에서는 "LEFT JOIN LATERAL" 절을 사용하여 관련 테이블에서 특정 데이터를 효율적으로 가져옵니다. MySQL(PlanetScale)과 SQLite에서는 간단한 서브쿼리 선택을 사용하여 쿼리 계획과 전반적인 성능을 개선했습니다.
 
-3. Reduced Aggregations: In the new version we've reduced the number of aggregation functions (e.g., COUNT, json_agg). By using json_build_array directly within the lateral joins, drizzle is aggregating the data in a more streamlined manner, leading to improved query performance.
+2. **선택적 데이터 검색**: 새 버전에서는 테이블에서 필요한 데이터만 검색합니다. 이렇게 특정 데이터만 가져오면 불필요한 정보를 줄여 처리할 데이터셋이 작아지고 실행 속도가 빨라집니다.
 
-4. Simplified Grouping: In the new version the GROUP BY clause is removed, as the lateral joins and subqueries already handle data aggregation more efficiently.
+3. **집계 함수 감소**: 새 버전에서는 집계 함수(예: COUNT, json_agg)의 수를 줄였습니다. Lateral 조인 내에서 json_build_array를 직접 사용하여 데이터를 더 효율적으로 집계함으로써 쿼리 성능을 개선했습니다.
 
-For this drizzle query
+4. **단순화된 그룹화**: 새 버전에서는 GROUP BY 절을 제거했습니다. Lateral 조인과 서브쿼리가 이미 데이터 집계를 더 효율적으로 처리하기 때문입니다.
 
-<Section>
-```ts copy
+다음은 Drizzle 쿼리 예제입니다:
+
+```ts
 const items = await db.query.comments.findMany({
   limit,
   orderBy: comments.id,
@@ -89,95 +90,116 @@ const items = await db.query.comments.findMany({
 });
 ```
 
+새로 생성된 쿼리:
+
 ```sql
--- Query generated now
-select "comments"."id",
+SELECT "comments"."id",
        "comments"."user_id",
        "comments"."post_id",
        "comments"."content",
-       "comments_user"."data" as "user",
-       "comments_post"."data" as "post"
-from "comments"
-         left join lateral (select json_build_array("comments_user"."name") as "data"
-                            from (select *
-                                  from "users" "comments_user"
-                                  where "comments_user"."id" = "comments"."user_id"
-                                  limit 1) "comments_user") "comments_user" on true
-         left join lateral (select json_build_array("comments_post"."title", "comments_post_user"."data") as "data"
-                            from (select *
-                                  from "posts" "comments_post"
-                                  where "comments_post"."id" = "comments"."post_id"
-                                  limit 1) "comments_post"
-                                     left join lateral (select json_build_array("comments_post_user"."name") as "data"
-                                                        from (select *
-                                                              from "users" "comments_post_user"
-                                                              where "comments_post_user"."id" = "comments_post"."user_id"
-                                                              limit 1) "comments_post_user") "comments_post_user"
-                                               on true) "comments_post" on true
-order by "comments"."id"
-limit 1
+       "comments_user"."data" AS "user",
+       "comments_post"."data" AS "post"
+FROM "comments"
+LEFT JOIN LATERAL (
+    SELECT json_build_array("comments_user"."name") AS "data"
+    FROM (
+        SELECT *
+        FROM "users" "comments_user"
+        WHERE "comments_user"."id" = "comments"."user_id"
+        LIMIT 1
+    ) "comments_user"
+) "comments_user" ON true
+LEFT JOIN LATERAL (
+    SELECT json_build_array("comments_post"."title", "comments_post_user"."data") AS "data"
+    FROM (
+        SELECT *
+        FROM "posts" "comments_post"
+        WHERE "comments_post"."id" = "comments"."post_id"
+        LIMIT 1
+    ) "comments_post"
+    LEFT JOIN LATERAL (
+        SELECT json_build_array("comments_post_user"."name") AS "data"
+        FROM (
+            SELECT *
+            FROM "users" "comments_post_user"
+            WHERE "comments_post_user"."id" = "comments_post"."user_id"
+            LIMIT 1
+        ) "comments_post_user"
+    ) "comments_post_user" ON true
+) "comments_post" ON true
+ORDER BY "comments"."id"
+LIMIT 1
 ```
 
+이전에 생성된 쿼리:
+
 ```sql
--- Query generated before
 SELECT "id",
        "user_id",
        "post_id",
        "content",
        "user"::JSON,
        "post"::JSON
-FROM
-  (SELECT "comments".*,
-          CASE
-              WHEN count("comments_post"."id") = 0 THEN '[]'
-              ELSE json_agg(json_build_array("comments_post"."title", "comments_post"."user"::JSON))::text
-          END AS "post"
-   FROM
-     (SELECT "comments".*,
-             CASE
-                 WHEN count("comments_user"."id") = 0 THEN '[]'
-                 ELSE json_agg(json_build_array("comments_user"."name"))::text
-             END AS "user"
-      FROM "comments"
-      LEFT JOIN
-        (SELECT "comments_user".*
-         FROM "users" "comments_user") "comments_user" ON "comments"."user_id" = "comments_user"."id"
-      GROUP BY "comments"."id",
-               "comments"."user_id",
-               "comments"."post_id",
-               "comments"."content") "comments"
-   LEFT JOIN
-     (SELECT "comments_post".*
-      FROM
-        (SELECT "comments_post".*,
-                CASE
-                    WHEN count("comments_post_user"."id") = 0 THEN '[]'
-                    ELSE json_agg(json_build_array("comments_post_user"."name"))
-                END AS "user"
-         FROM "posts" "comments_post"
-         LEFT JOIN
-           (SELECT "comments_post_user".*
-            FROM "users" "comments_post_user") "comments_post_user" ON "comments_post"."user_id" = "comments_post_user"."id"
-         GROUP BY "comments_post"."id") "comments_post") "comments_post" ON "comments"."post_id" = "comments_post"."id"
-   GROUP BY "comments"."id",
-            "comments"."user_id",
-            "comments"."post_id",
-            "comments"."content",
-            "comments"."user") "comments"
+FROM (
+    SELECT "comments".*,
+           CASE
+               WHEN count("comments_post"."id") = 0 THEN '[]'
+               ELSE json_agg(json_build_array("comments_post"."title", "comments_post"."user"::JSON))::text
+           END AS "post"
+    FROM (
+        SELECT "comments".*,
+               CASE
+                   WHEN count("comments_user"."id") = 0 THEN '[]'
+                   ELSE json_agg(json_build_array("comments_user"."name"))::text
+               END AS "user"
+        FROM "comments"
+        LEFT JOIN (
+            SELECT "comments_user".*
+            FROM "users" "comments_user"
+        ) "comments_user" ON "comments"."user_id" = "comments_user"."id"
+        GROUP BY "comments"."id",
+                 "comments"."user_id",
+                 "comments"."post_id",
+                 "comments"."content"
+    ) "comments"
+    LEFT JOIN (
+        SELECT "comments_post".*
+        FROM (
+            SELECT "comments_post".*,
+                   CASE
+                       WHEN count("comments_post_user"."id") = 0 THEN '[]'
+                       ELSE json_agg(json_build_array("comments_post_user"."name"))
+                   END AS "user"
+            FROM "posts" "comments_post"
+            LEFT JOIN (
+                SELECT "comments_post_user".*
+                FROM "users" "comments_post_user"
+            ) "comments_post_user" ON "comments_post"."user_id" = "comments_post_user"."id"
+            GROUP BY "comments_post"."id"
+        ) "comments_post"
+    ) "comments_post" ON "comments"."post_id" = "comments_post"."id"
+    GROUP BY "comments"."id",
+             "comments"."user_id",
+             "comments"."post_id",
+             "comments"."content",
+             "comments"."user"
+) "comments"
 LIMIT 1
 ```
-</Section>
 
-Read more about [Relational Queries](/docs/rqb) in the documentation.
+더 자세한 내용은 [관계형 쿼리 문서](/docs/rqb)에서 확인할 수 있습니다.
 
-## Possibility to insert rows with default values for all columns
 
-You can now provide an empty object or an array of empty objects, and Drizzle will insert all defaults into the database.
+## 모든 컬럼에 기본값을 사용해 행 삽입하기
+
+이제 빈 객체나 빈 객체 배열을 제공하면 Drizzle이 데이터베이스에 모든 기본값을 삽입합니다.
 
 ```ts copy {2,5}
-// Insert 1 row with all defaults
+// 모든 기본값을 사용해 1개의 행 삽입
 await db.insert(usersTable).values({});
 
-// Insert 2 rows with all defaults
+// 모든 기본값을 사용해 2개의 행 삽입
 await db.insert(usersTable).values([{}, {}]);
 ```
+
+

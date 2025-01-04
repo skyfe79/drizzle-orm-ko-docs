@@ -8,31 +8,28 @@ import Prerequisites from "@mdx/Prerequisites.astro";
 import Npm from "@mdx/Npm.astro";
 import Npx from "@mdx/Npx.astro";
 
-
 # `drizzle-kit check`
 
 <Prerequisites>
-- Get started with Drizzle and `drizzle-kit` - [read here](/docs/get-started)
-- Drizzle schema foundamentals - [read here](/docs/sql-schema-declaration)
-- Database connection basics - [read here](/docs/connect-overview)
-- Drizzle migrations foundamentals - [read here](/docs/migrations)
-- Drizzle Kit [overview](/docs/kit-overview) and [config file](/docs/drizzle-config-file)
-- `drizzle-kit generate` command - [read here](/docs/drizzle-kit-generate)
+- Drizzle와 `drizzle-kit` 시작하기 - [여기서 읽기](/docs/get-started)
+- Drizzle 스키마 기초 - [여기서 읽기](/docs/sql-schema-declaration)
+- 데이터베이스 연결 기초 - [여기서 읽기](/docs/connect-overview)
+- Drizzle 마이그레이션 기초 - [여기서 읽기](/docs/migrations)
+- Drizzle Kit [개요](/docs/kit-overview)와 [설정 파일](/docs/drizzle-config-file)
+- `drizzle-kit generate` 커맨드 - [여기서 읽기](/docs/drizzle-kit-generate)
 </Prerequisites>
 
-`drizzle-kit check` command lets you check consistency of your generated SQL migrations history.
+`drizzle-kit check` 커맨드는 생성된 SQL 마이그레이션 기록의 일관성을 확인할 수 있게 해줍니다.
 
-That's extremely useful when you have multiple developers working on the project and 
-altering database schema on different branches - read more about [migrations for teams](/docs/kit-migrations-for-teams).
+이 기능은 여러 개발자가 프로젝트에서 작업하고 다른 브랜치에서 데이터베이스 스키마를 변경할 때 매우 유용합니다. [팀을 위한 마이그레이션](/docs/kit-migrations-for-teams)에 대해 더 알아보세요.
 
 <br/>
 <hr/>
 <br/>
 
-`drizzle-kit check` command requires you to specify both `dialect` and database connection credentials, 
-you can provide them either via [drizzle.config.ts](/docs/drizzle-config-file) config file or via CLI options
+`drizzle-kit check` 커맨드를 사용하려면 `dialect`와 데이터베이스 연결 정보를 지정해야 합니다. 이 정보는 [drizzle.config.ts](/docs/drizzle-config-file) 설정 파일을 통해 제공하거나 CLI 옵션으로 제공할 수 있습니다.
 
-<CodeTabs items={["With config file", "As CLI options"]}>
+<CodeTabs items={["설정 파일 사용", "CLI 옵션 사용"]}>
 <Section>
 ```ts {5,8}
 // drizzle.config.ts
@@ -51,12 +48,16 @@ npx drizzle-kit check --dialect=postgresql
 ```
 </CodeTabs>
 
-### Multiple configuration files in one project
-You can have multiple config files in the project, it's very useful when you have multiple database stages or multiple databases on the same project:
+
+### 하나의 프로젝트에 여러 설정 파일 사용하기
+
+하나의 프로젝트에서 여러 설정 파일을 사용할 수 있습니다. 이는 여러 데이터베이스 단계나 동일한 프로젝트 내에서 여러 데이터베이스를 사용할 때 매우 유용합니다.
+
 <Npx>
   drizzle-kit migrate --config=drizzle-dev.config.ts
   drizzle-kit migrate --config=drizzle-prod.config.ts
 </Npx>
+
 ```plaintext {5-6}
 📦 <project root>
  ├ 📂 drizzle
@@ -68,17 +69,22 @@ You can have multiple config files in the project, it's very useful when you hav
  └ 📜 tsconfig.json
 ```
 
-### Extended list of configurations
-We recommend configuring `drizzle-kit` through [drizzle.config.ts](/docs/drizzle-config-file) file, 
-yet you can provide all configuration options through CLI if necessary, e.g. in CI/CD pipelines, etc.
+이 구조를 통해 개발 환경과 프로덕션 환경에 각각 다른 설정 파일을 적용할 수 있습니다. 예를 들어, `drizzle-dev.config.ts`는 개발용 데이터베이스 설정을, `drizzle-prod.config.ts`는 프로덕션용 데이터베이스 설정을 담고 있습니다. 이렇게 하면 환경에 따라 적절한 설정을 쉽게 적용할 수 있습니다.
+
+
+### 확장된 설정 목록
+
+`drizzle-kit`은 [drizzle.config.ts](/docs/drizzle-config-file) 파일을 통해 설정하는 것을 권장합니다. 하지만 CI/CD 파이프라인 등에서 필요할 경우, 모든 설정 옵션을 CLI를 통해 제공할 수도 있습니다.
 <rem025/>
 |           |            |                                                                         |
 | :-------- | :--------- | :---------------------------------------------------------------------- |
-| `dialect` | `required` | Database dialect you are using. Can be `postgresql`,`mysql` or `sqlite` |
-| `out`     |            | migrations folder, default=`./drizzle`                                  |
-| `config`  |            | config file path, default=`drizzle.config.ts`                           |
-<br/>
+| `dialect` | `필수`     | 사용 중인 데이터베이스 방언. `postgresql`, `mysql`, `sqlite` 중 선택 가능 |
+| `out`     |            | 마이그레이션 폴더, 기본값=`./drizzle`                                   |
+| `config`  |            | 설정 파일 경로, 기본값=`drizzle.config.ts`                              |
+<br />
 <Npx>
 drizzle-kit check --dialect=postgresql
 drizzle-kit check --dialect=postgresql --our=./migrations-folder
 </Npx>
+
+

@@ -10,27 +10,31 @@ import LibsqlTabs from "@mdx/LibsqlTabs.mdx";
 
 # Drizzle \<\> Turso
 
+
 <Prerequisites>
-- Database [connection basics](/docs/connect-overview) with Drizzle
-- Turso Database - [website](https://docs.turso.tech/introduction)
-- LibSQL driver - [website](https://docs.turso.tech/sdk/ts/reference) & [GitHub](https://github.com/tursodatabase/libsql-client-ts)
+- Drizzle를 사용한 데이터베이스 [연결 기본 사항](/docs/connect-overview)
+- Turso 데이터베이스 - [웹사이트](https://docs.turso.tech/introduction)
+- LibSQL 드라이버 - [웹사이트](https://docs.turso.tech/sdk/ts/reference) & [GitHub](https://github.com/tursodatabase/libsql-client-ts)
 </Prerequisites>
 
-According to the **[official website](https://turso.tech/drizzle)**, 
-Turso is a **[libSQL](https://github.com/libsql/libsql)** powered edge SQLite database as a service.
-  
-Drizzle ORM natively supports libSQL driver, 
-we embrace SQL dialects and dialect specific drivers and syntax and mirror most popular 
-SQLite-like `all`, `get`, `values` and `run` query methods syntax. 
+**[공식 웹사이트](https://turso.tech/drizzle)**에 따르면, Turso는 **[libSQL](https://github.com/libsql/libsql)** 기반의 에지 SQLite 데이터베이스 서비스입니다.
 
-#### Step 1 - Install packages
+Drizzle ORM은 libSQL 드라이버를 기본적으로 지원하며, SQL 방언과 방언별 드라이버 및 문법을 수용합니다. 또한 SQLite와 유사한 `all`, `get`, `values`, `run` 쿼리 메서드 문법을 대부분 반영합니다.
+
+
+#### 1단계 - 패키지 설치
+
 <Npm>
 drizzle-orm @libsql/client
 -D drizzle-kit
 </Npm>
 
-#### Step 2 - Initialize the driver
-Drizzle has native support for all `@libsql/client` driver variations:
+위 명령어를 사용하여 필요한 패키지를 설치합니다. `drizzle-orm`과 `@libsql/client`는 프로젝트에 필수적인 패키지이며, `drizzle-kit`은 개발 환경에서만 사용하는 개발 의존성 패키지입니다.
+
+
+#### 2단계 - 드라이버 초기화
+
+Drizzle은 모든 `@libsql/client` 드라이버 변형을 기본적으로 지원합니다.
 
 <LibsqlTable />
 
@@ -38,8 +42,7 @@ Drizzle has native support for all `@libsql/client` driver variations:
 
 <LibsqlTabs />
 
-
-If you need to provide your existing driver:
+기존 드라이버를 제공해야 하는 경우:
 
 <CodeTabs items={["default", "web"]}>
 ```typescript copy
@@ -70,25 +73,34 @@ const result = await db.select().from(users).all()
 ```
 </CodeTabs>
 
-#### Step 3 - make a query
+
+#### 3단계 - 쿼리 만들기
 
 ```ts
 import { drizzle } from 'drizzle-orm/libsql';
 import * as s from 'drizzle-orm/sqlite-core';
 
-const db = drizzle({ connection: {
-  url: process.env.DATABASE_URL, 
-  authToken: process.env.DATABASE_AUTH_TOKEN 
-}});
+// 데이터베이스 연결 설정
+const db = drizzle({ 
+  connection: {
+    url: process.env.DATABASE_URL, 
+    authToken: process.env.DATABASE_AUTH_TOKEN 
+  }
+});
 
+// users 테이블 정의
 const users = s.sqliteTable("users", {
   id: s.integer(),
   name: s.text(),
-})
+});
 
+// users 테이블에서 데이터 조회
 const result = await db.select().from(users);
 ```
 
-#### What's next?
+
+#### 다음 단계는 무엇인가요?
 
 <WhatsNextPostgres/>
+
+

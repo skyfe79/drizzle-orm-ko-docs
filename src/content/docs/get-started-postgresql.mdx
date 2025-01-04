@@ -9,32 +9,44 @@ import CodeTabs from "@mdx/CodeTabs.astro";
 import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
 
 # Drizzle \<\> PostgreSQL
+
 <Prerequisites>
-- Database [connection basics](/docs/connect-overview) with Drizzle
-- node-postgres [basics](https://node-postgres.com/)
-- postgres.js [basics](https://github.com/porsager/postgres?tab=readme-ov-file#usage)
+- Drizzle를 사용한 데이터베이스 [연결 기본 사항](/docs/connect-overview)
+- node-postgres [기본 사항](https://node-postgres.com/)
+- postgres.js [기본 사항](https://github.com/porsager/postgres?tab=readme-ov-file#usage)
 </Prerequisites>
 
-Drizzle has native support for PostgreSQL connections with the `node-postgres` and `postgres.js` drivers.
+Drizzle는 `node-postgres`와 `postgres.js` 드라이버를 통해 PostgreSQL 연결을 기본적으로 지원합니다.
 
-There are a few differences between the `node-postgres` and `postgres.js` drivers that we discovered while using both and integrating them with the Drizzle ORM. For example:
+`node-postgres`와 `postgres.js` 드라이버를 사용하고 Drizzle ORM과 통합하면서 발견한 몇 가지 차이점이 있습니다. 예를 들어:
 
-- With `node-postgres`, you can install `pg-native` to boost the speed of both `node-postgres` and Drizzle by approximately 10%.
-- `node-postgres` supports providing type parsers on a per-query basis without globally patching things. For more details, see [Types Docs](https://node-postgres.com/features/queries#types).
-- `postgres.js` uses prepared statements by default, which you may need to opt out of. This could be a potential issue in AWS environments, among others, so please keep that in mind.
-- If there's anything else you'd like to contribute, we'd be happy to receive your PRs [here](https://github.com/drizzle-team/drizzle-orm-docs/pulls)
+- `node-postgres`의 경우 `pg-native`를 설치하여 `node-postgres`와 Drizzle의 속도를 약 10% 향상시킬 수 있습니다.
+- `node-postgres`는 전역 패치 없이 쿼리별로 타입 파서를 제공할 수 있습니다. 자세한 내용은 [Types Docs](https://node-postgres.com/features/queries#types)를 참고하세요.
+- `postgres.js`는 기본적으로 준비된 문장(prepared statements)을 사용하며, 이를 선택 해제해야 할 수도 있습니다. 이는 AWS 환경 등에서 잠재적인 문제가 될 수 있으니 참고하세요.
+- 추가로 기여하고 싶은 내용이 있다면 [여기](https://github.com/drizzle-team/drizzle-orm-docs/pulls)로 PR을 보내주시면 감사하겠습니다.
+
 
 ## node-postgres
-#### Step 1 - Install packages
+
+
+
+
+
+#### 1단계 - 패키지 설치
+
 <Npm>
 drizzle-orm pg
 -D drizzle-kit @types/pg
 </Npm>
 
-#### Step 2 - Initialize the driver and make a query
+위 명령어를 사용하여 필요한 패키지를 설치합니다. `drizzle-orm`과 `pg`는 프로젝트에 필수적인 패키지이며, `drizzle-kit`과 `@types/pg`는 개발 환경에서 사용할 패키지입니다.
+
+
+#### 2단계 - 드라이버 초기화 및 쿼리 실행
+
 <CodeTabs items={["node-postgres", "node-postgres with config"]}>
 ```typescript copy
-// Make sure to install the 'pg' package 
+// 'pg' 패키지를 설치해야 합니다.
 import { drizzle } from 'drizzle-orm/node-postgres';
 
 const db = drizzle(process.env.DATABASE_URL);
@@ -42,10 +54,10 @@ const db = drizzle(process.env.DATABASE_URL);
 const result = await db.execute('select 1');
 ```
 ```typescript copy
-// Make sure to install the 'pg' package 
+// 'pg' 패키지를 설치해야 합니다.
 import { drizzle } from 'drizzle-orm/node-postgres';
 
-// You can specify any property from the node-postgres connection options
+// node-postgres 연결 옵션에서 원하는 속성을 지정할 수 있습니다.
 const db = drizzle({ 
   connection: { 
     connectionString: process.env.DATABASE_URL,
@@ -57,10 +69,10 @@ const result = await db.execute('select 1');
 ```
 </CodeTabs>
 
-If you need to provide your existing driver:
+기존 드라이버를 제공해야 하는 경우:
 
 ```typescript copy
-// Make sure to install the 'pg' package 
+// 'pg' 패키지를 설치해야 합니다.
 import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
@@ -73,14 +85,25 @@ const db = drizzle({ client: pool });
 const result = await db.execute('select 1');
 ```
 
+
 ## postgres.js
-#### Step 1 - Install packages
+
+
+
+
+
+#### 1단계 - 패키지 설치
+
 <Npm>
 drizzle-orm postgres
 -D drizzle-kit
 </Npm>
 
-#### Step 2 - Initialize the driver and make a query
+위 명령어를 사용하여 필요한 패키지를 설치합니다. `drizzle-orm postgres`는 PostgreSQL 데이터베이스와 상호작용하기 위한 ORM(객체 관계 매핑) 라이브러리입니다. `-D drizzle-kit`는 개발 환경에서 사용할 도구를 설치하는 옵션입니다.
+
+
+#### 2단계 - 드라이버 초기화 및 쿼리 실행
+
 <CodeTabs items={["postgres.js", "postgres.js with config"]}>
 ```typescript copy
 import { drizzle } from 'drizzle-orm/postgres-js';
@@ -92,7 +115,7 @@ const result = await db.execute('select 1');
 ```typescript copy
 import { drizzle } from 'drizzle-orm/postgres-js';
 
-// You can specify any property from the postgres-js connection options
+// postgres-js 연결 옵션에서 원하는 속성을 지정할 수 있습니다.
 const db = drizzle({ 
   connection: { 
     url: process.env.DATABASE_URL, 
@@ -104,10 +127,10 @@ const result = await db.execute('select 1');
 ```
 </CodeTabs>
 
-If you need to provide your existing driver:
+기존 드라이버를 제공해야 하는 경우:
 
 ```typescript copy
-// Make sure to install the 'postgres' package
+// 'postgres' 패키지를 설치해야 합니다.
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 
@@ -117,6 +140,9 @@ const db = drizzle({ client: queryClient });
 const result = await db.execute('select 1');
 ```
 
-#### What's next?
+
+#### 다음 단계는 무엇인가요?
 
 <WhatsNextPostgres/>
+
+

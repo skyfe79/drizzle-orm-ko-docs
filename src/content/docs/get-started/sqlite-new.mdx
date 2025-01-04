@@ -17,58 +17,73 @@ import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 import CreateTable from '@mdx/get-started/sqlite/CreateTable.mdx';
 import ConnectLibsql from '@mdx/get-started/sqlite/ConnectLibsql.mdx';
 
+
 <Breadcrumbs/>
 
-# Get Started with Drizzle and SQLite
+# Drizzle와 SQLite 시작하기
 
 <Prerequisites>  
-  - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
-  - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
-  - **libsql** - a fork of SQLite optimized for low query latency, making it suitable for global applications - [read here](https://docs.turso.tech/libsql)
+  - **dotenv** - 환경 변수를 관리하기 위한 패키지 - [자세히 보기](https://www.npmjs.com/package/dotenv)
+  - **tsx** - TypeScript 파일을 실행하기 위한 패키지 - [자세히 보기](https://tsx.is/)
+  - **libsql** - 전역 애플리케이션에 적합하도록 낮은 쿼리 지연 시간을 위해 최적화된 SQLite 포크 - [자세히 보기](https://docs.turso.tech/libsql)
 </Prerequisites>
 
-Drizzle has native support for SQLite connections with the `libsql` and `better-sqlite3` drivers.
+Drizzle는 `libsql`과 `better-sqlite3` 드라이버를 통해 SQLite 연결을 기본적으로 지원합니다.
 
-We will use `libsql` for this get started example. But if you want to find more ways to connect to SQLite check
-our [SQLite Connection](/docs/get-started-sqlite) page 
+이 시작 가이드에서는 `libsql`을 사용할 예정입니다. SQLite에 연결하는 다른 방법을 찾고 있다면 [SQLite 연결](/docs/get-started-sqlite) 페이지를 확인하세요.
 
 <FileStructure />
 
-#### Step 1 - Install required packages
+
+#### 1단계 - 필요한 패키지 설치하기
+
 <InstallPackages lib='@libsql/client'/>
 
-#### Step 2 - Setup connection variables
+
+#### 2단계 - 연결 변수 설정하기
 
 <SetupEnv env_variable='DB_FILE_NAME' />
 
-<Callout type='info' title='important'>
-For example, if you want to create an SQLite database file in the root of your project for testing purposes, you need to use `file:` before the actual filename, as this is the format required by `LibSQL`, like this:
+<Callout type='info' title='중요'>
+예를 들어, 테스트 목적으로 프로젝트 루트에 SQLite 데이터베이스 파일을 생성하려면, `LibSQL`에서 요구하는 형식인 `file:`을 실제 파일명 앞에 붙여야 합니다. 아래와 같이 작성하면 됩니다:
 ```plaintext copy
 DB_FILE_NAME=file:local.db
 ```
-You can check the **[LibSQL docs](https://docs.turso.tech/sdk/ts/reference#local-development)** for more info.
+더 자세한 정보는 **[LibSQL 문서](https://docs.turso.tech/sdk/ts/reference#local-development)**를 참고하세요.
 </Callout>
 
-#### Step 3 - Connect Drizzle ORM to the database
+
+#### 3단계 - Drizzle ORM을 데이터베이스에 연결하기
 
 <ConnectLibsql/>
 
-#### Step 4 - Create a table
+#### 4단계 - 테이블 생성
 
-<CreateTable/>
+<CreateTable />
 
-#### Step 5 - Setup Drizzle config file
+#### 5단계 - Drizzle 설정 파일 구성
+
 
 <SetupConfig dialect='sqlite' env_variable='DB_FILE_NAME'/>
 
-#### Step 6 - Applying changes to the database
+
+#### 6단계 - 데이터베이스에 변경 사항 적용하기
+
 
 <ApplyChanges />
 
-#### Step 7 - Seed and Query the database
+
+#### 7단계 - 데이터베이스 시드 및 쿼리
 
 <QueryDatabase dialect='libsql' env_variable='DB_FILE_NAME'/>
 
-#### Step 8 - Run index.ts file
+
+
+
+
+#### 8단계 - index.ts 파일 실행하기
 
 <RunFile/>
+
+
+

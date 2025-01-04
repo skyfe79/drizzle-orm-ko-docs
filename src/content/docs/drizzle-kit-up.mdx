@@ -9,26 +9,27 @@ import Npx from "@mdx/Npx.astro";
 
 # `drizzle-kit up`
 
+
 <Prerequisites>
-- Get started with Drizzle and `drizzle-kit` - [read here](/docs/get-started)
-- Drizzle schema foundamentals - [read here](/docs/sql-schema-declaration)
-- Database connection basics - [read here](/docs/connect-overview)
-- Drizzle migrations foundamentals - [read here](/docs/migrations)
-- Drizzle Kit [overview](/docs/kit-overview) and [config file](/docs/drizzle-config-file)
-- `drizzle-kit generate` command - [read here](/docs/drizzle-kit-generate)
+- Drizzle와 `drizzle-kit` 시작하기 - [여기서 읽기](/docs/get-started)
+- Drizzle 스키마 기본 개념 - [여기서 읽기](/docs/sql-schema-declaration)
+- 데이터베이스 연결 기본 - [여기서 읽기](/docs/connect-overview)
+- Drizzle 마이그레이션 기본 - [여기서 읽기](/docs/migrations)
+- Drizzle Kit [개요](/docs/kit-overview)와 [설정 파일](/docs/drizzle-config-file)
+- `drizzle-kit generate` 커맨드 - [여기서 읽기](/docs/drizzle-kit-generate)
 </Prerequisites>
 
-`drizzle-kit up` command lets you upgrade drizzle schema snapshots to a newer version. 
-It's required whenever we introduce breaking changes to the json snapshots of the schema and upgrade the internal version.
+`drizzle-kit up` 커맨드는 Drizzle 스키마 스냅샷을 새로운 버전으로 업그레이드할 수 있게 해줍니다.  
+이 커맨드는 스키마의 JSON 스냅샷에 주요 변경 사항이 발생하거나 내부 버전이 업그레이드될 때 필요합니다.
 
 <br/>
 <hr/>
 <br/>
 
-`drizzle-kit up` command requires you to specify both `dialect` and database connection credentials, 
-you can provide them either via [drizzle.config.ts](/docs/drizzle-config-file) config file or via CLI options
+`drizzle-kit up` 커맨드를 사용하려면 `dialect`와 데이터베이스 연결 정보를 지정해야 합니다.  
+이 정보는 [drizzle.config.ts](/docs/drizzle-config-file) 설정 파일을 통해 제공하거나 CLI 옵션으로 직접 전달할 수 있습니다.
 
-<CodeTabs items={["With config file", "As CLI options"]}>
+<CodeTabs items={["설정 파일 사용", "CLI 옵션 사용"]}>
 <Section>
 ```ts {5,8}
 // drizzle.config.ts
@@ -47,13 +48,17 @@ npx drizzle-kit up --dialect=postgresql
 ```
 </CodeTabs>
 
-### Multiple configuration files in one project
-You can have multiple config files in the project, it's very useful when you have multiple database stages or multiple databases on the same project:
-<Npx>
-  drizzle-kit migrate --config=drizzle-dev.config.ts
-  drizzle-kit migrate --config=drizzle-prod.config.ts
-</Npx>
-```plaintext {5-6}
+
+### 하나의 프로젝트에 여러 설정 파일 사용하기
+
+하나의 프로젝트에서 여러 설정 파일을 사용할 수 있습니다. 이는 여러 데이터베이스 단계나 동일한 프로젝트 내에서 여러 데이터베이스를 사용할 때 매우 유용합니다.
+
+```bash
+npx drizzle-kit migrate --config=drizzle-dev.config.ts
+npx drizzle-kit migrate --config=drizzle-prod.config.ts
+```
+
+```plaintext
 📦 <project root>
  ├ 📂 drizzle
  ├ 📂 src
@@ -64,20 +69,24 @@ You can have multiple config files in the project, it's very useful when you hav
  └ 📜 tsconfig.json
 ```
 
-### Extended list of configurations
-We recommend configuring `drizzle-kit` through [drizzle.config.ts](/docs/drizzle-config-file) file, 
-yet you can provide all configuration options through CLI if necessary, e.g. in CI/CD pipelines, etc.
-<rem025/>
+위 예제처럼 `drizzle-dev.config.ts`와 `drizzle-prod.config.ts` 파일을 각각 사용하여 개발 환경과 프로덕션 환경에 맞는 설정을 적용할 수 있습니다.
+
+
+### 확장된 설정 목록
+
+`drizzle-kit` 설정은 [drizzle.config.ts](/docs/drizzle-config-file) 파일을 통해 구성하는 것을 권장합니다. 하지만 CI/CD 파이프라인 등에서 필요할 경우, 모든 설정 옵션을 CLI를 통해 제공할 수도 있습니다.
+
 |           |            |                                                                         |
 | :-------- | :--------- | :---------------------------------------------------------------------- |
-| `dialect` | `required` | Database dialect you are using. Can be `postgresql`,`mysql` or `sqlite` |
-| `out`     |            | migrations folder, default=`./drizzle`                                  |
-| `config`  |            | config file path, default=`drizzle.config.ts`                           |
-<br/>
-<Npx>
+| `dialect` | `필수`     | 사용 중인 데이터베이스 방언. `postgresql`, `mysql`, `sqlite` 중 선택 가능 |
+| `out`     |            | 마이그레이션 폴더, 기본값=`./drizzle`                                   |
+| `config`  |            | 설정 파일 경로, 기본값=`drizzle.config.ts`                              |
+
+```bash
 drizzle-kit up --dialect=postgresql
 drizzle-kit up --dialect=postgresql --out=./migrations-folder
-</Npx>
+```
 
 ![](@/assets/gifs/up_mysql.gif)
+
 

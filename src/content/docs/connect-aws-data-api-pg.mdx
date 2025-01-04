@@ -6,38 +6,44 @@ import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 import CodeTabs from "@mdx/CodeTabs.astro";
 
-# Drizzle \<\> AWS Data API Postgres
+# Drizzle와 AWS Data API를 사용한 Postgres 연동
+
 
 <Prerequisites>
-- Database [connection basics](/docs/connect-overview) with Drizzle
-- AWS Data API - [website](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html)
-- AWS SDK - [website](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/Package/-aws-sdk-client-rds-data/)
+- Drizzle를 사용한 데이터베이스 [연결 기본 사항](/docs/connect-overview)
+- AWS Data API - [공식 웹사이트](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html)
+- AWS SDK - [공식 웹사이트](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/Package/-aws-sdk-client-rds-data/)
 </Prerequisites>
 
-#### Step 1 - Install packages
+
+#### 1단계 - 패키지 설치
+
 <Npm>
 drizzle-orm @aws-sdk/client-rds-data
 -D drizzle-kit
 </Npm>
 
-#### Step 2 - Initialize the driver and make a query
-```typescript copy
+#### 2단계 - 드라이버 초기화 및 쿼리 실행
+
+```typescript
 import { drizzle } from 'drizzle-orm/aws-data-api-pg';
 
-// These three properties are required. You can also specify
-// any property from the RDSDataClient type inside the connection object.
-const db = drizzle({ connection: {
-  database: process.env['DATABASE']!,
-  secretArn: process.env['SECRET_ARN']!,
-  resourceArn: process.env['RESOURCE_ARN']!,
-}});
+// 다음 세 가지 속성은 필수입니다. 연결 객체 내부에
+// RDSDataClient 타입의 어떤 속성도 지정할 수 있습니다.
+const db = drizzle({ 
+  connection: {
+    database: process.env['DATABASE']!,
+    secretArn: process.env['SECRET_ARN']!,
+    resourceArn: process.env['RESOURCE_ARN']!,
+  }
+});
 
 await db.select().from(...);
 ```
 
-If you need to provide your existing driver:
+기존 드라이버를 제공해야 하는 경우:
 
-```typescript copy
+```typescript
 import { drizzle } from 'drizzle-orm/aws-data-api/pg';
 import { RDSDataClient } from '@aws-sdk/client-rds-data';
 
@@ -52,6 +58,9 @@ const db = drizzle(rdsClient, {
 await db.select().from(...);
 ```
 
-#### What's next?
+
+#### 다음 단계는 무엇인가요?
 
 <WhatsNextPostgres/>
+
+

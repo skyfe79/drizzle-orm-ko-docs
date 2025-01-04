@@ -1,169 +1,165 @@
 import Callout from '@mdx/Callout.astro';
 
-# Dynamic query building
+# 동적 쿼리 빌딩
 
-By default, as all the query builders in Drizzle try to conform to SQL as much as possible, you can only invoke most of the methods once.
-For example, in a `SELECT` statement there might only be one `WHERE` clause, so you can only invoke `.where()` once:
+Drizzle의 모든 쿼리 빌더는 기본적으로 SQL에 최대한 맞추려고 하기 때문에, 대부분의 메서드는 한 번만 호출할 수 있습니다. 예를 들어, `SELECT` 문에서는 `WHERE` 절이 하나만 있을 수 있으므로 `.where()` 메서드는 한 번만 호출할 수 있습니다:
 
 ```ts
 const query = db
-	.select()
-	.from(users)
-	.where(eq(users.id, 1))
-	.where(eq(users.name, 'John')); // ❌ Type error - where() can only be invoked once
+    .select()
+    .from(users)
+    .where(eq(users.id, 1))
+    .where(eq(users.name, 'John')); // ❌ 타입 에러 - where()은 한 번만 호출할 수 있음
 ```
 
-In the previous ORM versions, when such restrictions weren't implemented, this example in particular was a source of confusion for many users, as they expected the query builder to "merge" multiple `.where()` calls into a single condition.
+이전 ORM 버전에서는 이러한 제한이 구현되지 않았기 때문에, 많은 사용자들이 여러 `.where()` 호출을 하나의 조건으로 "병합"할 것으로 기대하며 혼란을 겪었습니다.
 
-This behavior is useful for conventional query building, i.e. when you create the whole query at once.
-However, it becomes a problem when you want to build a query dynamically, i.e. if you have a shared function that takes a query builder and enhances it.
-To solve this problem, Drizzle provides a special 'dynamic' mode for query builders, which removes the restriction of invoking methods only once.
-To enable it, you need to call `.$dynamic()` on a query builder.
+이러한 동작은 일반적인 쿼리 빌딩, 즉 전체 쿼리를 한 번에 생성할 때 유용합니다. 하지만 쿼리를 동적으로 빌드하려는 경우, 예를 들어 쿼리 빌더를 받아서 추가 기능을 제공하는 공유 함수를 사용할 때 문제가 됩니다. 이 문제를 해결하기 위해 Drizzle은 쿼리 빌더에 특별한 '동적' 모드를 제공하며, 이 모드에서는 메서드를 여러 번 호출할 수 있습니다. 이 모드를 활성화하려면 쿼리 빌더에서 `.$dynamic()`을 호출해야 합니다.
 
-Let's see how it works by implementing a simple `withPagination` function that adds `LIMIT` and `OFFSET` clauses to a query based on the provided page number and an optional page size:
+페이지 번호와 선택적인 페이지 크기를 기반으로 쿼리에 `LIMIT`과 `OFFSET` 절을 추가하는 간단한 `withPagination` 함수를 구현해 보겠습니다:
 
 ```ts
-function withPagination<T extends PgSelect>(
-	qb: T,
-	page: number = 1,
-	pageSize: number = 10,
+function withPagination(
+    qb: T,
+    page: number = 1,
+    pageSize: number = 10,
 ) {
-	return qb.limit(pageSize).offset((page - 1) * pageSize);
+    return qb.limit(pageSize).offset((page - 1) * pageSize);
 }
 
 const query = db.select().from(users).where(eq(users.id, 1));
-withPagination(query, 1); // ❌ Type error - the query builder is not in dynamic mode
+withPagination(query, 1); // ❌ 타입 에러 - 쿼리 빌더가 동적 모드가 아님
 
 const dynamicQuery = query.$dynamic();
-withPagination(dynamicQuery, 1); // ✅ OK
+withPagination(dynamicQuery, 1); // ✅ 정상 동작
 ```
 
-Note that the `withPagination` function is generic, which allows you to modify the result type of the query builder inside it, for example by adding a join:
+`withPagination` 함수는 제네릭 함수이기 때문에, 쿼리 빌더의 결과 타입을 수정할 수 있습니다. 예를 들어 조인을 추가할 수 있습니다:
 
 ```ts
-function withFriends<T extends PgSelect>(qb: T) {
-	return qb.leftJoin(friends, eq(friends.userId, users.id));
+function withFriends(qb: T) {
+    return qb.leftJoin(friends, eq(friends.userId, users.id));
 }
 
 let query = db.select().from(users).where(eq(users.id, 1)).$dynamic();
 query = withFriends(query);
 ```
 
-This is possible, because `PgSelect` and other similar types are specifically designed to be used in dynamic query building. They can only be used in dynamic mode.
+이는 `PgSelect`와 같은 타입들이 동적 쿼리 빌딩을 위해 특별히 설계되었기 때문에 가능합니다. 이러한 타입들은 동적 모드에서만 사용할 수 있습니다.
 
-Here is the list of all types that can be used as generic parameters in dynamic query building:
+다음은 동적 쿼리 빌딩에서 제네릭 매개변수로 사용할 수 있는 모든 타입 목록입니다:
 
 {
 
 <table>
-	<thead align='center'>
-		<tr>
-			<td>
-				<b>Dialect</b>
-			</td>
-			<td colspan='4'>
-				<b>Type</b>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<b>Query</b>
-			</td>
-			<td>
-				<b>Select</b>
-			</td>
-			<td>
-				<b>Insert</b>
-			</td>
-			<td>
-				<b>Update</b>
-			</td>
-			<td>
-				<b>Delete</b>
-			</td>
-		</tr>
-	</thead>
-	<tbody>
-		<tr align='center'>
-			<td rowspan='2'>Postgres</td>
-			<td>
-				<code>PgSelect</code>
-			</td>
-			<td rowspan='2'>
-				<code>PgInsert</code>
-			</td>
-			<td rowspan='2'>
-				<code>PgUpdate</code>
-			</td>
-			<td rowspan='2'>
-				<code>PgDelete</code>
-			</td>
-		</tr>
-		<tr align='center'>
-			<td>
-				<code>PgSelectQueryBuilder</code>
-			</td>
-		</tr>
-		<tr align='center'>
-			<td rowspan='2'>MySQL</td>
-			<td>
-				<code>MySqlSelect</code>
-			</td>
-			<td rowspan='2'>
-				<code>MySqlInsert</code>
-			</td>
-			<td rowspan='2'>
-				<code>MySqlUpdate</code>
-			</td>
-			<td rowspan='2'>
-				<code>MySqlDelete</code>
-			</td>
-		</tr>
-		<tr align='center'>
-			<td>
-				<code>MySqlSelectQueryBuilder</code>
-			</td>
-		</tr>
-		<tr align='center'>
-			<td rowspan='2'>SQLite</td>
-			<td>
-				<code>SQLiteSelect</code>
-			</td>
-			<td rowspan='2'>
-				<code>SQLiteInsert</code>
-			</td>
-			<td rowspan='2'>
-				<code>SQLiteUpdate</code>
-			</td>
-			<td rowspan='2'>
-				<code>SQLiteDelete</code>
-			</td>
-		</tr>
-		<tr align='center'>
-			<td>
-				<code>SQLiteSelectQueryBuilder</code>
-			</td>
-		</tr>
-	</tbody>
+    <thead align='center'>
+        <tr>
+            <td>
+                <b>Dialect</b>
+            </td>
+            <td colspan='4'>
+                <b>Type</b>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <b>Query</b>
+            </td>
+            <td>
+                <b>Select</b>
+            </td>
+            <td>
+                <b>Insert</b>
+            </td>
+            <td>
+                <b>Update</b>
+            </td>
+            <td>
+                <b>Delete</b>
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr align='center'>
+            <td rowspan='2'>Postgres</td>
+            <td>
+                <code>PgSelect</code>
+            </td>
+            <td rowspan='2'>
+                <code>PgInsert</code>
+            </td>
+            <td rowspan='2'>
+                <code>PgUpdate</code>
+            </td>
+            <td rowspan='2'>
+                <code>PgDelete</code>
+            </td>
+        </tr>
+        <tr align='center'>
+            <td>
+                <code>PgSelectQueryBuilder</code>
+            </td>
+        </tr>
+        <tr align='center'>
+            <td rowspan='2'>MySQL</td>
+            <td>
+                <code>MySqlSelect</code>
+            </td>
+            <td rowspan='2'>
+                <code>MySqlInsert</code>
+            </td>
+            <td rowspan='2'>
+                <code>MySqlUpdate</code>
+            </td>
+            <td rowspan='2'>
+                <code>MySqlDelete</code>
+            </td>
+        </tr>
+        <tr align='center'>
+            <td>
+                <code>MySqlSelectQueryBuilder</code>
+            </td>
+        </tr>
+        <tr align='center'>
+            <td rowspan='2'>SQLite</td>
+            <td>
+                <code>SQLiteSelect</code>
+            </td>
+            <td rowspan='2'>
+                <code>SQLiteInsert</code>
+            </td>
+            <td rowspan='2'>
+                <code>SQLiteUpdate</code>
+            </td>
+            <td rowspan='2'>
+                <code>SQLiteDelete</code>
+            </td>
+        </tr>
+        <tr align='center'>
+            <td>
+                <code>SQLiteSelectQueryBuilder</code>
+            </td>
+        </tr>
+    </tbody>
 </table>
 
 }
 
 <Callout type='info'>
-	The `...QueryBuilder` types are for usage with [standalone query builder
-	instances](/docs/goodies#standalone-query-builder). DB query builders are
-	subclasses of them, so you can use them as well.
+    `...QueryBuilder` 타입들은 [독립 실행형 쿼리 빌더 인스턴스](/docs/goodies#standalone-query-builder)와 함께 사용하기 위한 것입니다. 데이터베이스 쿼리 빌더는 이들의 하위 클래스이므로, 이들도 사용할 수 있습니다.
 
     ```ts
-    	import { QueryBuilder } from 'drizzle-orm/pg-core';
+    import { QueryBuilder } from 'drizzle-orm/pg-core';
 
-    	function withFriends<T extends PgSelectQueryBuilder>(qb: T) {
-    		return qb.leftJoin(friends, eq(friends.userId, users.id));
-    	}
+    function withFriends(qb: T) {
+        return qb.leftJoin(friends, eq(friends.userId, users.id));
+    }
 
-    	const qb = new QueryBuilder();
-    	let query = qb.select().from(users).where(eq(users.id, 1)).$dynamic();
-    	query = withFriends(query);
+    const qb = new QueryBuilder();
+    let query = qb.select().from(users).where(eq(users.id, 1)).$dynamic();
+    query = withFriends(query);
     ```
 
 </Callout>
+
+

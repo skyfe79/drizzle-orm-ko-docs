@@ -1,6 +1,6 @@
-## 🚀 Project Structure
+## 🚀 프로젝트 구조
 
-MDX files are located in this folder:
+MDX 파일은 다음 폴더에 위치합니다:
 
 ```text
 ├── src/
@@ -8,7 +8,7 @@ MDX files are located in this folder:
 │   │   └── docs
 ```
 
-Announcements markdown files:
+공지사항 마크다운 파일:
 
 ```text
 ├── src/
@@ -16,7 +16,7 @@ Announcements markdown files:
 │   │   └── announcements
 ```
 
-Roadmap markdown file:
+로드맵 마크다운 파일:
 
 ```text
 ├── src/
@@ -24,7 +24,7 @@ Roadmap markdown file:
 │   │   └── roadmap.md
 ```
 
-Shipping section yaml file:
+배송 섹션 YAML 파일:
 
 ```text
 ├── src/
@@ -32,7 +32,7 @@ Shipping section yaml file:
 │   │   └── shipping.yaml
 ```
 
-```
+```yaml
 progress: number
 weeks:
   - date:
@@ -42,15 +42,17 @@ weeks:
 ```
 
 
-## 🧞 Commands
+## 🧞 커맨드
 
-All commands are run from the root of the project, from a terminal:
+모든 커맨드는 프로젝트 루트 디렉토리에서 터미널을 통해 실행할 수 있습니다:
 
-| Command                   | Action                                           |
+| 커맨드                   | 동작                                           |
 | :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm run dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm run build`           | Build your production site to `./dist/`          |
-| `pnpm run preview`         | Preview your build locally, before deploying     |
-| `pnpm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm run astro -- --help` | Get help using the Astro CLI                     |
+| `pnpm install`             | 의존성 패키지 설치                            |
+| `pnpm run dev`             | 로컬 개발 서버를 `localhost:4321`에서 실행      |
+| `pnpm run build`           | 프로덕션 사이트를 `./dist/`에 빌드          |
+| `pnpm run preview`         | 배포 전에 로컬에서 빌드 결과 미리보기     |
+| `pnpm run astro ...`       | `astro add`, `astro check` 같은 CLI 커맨드 실행 |
+| `pnpm run astro -- --help` | Astro CLI 사용법 확인                     |
+
+

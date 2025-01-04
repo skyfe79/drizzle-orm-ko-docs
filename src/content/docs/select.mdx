@@ -6,12 +6,13 @@ import Section from '@mdx/Section.astro';
 import IsSupportedChipGroup from '@mdx/IsSupportedChipGroup.astro';
 import $count from '@mdx/$count.mdx';
 
-# SQL Select
-Drizzle provides you the most SQL-like way to fetch data from your database, while remaining type-safe and composable.
-It natively supports mostly every query feature and capability of every dialect,
-and whatever it doesn't support yet, can be added by the user with the powerful [`sql`](/docs/sql) operator.
 
-For the following examples, let's assume you have a `users` table defined like this:
+# SQL Select
+
+Drizzle는 타입 안전성과 합성 가능성을 유지하면서도 데이터베이스에서 데이터를 가져오는 가장 SQL스러운 방법을 제공합니다. Drizzle는 대부분의 모든 SQL 방언의 쿼리 기능과 능력을 기본적으로 지원하며, 아직 지원하지 않는 기능은 강력한 [`sql`](/docs/sql) 연산자를 통해 사용자가 직접 추가할 수 있습니다.
+
+다음 예제를 위해 `users` 테이블이 다음과 같이 정의되어 있다고 가정해 보겠습니다:
+
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
 <Tab>
 ```typescript
@@ -59,8 +60,10 @@ export const users = singlestoreTable('users', {
 </Tab>
 </Tabs>
 
-### Basic select
-Select all rows from a table including all columns:
+
+### 기본적인 SELECT 쿼리
+
+테이블의 모든 행과 모든 컬럼을 선택하는 방법:
 
 <Section>
 ```typescript
@@ -78,18 +81,19 @@ select "id", "name", "age" from "users";
 ```
 </Section>
 
-Notice that the result type is inferred automatically based on the table definition, including columns nullability.
+결과 타입은 테이블 정의를 기반으로 자동으로 추론됩니다. 이때 컬럼의 null 허용 여부도 포함됩니다.
 
 <Callout type="info">
-Drizzle always explicitly lists columns in the `select` clause instead of using `select *`.<br />
-This is required internally to guarantee the fields order in the query result, and is also generally considered a good practice.
+Drizzle는 항상 `select *` 대신 `select` 절에서 명시적으로 컬럼을 나열합니다.<br />
+이는 쿼리 결과에서 필드 순서를 보장하기 위해 내부적으로 필요하며, 일반적으로 좋은 관행으로 간주됩니다.
 </Callout>
 
-### Partial select
-In some cases, you might want to select only a subset of columns from a table.
-You can do that by providing a selection object to the `.select()` method:
-<Section>
-```typescript copy
+
+### 부분 선택
+
+특정 상황에서는 테이블에서 일부 컬럼만 선택하고 싶을 수 있습니다. 이 경우 `.select()` 메서드에 선택 객체를 제공하여 원하는 컬럼만 선택할 수 있습니다.
+
+```typescript
 const result = await db.select({
   field1: users.id,
   field2: users.name,
@@ -97,36 +101,40 @@ const result = await db.select({
 
 const { field1, field2 } = result[0];
 ```
+
+위 코드는 SQL로 다음과 같이 변환됩니다.
+
 ```sql
 select "id", "name" from "users";
 ```
-</Section>
 
-Like in SQL, you can use arbitrary expressions as selection fields, not just table columns:
+SQL과 마찬가지로, 테이블 컬럼뿐만 아니라 임의의 표현식을 선택 필드로 사용할 수도 있습니다.
 
-<Section>
 ```typescript
 const result = await db.select({
   id: users.id,
-  lowerName: sql<string>`lower(${users.name})`,
+  lowerName: sql`lower(${users.name})`,
 }).from(users);
 ```
+
+이 코드는 SQL로 다음과 같이 변환됩니다.
+
 ```sql
 select "id", lower("name") from "users";
 ```
-</Section>
 
 <Callout type="warning">
-By specifying `sql<string>`, you are telling Drizzle that the **expected** type of the field is `string`.<br />
-If you specify it incorrectly (e.g. use `sql<number>` for a field that will be returned as a string), the runtime value won't match the expected type.
-Drizzle cannot perform any type casts based on the provided type generic, because that information is not available at runtime.
+`sql<string>`을 지정하면 Drizzle에게 해당 필드의 **예상 타입**이 `string`임을 알리는 것입니다.<br />
+만약 잘못된 타입을 지정하면(예: 문자열로 반환될 필드에 `sql<number>`를 사용), 런타임 값이 예상 타입과 일치하지 않을 수 있습니다.
+Drizzle은 제공된 타입 제네릭을 기반으로 타입 캐스팅을 수행할 수 없습니다. 이 정보는 런타임에 사용할 수 없기 때문입니다.
 
-If you need to apply runtime transformations to the returned value, you can use the [`.mapWith()`](/docs/sql#sqlmapwith) method.
+반환된 값에 런타임 변환을 적용해야 한다면 [`.mapWith()`](/docs/sql#sqlmapwith) 메서드를 사용할 수 있습니다.
 </Callout>
 
-### Conditional select
 
-You can have a dynamic selection object based on some condition:
+### 조건부 선택
+
+특정 조건에 따라 동적으로 선택 객체를 만들 수 있습니다:
 
 ```typescript
 async function selectUsers(withName: boolean) {
@@ -141,57 +149,62 @@ async function selectUsers(withName: boolean) {
 const users = await selectUsers(true);
 ```
 
-### Distinct select
+이 코드는 `withName` 매개변수가 `true`일 때만 `name` 필드를 포함하는 객체를 선택합니다. 조건에 따라 동적으로 필드를 추가하거나 제외할 수 있습니다.
 
-You can use `.selectDistinct()` instead of `.select()` to retrieve only unique rows from a dataset:
-<Section>
+
+### 고유한 행 선택하기
+
+데이터셋에서 고유한 행만 가져오려면 `.select()` 대신 `.selectDistinct()`를 사용할 수 있습니다.
+
 ```ts
 await db.selectDistinct().from(users).orderBy(usersTable.id, usersTable.name);
 
 await db.selectDistinct({ id: users.id }).from(users).orderBy(usersTable.id);
 ```
+
 ```sql
 select distinct "id", "name" from "users" order by "id", "name";
 
 select distinct "id" from "users" order by "id";
 ```
-</Section>
 
-In PostgreSQL, you can also use the `distinct on` clause to specify how the unique rows are determined:
+PostgreSQL에서는 `distinct on` 절을 사용하여 고유한 행을 결정하는 방법을 지정할 수도 있습니다.
+
 <Callout type='warning'>
-`distinct on` clause is only supported in PostgreSQL.
+`distinct on` 절은 PostgreSQL에서만 지원됩니다.
 </Callout>
-<Section>
+
 ```ts
 await db.selectDistinctOn([users.id]).from(users).orderBy(users.id);
 await db.selectDistinctOn([users.name], { name: users.name }).from(users).orderBy(users.name);
 ```
+
 ```sql
 select distinct on ("id") "id", "name" from "users" order by "id";
 select distinct on ("name") "name" from "users" order by "name";
 ```
-</Section>
 
 
+### 고급 선택 기능
 
-### Advanced select
-Powered by TypeScript, Drizzle APIs let you build your select queries in a variety of flexible ways.
+Drizzle API는 TypeScript로 구동되며, 다양한 유연한 방법으로 쿼리를 작성할 수 있습니다.
 
-Sneak peek of advanced partial select, for more detailed advaced usage examples - see our [dedicated guide](/docs/guides/include-or-exclude-columns).
-<CodeTabs items={["example 1", "example 2", "example 3", "example 4"]}>
+고급 부분 선택 기능을 미리 살펴보고 싶다면, 더 자세한 사용 예제는 [전용 가이드](/docs/guides/include-or-exclude-columns)를 참고하세요.
+
+<CodeTabs items={["예제 1", "예제 2", "예제 3", "예제 4"]}>
 ```ts
 import { getTableColumns, sql } from 'drizzle-orm';
 
 await db.select({
     ...getTableColumns(posts),
-    titleLength: sql<number>`length(${posts.title})`,
+    titleLength: sql`length(${posts.title})`,
   }).from(posts);
 ```
 ```ts
 import { getTableColumns } from 'drizzle-orm';
 
-const { content, ...rest } = getTableColumns(posts); // exclude "content" column
-await db.select({ ...rest }).from(posts); // select all other columns
+const { content, ...rest } = getTableColumns(posts); // "content" 컬럼 제외
+await db.select({ ...rest }).from(posts); // 나머지 컬럼 선택
 ```
 ```ts
 await db.query.posts.findMany({
@@ -209,11 +222,16 @@ await db.query.posts.findMany({
 ```
 </CodeTabs>
 
+
 ## ---
 
-### Filters
 
-You can filter the query results using the [filter operators](/docs/operators) in the `.where()` method:
+
+
+
+### 필터
+
+`.where()` 메서드에서 [필터 연산자](/docs/operators)를 사용해 쿼리 결과를 필터링할 수 있습니다:
 
 <Section>
 ```typescript copy
@@ -233,9 +251,10 @@ select "id", "name", "age" from "users" where "id" <> 42;
 ```
 </Section>
 
-All filter operators are implemented using the [`sql`](/docs/sql) function.
-You can use it yourself to write arbitrary SQL filters, or build your own operators.
-For inspiration, you can check how the operators provided by Drizzle are [implemented](https://github.com/drizzle-team/drizzle-orm/blob/main/drizzle-orm/src/sql/expressions/conditions.ts).
+모든 필터 연산자는 [`sql`](/docs/sql) 함수를 사용해 구현됩니다.  
+이 함수를 직접 사용해 임의의 SQL 필터를 작성하거나, 자신만의 연산자를 만들 수도 있습니다.  
+Drizzle에서 제공하는 연산자들이 어떻게 [구현](https://github.com/drizzle-team/drizzle-orm/blob/main/drizzle-orm/src/sql/expressions/conditions.ts)되었는지 참고할 수 있습니다.
+
 <Section>
 ```typescript copy
 import { sql } from 'drizzle-orm';
@@ -262,18 +281,18 @@ select "id", "name", "age" from "users" where lower("name") = 'aaron';
 </Section>
 
 <Callout type='info'>
-All the values provided to filter operators and to the `sql` function are parameterized automatically.
-For example, this query:
+필터 연산자와 `sql` 함수에 제공된 모든 값은 자동으로 파라미터화됩니다.  
+예를 들어, 다음 쿼리:
 ```ts
 await db.select().from(users).where(eq(users.id, 42));
 ```
-will be translated to:
+는 다음과 같이 변환됩니다:
 ```sql
 select "id", "name", "age" from "users" where "id" = $1; -- params: [42]
 ```
 </Callout>
 
-Inverting condition with a `not` operator:
+`not` 연산자로 조건을 반전시키기:
 <Section>
 ```typescript copy
 import { eq, not, sql } from 'drizzle-orm';
@@ -288,13 +307,15 @@ select "id", "name", "age" from "users" where not ("id" = 42);
 </Section>
 
 <Callout type="info">
-You can safely alter schema, rename tables and columns
-and it will be automatically reflected in your queries because of template interpolation,
-as opposed to hardcoding column or table names when writing raw SQL.
+템플릿 보간 덕분에 스키마를 변경하거나 테이블 및 컬럼 이름을 바꿔도 쿼리에 자동으로 반영됩니다.  
+이는 raw SQL을 작성할 때 컬럼이나 테이블 이름을 하드코딩하는 것과 대조적입니다.
 </Callout>
 
-### Combining filters
-You can logically combine filter operators with `and()` and `or()` operators:
+
+### 필터 조합하기
+
+`and()`와 `or()` 연산자를 사용하여 필터를 논리적으로 조합할 수 있습니다.
+
 <Section>
 ```typescript copy
 import { eq, and, sql } from 'drizzle-orm';
@@ -331,11 +352,14 @@ select "id", "name", "age" from "users" where "id" = 42 or "name" = 'Dan';
 ```
 </Section>
 
-### Advanced filters
-In combination with TypeScript, Drizzle APIs provide you powerful and flexible ways to combine filters in queries.
 
-Sneak peek of conditional filtering, for more detailed advaced usage examples - see our [dedicated guide](/docs/guides/conditional-filters-in-query).
-<CodeTabs items={["example 1", "example 2"]}>
+### 고급 필터링
+
+TypeScript와 함께 사용하면 Drizzle API는 쿼리에서 필터를 결합할 수 있는 강력하고 유연한 방법을 제공합니다.
+
+조건부 필터링을 간단히 살펴보겠습니다. 더 자세한 고급 사용법 예제는 [전용 가이드](/docs/guides/conditional-filters-in-query)를 참고하세요.
+
+<CodeTabs items={["예제 1", "예제 2"]}>
 ```ts
 const searchPosts = async (term?: string) => {
   await db
@@ -361,58 +385,81 @@ await searchPosts(filters);
 ```
 </CodeTabs>
 
-## ---
 
-### Limit & offset
-Use `.limit()` and `.offset()` to add `limit` and `offset` clauses to the query - for example, to implement pagination:
-<Section>
+## ---_EHmKdJFpumpm7kebEukFCh
+
+
+
+
+
+### Limit과 Offset
+
+`.limit()`과 `.offset()`을 사용하여 쿼리에 `limit`과 `offset` 절을 추가할 수 있습니다. 예를 들어, 페이지네이션을 구현할 때 유용합니다:
+
 ```typescript
 await db.select().from(users).limit(10);
 await db.select().from(users).limit(10).offset(10);
 ```
+
+위 코드는 다음과 같은 SQL 쿼리로 변환됩니다:
+
 ```sql
 select "id", "name", "age" from "users" limit 10;
 select "id", "name", "age" from "users" limit 10 offset 10;
 ```
-</Section>
+
 
 ### Order By
-Use `.orderBy()` to add `order by` clause to the query, sorting the results by the specified fields:
-<Section>
+
+`.orderBy()`를 사용하여 쿼리에 `order by` 절을 추가할 수 있습니다. 이를 통해 지정된 필드로 결과를 정렬할 수 있습니다.
+
 ```typescript
 import { asc, desc } from 'drizzle-orm';
 
+// 이름 기준으로 오름차순 정렬
 await db.select().from(users).orderBy(users.name);
+
+// 이름 기준으로 내림차순 정렬
 await db.select().from(users).orderBy(desc(users.name));
 
-// order by multiple fields
+// 여러 필드로 정렬
 await db.select().from(users).orderBy(users.name, users.name2);
+
+// 이름은 오름차순, 이름2는 내림차순으로 정렬
 await db.select().from(users).orderBy(asc(users.name), desc(users.name2));
 ```
+
+위 코드는 다음과 같은 SQL 쿼리로 변환됩니다.
+
 ```sql
+-- 이름 기준으로 오름차순 정렬
 select "id", "name", "age" from "users" order by "name";
+
+-- 이름 기준으로 내림차순 정렬
 select "id", "name", "age" from "users" order by "name" desc;
 
+-- 이름과 이름2 기준으로 정렬
 select "id", "name", "age" from "users" order by "name", "name2";
+
+-- 이름은 오름차순, 이름2는 내림차순으로 정렬
 select "id", "name", "age" from "users" order by "name" asc, "name2" desc;
 ```
-</Section>
 
-### Advanced pagination
-Powered by TypeScript, Drizzle APIs let you implement all possible SQL paginations and sorting approaches.
 
-Sneak peek of advanced pagination, for more detailed advaced 
-usage examples - see our dedicated [limit offset pagination](/docs/guides/limit-offset-pagination) 
-and [cursor pagination](/docs/guides/cursor-based-pagination) guides.
+### 고급 페이징
 
-<CodeTabs items={["example 1", "example 2", "example 3", "example 4"]}>
+TypeScript로 구동되는 Drizzle API를 사용하면 모든 SQL 페이징 및 정렬 방식을 구현할 수 있습니다.
+
+고급 페이징 기능을 간단히 살펴보겠습니다. 더 자세한 사용 예제는 [limit offset 페이징](/docs/guides/limit-offset-pagination)과 [커서 기반 페이징](/docs/guides/cursor-based-pagination) 가이드를 참고하세요.
+
+<CodeTabs items={["예제 1", "예제 2", "예제 3", "예제 4"]}>
 ```ts
 await db
   .select()
   .from(users)
-  .orderBy(asc(users.id)) // order by is mandatory
-  .limit(4) // the number of rows to return
-  .offset(4); // the number of rows to skip
+  .orderBy(asc(users.id)) // 정렬은 필수
+  .limit(4) // 반환할 행 수
+  .offset(4); // 건너뛸 행 수
 ```
 ```ts
 const getUsers = async (page = 1, pageSize = 3) => {
@@ -441,24 +488,30 @@ const nextUserPage = async (cursor?: number, pageSize = 3) => {
   await db
     .select()
     .from(users)
-    .where(cursor ? gt(users.id, cursor) : undefined) // if cursor is provided, get rows after it
-    .limit(pageSize) // the number of rows to return
-    .orderBy(asc(users.id)); // ordering
+    .where(cursor ? gt(users.id, cursor) : undefined) // 커서가 제공되면 해당 커서 이후의 행을 가져옴
+    .limit(pageSize) // 반환할 행 수
+    .orderBy(asc(users.id)); // 정렬
 };
-// pass the cursor of the last row of the previous page (id)
+// 이전 페이지의 마지막 행 커서(id)를 전달
 await nextUserPage(3);
 ```
 </CodeTabs>
 
-## ---
 
-### WITH clause
+## ---_bYJisN2M2Awgke65oaa5BH
+
+
+
+
+
+### WITH 절
 
 <Callout>
-  Check how to use WITH statement with [insert](/docs/insert#with-insert-clause), [update](/docs/update#with-update-clause), [delete](/docs/delete#with-delete-clause)
+  [insert](/docs/insert#with-insert-clause), [update](/docs/update#with-update-clause), [delete](/docs/delete#with-delete-clause)와 함께 WITH 문을 사용하는 방법을 확인하세요.
 </Callout>
 
-Using the `with` clause can help you simplify complex queries by splitting them into smaller subqueries called common table expressions (CTEs):
+`WITH` 절을 사용하면 복잡한 쿼리를 더 작은 하위 쿼리인 공통 테이블 표현식(CTE)으로 나누어 단순화할 수 있습니다.
+
 <Section>
 ```typescript copy
 const sq = db.$with('sq').as(db.select().from(users).where(eq(users.id, 42)));
@@ -471,105 +524,112 @@ select "id", "name", "age" from sq;
 ```
 </Section>
 
-To select arbitrary SQL values as fields in a CTE and reference them in other CTEs or in the main query,
-you need to add aliases to them:
-```typescript copy
+CTE에서 임의의 SQL 값을 필드로 선택하고 다른 CTE나 메인 쿼리에서 참조하려면, 해당 값에 별칭(alias)을 추가해야 합니다.
 
+```typescript copy
 const sq = db.$with('sq').as(db.select({ 
-  name: sql<string>`upper(${users.name})`.as('name'),
+  name: sql`upper(${users.name})`.as('name'),
 })
 .from(users));
 
 const result = await db.with(sq).select({ name: sq.name }).from(sq);
 ```
-If you don't provide an alias, the field type will become `DrizzleTypeError` and you won't be able to reference it in other queries.
-If you ignore the type error and still try to use the field,
-you will get a runtime error, since there's no way to reference that field without an alias.
 
-### Select from subquery
-Just like in SQL, you can embed queries into other queries by using the subquery API:
-<Section>
-```typescript copy
+별칭을 제공하지 않으면 필드 타입이 `DrizzleTypeError`가 되며, 다른 쿼리에서 참조할 수 없습니다. 타입 오류를 무시하고 필드를 사용하려고 하면, 별칭 없이 해당 필드를 참조할 방법이 없기 때문에 런타임 오류가 발생합니다.
+
+
+### 서브쿼리로 선택하기
+
+SQL과 마찬가지로, 서브쿼리 API를 사용해 다른 쿼리 안에 쿼리를 포함시킬 수 있습니다:
+
+```typescript
 const sq = db.select().from(users).where(eq(users.id, 42)).as('sq');
 const result = await db.select().from(sq);
 ```
+
 ```sql
 select "id", "name", "age" from (select "id", "name", "age" from "users" where "id" = 42) "sq";
 ```
-</Section>
 
-Subqueries can be used in any place where a table can be used, for example in joins:
-<Section>
-```typescript copy
+서브쿼리는 테이블을 사용할 수 있는 모든 곳에서 사용할 수 있습니다. 예를 들어 조인(join)에서도 활용 가능합니다:
+
+```typescript
 const sq = db.select().from(users).where(eq(users.id, 42)).as('sq');
 const result = await db.select().from(users).leftJoin(sq, eq(users.id, sq.id));
 ```
+
 ```sql
 select "users"."id", "users"."name", "users"."age", "sq"."id", "sq"."name", "sq"."age" from "users"
   left join (select "id", "name", "age" from "users" where "id" = 42) "sq"
     on "users"."id" = "sq"."id";
 ```
-</Section>
 
-## ---
 
-### Aggregations
-With Drizzle, you can do aggregations using functions like `sum`, `count`, `avg`, etc. by
-grouping and filtering with `.groupBy()` and `.having()` respectfully, same as you would do in raw SQL:
+## ---_LLn3jbC98A85Hef9Qs6Cdp
 
-<Section>
+
+
+
+
+### 집계(Aggregations)
+
+Drizzle를 사용하면 `sum`, `count`, `avg`와 같은 함수를 활용해 집계를 수행할 수 있습니다. 이때 `.groupBy()`와 `.having()`을 사용해 그룹화와 필터링을 할 수 있으며, 이는 원시 SQL에서와 동일한 방식으로 작동합니다.
+
 ```typescript
 import { gt } from 'drizzle-orm';
 
+// 나이별 사용자 수 조회
 await db.select({
   age: users.age,
-  count: sql<number>`cast(count(${users.id}) as int)`,
+  count: sql`cast(count(${users.id}) as int)`,
 })
   .from(users)
   .groupBy(users.age);
 
+// 나이별 사용자 수가 1명 초과인 경우 조회
 await db.select({
   age: users.age,
-  count: sql<number>`cast(count(${users.id}) as int)`,
+  count: sql`cast(count(${users.id}) as int)`,
 })
   .from(users)
   .groupBy(users.age)
   .having(({ count }) => gt(count, 1));
 ```
+
 ```sql
+-- 나이별 사용자 수 조회
 select "age", cast(count("id") as int)
   from "users"
   group by "age";
 
+-- 나이별 사용자 수가 1명 초과인 경우 조회
 select "age", cast(count("id") as int)
   from "users"
   group by "age"
   having cast(count("id") as int) > 1;
 ```
-</Section>
 
 <Callout type="info">
-`cast(... as int)` is necessary because `count()` returns `bigint` in PostgreSQL and `decimal` in MySQL, which are treated as string values instead of numbers.
-Alternatively, you can use [`.mapWith(Number)`](/docs/sql#sqlmapwith) to cast the value to a number at runtime.
+`cast(... as int)`는 PostgreSQL에서 `count()`가 `bigint`를 반환하고, MySQL에서는 `decimal`을 반환하기 때문에 필요합니다. 이 값들은 숫자 대신 문자열로 처리됩니다.  
+또는 런타임에 값을 숫자로 변환하기 위해 [`.mapWith(Number)`](/docs/sql#sqlmapwith)를 사용할 수도 있습니다.
 
-If you need count aggregation - we recommend using our [`$count`](/docs/select#count) API
+만약 `count` 집계가 필요하다면, [`$count`](/docs/select#count) API를 사용하는 것을 권장합니다.
 </Callout>
 
-### Aggregations helpers
 
-Drizzle has a set of wrapped `sql` functions, so you don't need to write
-`sql` templates for common cases in your app
+### 집계 헬퍼 함수
+
+Drizzle는 일반적인 경우에 `sql` 템플릿을 작성하지 않아도 되도록 래핑된 `sql` 함수 세트를 제공합니다.
 
 <Callout type="info">
- Remember, aggregation functions are often used with the GROUP BY clause of the SELECT statement. 
- So if you are selecting using aggregating functions and other columns in one query, 
- be sure to use the `.groupBy` clause
+  집계 함수는 주로 SELECT 문의 GROUP BY 절과 함께 사용됩니다. 
+  따라서 하나의 쿼리에서 집계 함수와 다른 컬럼을 함께 선택할 때는 
+  반드시 `.groupBy` 절을 사용해야 합니다.
 </Callout>
-
 
 **count**
 
-Returns the number of values in `expression`.
+`expression`에 있는 값의 개수를 반환합니다.
 <Section>
 ```ts
 import { count } from 'drizzle-orm'
@@ -582,7 +642,7 @@ select count("*") from "users";
 select count("id") from "users";
 ```
 ```ts
-// It's equivalent to writing
+// 아래와 동일한 코드
 await db.select({ 
   value: sql`count('*'))`.mapWith(Number) 
 }).from(users);
@@ -595,7 +655,7 @@ await db.select({
 
 **countDistinct**
 
-Returns the number of non-duplicate values in `expression`.
+`expression`에 있는 중복되지 않은 값의 개수를 반환합니다.
 <Section>
 ```ts
 import { countDistinct } from 'drizzle-orm'
@@ -606,7 +666,7 @@ await db.select({ value: countDistinct(users.id) }).from(users);
 select count(distinct "id") from "users";
 ```
 ```ts
-// It's equivalent to writing
+// 아래와 동일한 코드
 await db.select({ 
   value: sql`count(${users.id})`.mapWith(Number) 
 }).from(users);
@@ -615,7 +675,7 @@ await db.select({
 
 **avg**
 
-Returns the average (arithmetic mean) of all non-null values in `expression`.
+`expression`에 있는 모든 null이 아닌 값의 평균(산술 평균)을 반환합니다.
 <Section>
 ```ts
 import { avg } from 'drizzle-orm'
@@ -626,7 +686,7 @@ await db.select({ value: avg(users.id) }).from(users);
 select avg("id") from "users";
 ```
 ```ts
-// It's equivalent to writing
+// 아래와 동일한 코드
 await db.select({ 
   value: sql`avg(${users.id})`.mapWith(String) 
 }).from(users);
@@ -635,7 +695,7 @@ await db.select({
 
 **avgDistinct**
 
-Returns the average (arithmetic mean) of all non-null values in `expression`.
+`expression`에 있는 모든 null이 아닌 값의 평균(산술 평균)을 반환합니다.
 <Section>
 ```ts
 import { avgDistinct } from 'drizzle-orm'
@@ -646,7 +706,7 @@ await db.select({ value: avgDistinct(users.id) }).from(users);
 select avg(distinct "id") from "users";
 ```
 ```ts
-// It's equivalent to writing
+// 아래와 동일한 코드
 await db.select({ 
   value: sql`avg(distinct ${users.id})`.mapWith(String) 
 }).from(users);
@@ -655,7 +715,7 @@ await db.select({
 
 **sum**
 
-Returns the sum of all non-null values in `expression`.
+`expression`에 있는 모든 null이 아닌 값의 합계를 반환합니다.
 <Section>
 ```ts
 import { sum } from 'drizzle-orm'
@@ -666,7 +726,7 @@ await db.select({ value: sum(users.id) }).from(users);
 select sum("id") from "users";
 ```
 ```ts
-// It's equivalent to writing
+// 아래와 동일한 코드
 await db.select({ 
   value: sql`sum(${users.id})`.mapWith(String) 
 }).from(users);
@@ -675,7 +735,7 @@ await db.select({
 
 **sumDistinct**
 
-Returns the sum of all non-null and non-duplicate values in `expression`.
+`expression`에 있는 모든 null이 아니고 중복되지 않은 값의 합계를 반환합니다.
 <Section>
 ```ts
 import { sumDistinct } from 'drizzle-orm'
@@ -686,7 +746,7 @@ await db.select({ value: sumDistinct(users.id) }).from(users);
 select sum(distinct "id") from "users";
 ```
 ```ts
-// It's equivalent to writing
+// 아래와 동일한 코드
 await db.select({ 
   value: sql`sum(distinct ${users.id})`.mapWith(String) 
 }).from(users);
@@ -695,7 +755,7 @@ await db.select({
 
 **max**
 
-Returns the maximum value in `expression`.
+`expression`에 있는 값 중 최대값을 반환합니다.
 <Section>
 ```ts
 import { max } from 'drizzle-orm'
@@ -706,7 +766,7 @@ await db.select({ value: max(users.id) }).from(users);
 select max("id") from "users";
 ```
 ```ts
-// It's equivalent to writing
+// 아래와 동일한 코드
 await db.select({ 
   value: sql`max(${expression})`.mapWith(users.id) 
 }).from(users);
@@ -715,7 +775,7 @@ await db.select({
 
 **min**
 
-Returns the minimum value in `expression`.
+`expression`에 있는 값 중 최소값을 반환합니다.
 <Section>
 ```ts
 import { min } from 'drizzle-orm'
@@ -726,14 +786,14 @@ await db.select({ value: min(users.id) }).from(users);
 select min("id") from "users";
 ```
 ```ts
-// It's equivalent to writing
+// 아래와 동일한 코드
 await db.select({ 
   value: sql`min(${users.id})`.mapWith(users.id) 
 }).from(users);
 ```
 </Section>
 
-A more advanced example:
+더 복잡한 예제:
 
 ```typescript copy
 const orders = sqliteTable('order', {
@@ -768,9 +828,9 @@ db
     shipName: orders.shipName,
     shipCity: orders.shipCity,
     shipCountry: orders.shipCountry,
-    productsCount: sql<number>`cast(count(${details.productId}) as int)`,
-    quantitySum: sql<number>`sum(${details.quantity})`,
-    totalPrice: sql<number>`sum(${details.quantity} * ${details.unitPrice})`,
+    productsCount: sql`cast(count(${details.productId}) as int)`,
+    quantitySum: sql`sum(${details.quantity})`,
+    totalPrice: sql`sum(${details.quantity} * ${details.unitPrice})`,
   })
   .from(orders)
   .leftJoin(details, eq(orders.id, details.orderId))
@@ -779,16 +839,29 @@ db
   .all();
 ```
 
+
 ### $count
+
+`<$count />`는 특정 기능을 수행하는 컴포넌트입니다. 이 컴포넌트는 주로 카운팅 기능을 구현할 때 사용됩니다. 예를 들어, 리스트의 항목 수를 표시하거나 특정 이벤트의 발생 횟수를 추적하는 데 유용합니다.
+
+
 <$count />
 
-## ---
 
-### Iterator
+위 코드는 `$count` 컴포넌트를 사용하는 간단한 예제입니다. 이 컴포넌트를 사용하면 여러분의 애플리케이션에서 쉽게 카운팅 기능을 추가할 수 있습니다.
+
+
+## ---_C5oCpotRCsiHJjXNSSNeWV
+
+
+
+
+
+### 이터레이터(Iterator)
 
 <IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL[WIP]': false, 'SQLite[WIP]': false, 'SingleStore[WIP]': false }} />
 
-If you need to return a very large amount of rows from a query and you don't want to load them all into memory, you can use `.iterator()` to convert the query into an async iterator:
+쿼리 결과로 매우 많은 양의 행(row)을 반환해야 하는데, 이 모든 데이터를 메모리에 한 번에 로드하고 싶지 않다면 `.iterator()`를 사용해 쿼리를 비동기 이터레이터로 변환할 수 있습니다.
 
 ```ts copy
 const iterator = await db.select().from(users).iterator();
@@ -798,7 +871,7 @@ for await (const row of iterator) {
 }
 ```
 
-It also works with prepared statements:
+이 기능은 준비된 문장(prepared statements)에서도 동작합니다.
 
 ```ts copy
 const query = await db.select().from(users).prepare();
@@ -809,11 +882,16 @@ for await (const row of iterator) {
 }
 ```
 
-## ---
 
-### Use Index
+## ---_ASJACLzTxoj3vXUytQDg7z
 
-The `USE INDEX` hint suggests to the optimizer which indexes to consider when processing the query. The optimizer is not forced to use these indexes but will prioritize them if they are suitable.
+
+
+
+
+### 인덱스 사용하기
+
+`USE INDEX` 힌트는 쿼리를 처리할 때 최적화 도구가 고려해야 할 인덱스를 제안합니다. 최적화 도구는 이 인덱스를 반드시 사용해야 하는 것은 아니지만, 적합하다면 이를 우선적으로 고려합니다.
 
 <IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL': false, 'SQLite': false, 'SingleStore': false }} />
 
@@ -830,7 +908,7 @@ await db.select()
   .where(eq(users.name, 'David'));
 ```
 
-You can also use this option on any join you want
+이 옵션은 원하는 조인에서도 사용할 수 있습니다.
 
 ```ts
 await db.select()
@@ -839,9 +917,10 @@ await db.select()
   .where(eq(users.name, 'David'));
 ```
 
-### Ignore Index
 
-The `IGNORE INDEX` hint tells the optimizer to avoid using specific indexes for the query. MySQL will consider all other indexes (if any) or perform a full table scan if necessary.
+### 인덱스 무시하기
+
+`IGNORE INDEX` 힌트는 옵티마이저에게 특정 인덱스를 사용하지 않도록 지시합니다. MySQL은 다른 인덱스(존재하는 경우)를 고려하거나 필요한 경우 전체 테이블 스캔을 수행합니다.
 
 <IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL': false, 'SQLite': false, 'SingleStore': false }} />
 
@@ -858,7 +937,7 @@ await db.select()
   .where(eq(users.name, 'David'));
 ```
 
-You can also use this option on any join you want
+이 옵션은 원하는 조인에서도 사용할 수 있습니다.
 
 ```ts
 await db.select()
@@ -868,30 +947,32 @@ await db.select()
 ```
 
 
-### Force Index
+### FORCE INDEX 힌트
 
-The `FORCE INDEX` hint forces the optimizer to use the specified index(es) for the query. If the specified index cannot be used, MySQL will not fall back to other indexes; it might resort to a full table scan instead.
+`FORCE INDEX` 힌트는 쿼리에서 지정된 인덱스를 사용하도록 옵티마이저에 강제합니다. 지정된 인덱스를 사용할 수 없는 경우, MySQL은 다른 인덱스로 대체하지 않고 전체 테이블 스캔을 수행할 수 있습니다.
 
 <IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL': false, 'SQLite': false, 'SingleStore': false }} />
 
 ```ts copy
 export const users = mysqlTable('users', {
-	id: int('id').primaryKey(),
-	name: varchar('name', { length: 100 }).notNull(),
+    id: int('id').primaryKey(),
+    name: varchar('name', { length: 100 }).notNull(),
 }, () => [usersTableNameIndex]);
 
 const usersTableNameIndex = index('users_name_index').on(users.name);
 
 await db.select()
-  .from(users, { forceIndex: usersTableNameIndex })
-  .where(eq(users.name, 'David'));
+    .from(users, { forceIndex: usersTableNameIndex })
+    .where(eq(users.name, 'David'));
 ```
 
-You can also use this option on any join you want
+이 옵션은 원하는 조인에서도 사용할 수 있습니다.
 
 ```ts
 await db.select()
-  .from(users)
-  .leftJoin(posts, eq(posts.userId, users.id), { useIndex: usersTableNameIndex })
-  .where(eq(users.name, 'David'));
+    .from(users)
+    .leftJoin(posts, eq(posts.userId, users.id), { useIndex: usersTableNameIndex })
+    .where(eq(users.name, 'David'));
 ```
+
+

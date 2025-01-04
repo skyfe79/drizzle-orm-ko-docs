@@ -1,48 +1,51 @@
 import CodeTabs from "@mdx/CodeTabs.astro"
 
 <CodeTabs items={["AWS Data API", "PGLite", "Cloudflare D1 HTTP"]}>
-```ts {6}
-import { defineConfig } from "drizzle-kit";
+  ```ts {6}
+  import { defineConfig } from "drizzle-kit";
 
-export default defineConfig({
-  dialect: "postgresql",
-  schema: "./src/schema.ts",
-  driver: "aws-data-api",
-  dbCredentials: {
-    database: "database",
-    resourceArn: "resourceArn",
-    secretArn: "secretArn",
-  },
-};
-```
-```ts {6}
-import { defineConfig } from "drizzle-kit";
+  export default defineConfig({
+    dialect: "postgresql",
+    schema: "./src/schema.ts",
+    driver: "aws-data-api",
+    dbCredentials: {
+      database: "database",
+      resourceArn: "resourceArn",
+      secretArn: "secretArn",
+    },
+  });
+  ```
+  ```ts {6}
+  import { defineConfig } from "drizzle-kit";
 
-export default defineConfig({
-  dialect: "postgresql",
-  schema: "./src/schema.ts",
-  driver: "pglite",
-  dbCredentials: {
-    // inmemory
-    url: ":memory:"
-    
-    // or database folder
-    url: "./database/"
-  },
-};
-```
-```ts {6}
-import { defineConfig } from "drizzle-kit";
+  export default defineConfig({
+    dialect: "postgresql",
+    schema: "./src/schema.ts",
+    driver: "pglite",
+    dbCredentials: {
+      // 메모리 내 데이터베이스
+      url: ":memory:"
+      
+      // 또는 데이터베이스 폴더
+      url: "./database/"
+    },
+  });
+  ```
+  ```ts {6}
+  import { defineConfig } from "drizzle-kit";
 
-export default defineConfig({
-  dialect: "sqlite",
-  schema: "./src/schema.ts",
-  driver: "d1-http",
-  dbCredentials: {
-    accountId: "accountId",
-    databaseId: "databaseId",
-    token: "token",
-  },
-};
-```
+  export default defineConfig({
+    dialect: "sqlite",
+    schema: "./src/schema.ts",
+    driver: "d1-http",
+    dbCredentials: {
+      accountId: "accountId",
+      databaseId: "databaseId",
+      token: "token",
+    },
+  });
+  ```
 </CodeTabs>
+
+
+

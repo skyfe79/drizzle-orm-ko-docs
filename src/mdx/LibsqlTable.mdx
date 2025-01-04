@@ -1,9 +1,11 @@
 |                          |                                                                                                                                           |
 | :----------------------- | :---------------------------------------------------------------------------------------------------------------------------------------- |
-| `@libsql/client`         | defaults to `node` import, automatically changes to `web` if `target` or `platofrm` is set for bundler, e.g. `esbuild --platform=browser` |
-| `@libsql/client/node`    | `node` compatible module, supports `:memory:`, `file`, `wss`, `http` and `turso` conneciton protocols                                     |
-| `@libsql/client/web`     | module for fullstack web frameworks like `next`, `nuxt`, `astro`, etc.                                                                    |
-| `@libsql/client/http`    | module for `http` and `https` connection protocols                                                                                        |
-| `@libsql/client/ws`      | module for `ws` and `wss` conneciton protocols                                                                                            |
-| `@libsql/client/sqlite3` | module for `:memory:` and `file` conneciton protocols                                                                                     |
-| `@libsql/client-wasm`    | Separate experimental package for WASM                                                                                                    |
+| `@libsql/client`         | 기본적으로 `node` 모듈로 임포트되며, 번들러에서 `target`이나 `platform`이 설정되면 자동으로 `web` 모듈로 변경됩니다. 예를 들어, `esbuild --platform=browser`와 같은 설정이 적용됩니다. |
+| `@libsql/client/node`    | `node` 호환 모듈로, `:memory:`, `file`, `wss`, `http`, `turso` 연결 프로토콜을 지원합니다.                                                |
+| `@libsql/client/web`     | `next`, `nuxt`, `astro`와 같은 풀스택 웹 프레임워크를 위한 모듈입니다.                                                                    |
+| `@libsql/client/http`    | `http` 및 `https` 연결 프로토콜을 위한 모듈입니다.                                                                                        |
+| `@libsql/client/ws`      | `ws` 및 `wss` 연결 프로토콜을 위한 모듈입니다.                                                                                            |
+| `@libsql/client/sqlite3` | `:memory:` 및 `file` 연결 프로토콜을 위한 모듈입니다.                                                                                     |
+| `@libsql/client-wasm`    | WASM을 위한 별도의 실험적 패키지입니다.                                                                                                   |
+
+

@@ -1,17 +1,20 @@
-Create a `index.ts` file in the `src/db` directory and initialize the connection:
+`src/db` 디렉토리에 `index.ts` 파일을 생성하고 데이터베이스 연결을 초기화해 보겠습니다.
 
-```typescript copy
+```typescript
 import { drizzle } from "drizzle-orm/planetscale-serverless";
 
-const db = drizzle({ connection: {
-  host: process.env.DATABASE_HOST!,
-  username: process.env.DATABASE_USERNAME!,
-  password: process.env.DATABASE_PASSWORD!,
-}});
+const db = drizzle({
+  connection: {
+    host: process.env.DATABASE_HOST!,
+    username: process.env.DATABASE_USERNAME!,
+    password: process.env.DATABASE_PASSWORD!,
+  },
+});
 ```
 
-If you need to provide your existing driver
-```typescript copy"
+기존 드라이버를 사용해야 한다면 다음과 같이 작성할 수 있습니다.
+
+```typescript
 import { drizzle } from "drizzle-orm/planetscale-serverless";
 import { Client } from "@planetscale/database";
 
@@ -23,3 +26,5 @@ const client = new Client({
 
 const db = drizzle({ client: client });
 ```
+
+

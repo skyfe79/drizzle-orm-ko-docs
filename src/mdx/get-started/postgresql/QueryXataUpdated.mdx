@@ -1,6 +1,6 @@
 import CodeWithProps from "@mdx/CodeWithProps.astro";
 
-Let's **update** the `src/index.ts` file with queries to create, read, update, and delete users
+`src/index.ts` 파일을 업데이트하여 사용자를 생성, 조회, 수정, 삭제하는 쿼리를 추가해 보겠습니다.
 
 <CodeWithProps dialect={props.dialect} env_variable={props.env_variable}>
 ```typescript copy filename="src/index.ts"
@@ -21,11 +21,13 @@ async function main() {
     phone: '123-456-7890',
   };
 
+  // 사용자 생성
   await db.insert(usersTable).values(user);
-  console.log('New user created!')
+  console.log('새 사용자가 생성되었습니다!');
 
+  // 모든 사용자 조회
   const users = await db.select().from(usersTable);
-  console.log('Getting all users from the database: ', users)
+  console.log('데이터베이스에서 모든 사용자를 가져옵니다: ', users);
   /*
   const users: {
     id: number;
@@ -36,18 +38,22 @@ async function main() {
   }[]
   */
 
+  // 사용자 정보 수정
   await db
     .update(usersTable)
     .set({
       age: 31,
     })
     .where(eq(usersTable.email, user.email));
-  console.log('User info updated!')
+  console.log('사용자 정보가 업데이트되었습니다!');
 
+  // 사용자 삭제
   await db.delete(usersTable).where(eq(usersTable.email, user.email));
-  console.log('User deleted!')
+  console.log('사용자가 삭제되었습니다!');
 }
 
 main();
 ```
 </CodeWithProps>
+
+

@@ -8,45 +8,49 @@ import IsSupportedChipGroup from '@mdx/IsSupportedChipGroup.astro';
 
 # Drizzle Seed
 
+
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': true, 'SingleStore': false }} />
 
+
+
 <Callout type='warning'>
-  `drizzle-seed` can only be used with `drizzle-orm@0.36.4` or higher. Versions lower than this may work at runtime but could have type issues and identity column issues, as this patch was introduced in `drizzle-orm@0.36.4`
+  `drizzle-seed`는 `drizzle-orm@0.36.4` 이상 버전에서만 사용할 수 있습니다. 이보다 낮은 버전은 런타임에서 동작할 수 있지만, 타입 문제와 identity column 문제가 발생할 수 있습니다. 이 패치는 `drizzle-orm@0.36.4`에서 도입되었습니다.
 </Callout>
 
-`drizzle-seed` is a TypeScript library that helps you generate deterministic, yet realistic,
-fake data to populate your database. By leveraging a seedable pseudorandom number generator (pRNG),
-it ensures that the data you generate is consistent and reproducible across different runs.
-This is especially useful for testing, development, and debugging purposes.
 
-#### What is Deterministic Data Generation?
+`drizzle-seed`는 데이터베이스에 채울 수 있는 결정적이면서도 현실적인 가짜 데이터를 생성하는 데 도움을 주는 TypeScript 라이브러리입니다. 시드 가능한 의사 난수 생성기(pRNG)를 활용하여, 생성된 데이터가 여러 실행에서 일관되고 재현 가능하도록 보장합니다. 이는 테스트, 개발, 디버깅 목적으로 특히 유용합니다.
 
-Deterministic data generation means that the same input will always produce the same output.
-In the context of `drizzle-seed`, when you initialize the library with the same seed number,
-it will generate the same sequence of fake data every time. This allows for predictable and repeatable data sets.
 
-#### Pseudorandom Number Generator (pRNG)
+#### 결정적 데이터 생성이란?
 
-A pseudorandom number generator is an algorithm that produces a sequence of numbers
-that approximates the properties of random numbers. However, because it's based on an initial value
-called a seed, you can control its randomness. By using the same seed, the pRNG will produce the
-same sequence of numbers, making your data generation process reproducible.
+결정적 데이터 생성은 동일한 입력이 항상 동일한 출력을 생성한다는 것을 의미합니다.  
+`drizzle-seed` 라이브러리의 경우, 동일한 시드(seed) 번호로 초기화하면 매번 같은 순서의 가짜 데이터를 생성합니다. 이를 통해 예측 가능하고 반복 가능한 데이터 세트를 만들 수 있습니다.
 
-#### Benefits of Using a pRNG:
 
-- Consistency: Ensures that your tests run on the same data every time.
-- Debugging: Makes it easier to reproduce and fix bugs by providing a consistent data set.
-- Collaboration: Team members can share seed numbers to work with the same data sets.
+#### 의사 난수 생성기 (pRNG)
 
-With drizzle-seed, you get the best of both worlds: the ability to generate realistic fake data and the control to reproduce it whenever needed.
+의사 난수 생성기(pseudorandom number generator, pRNG)는 난수의 특성을 근사적으로 모방한 숫자 시퀀스를 생성하는 알고리즘입니다. 하지만 이 알고리즘은 시드(seed)라고 불리는 초기값에 기반하기 때문에, 난수의 생성 과정을 제어할 수 있습니다. 동일한 시드를 사용하면 pRNG는 항상 같은 숫자 시퀀스를 생성하므로, 데이터 생성 과정을 재현 가능하게 만들 수 있습니다.
 
-## Installation
+
+#### pRNG 사용의 장점:
+
+- **일관성**: 테스트를 실행할 때마다 동일한 데이터를 사용할 수 있습니다.
+- **디버깅**: 일관된 데이터 세트를 제공해 버그를 재현하고 수정하기가 더 쉬워집니다.
+- **협업**: 팀원들이 시드(seed) 번호를 공유해 동일한 데이터 세트로 작업할 수 있습니다.
+
+drizzle-seed를 사용하면 두 가지 장점을 모두 누릴 수 있습니다. 현실적인 가짜 데이터를 생성할 수 있을 뿐만 아니라, 필요할 때마다 이를 재현할 수 있는 제어 기능도 제공합니다.
+
+
+## 설치
 
 <Npm>drizzle-seed</Npm>
 
-## Basic Usage
+`drizzle-seed` 패키지를 설치하려면 위의 명령어를 사용하세요. 이 명령어는 npm을 통해 패키지를 설치합니다.
 
-In this example we will create 10 users with random names and ids
+
+## 기본 사용법
+
+이 예제에서는 무작위 이름과 ID를 가진 10명의 사용자를 생성합니다.
 
 ```ts {12}
 import { pgTable, integer, text } from "drizzle-orm/pg-core";
@@ -66,12 +70,23 @@ async function main() {
 main();
 ```
 
-## Options
+### 코드 설명
+1. **`pgTable`**: PostgreSQL 테이블을 정의합니다. `users` 테이블에는 `id`와 `name` 두 개의 컬럼이 있습니다.
+   - `id`: 정수 타입의 기본 키(primary key)입니다.
+   - `name`: 텍스트 타입이며, `null` 값을 허용하지 않습니다.
+
+2. **`drizzle`**: 데이터베이스 연결을 설정합니다. 환경 변수 `DATABASE_URL`을 사용해 데이터베이스에 접속합니다.
+
+3. **`seed`**: 데이터베이스에 초기 데이터를 삽입합니다. `users` 테이블에 무작위 데이터를 생성합니다.
+
+4. **`main` 함수**: 데이터베이스 연결과 초기 데이터 삽입을 실행합니다.
+
+
+## 옵션
 
 **`count`**
 
-By default, the `seed` function will create 10 entities.
-However, if you need more for your tests, you can specify this in the seed options object
+기본적으로 `seed` 함수는 10개의 엔티티를 생성합니다. 하지만 테스트를 위해 더 많은 엔티티가 필요하다면, 시드 옵션 객체에서 이 값을 지정할 수 있습니다.
 
 ```ts
 await seed(db, schema, { count: 1000 });
@@ -79,19 +94,19 @@ await seed(db, schema, { count: 1000 });
 
 **`seed`**
 
-If you need a seed to generate a different set of values for all subsequent runs, you can define a different number
-in the `seed` option. Any new number will generate a unique set of values
+모든 후속 실행에서 다른 값 세트를 생성하기 위해 시드가 필요하다면, `seed` 옵션에 다른 숫자를 정의할 수 있습니다. 새로운 숫자는 고유한 값 세트를 생성합니다.
 
 ```ts
 await seed(db, schema, { seed: 12345 });
 ```
 
-## Reset database
 
-With `drizzle-seed`, you can easily reset your database and seed it with new values, for example, in your test suites
+## 데이터베이스 초기화
+
+`drizzle-seed`를 사용하면 데이터베이스를 쉽게 초기화하고 새로운 값으로 시드할 수 있습니다. 예를 들어, 테스트 스위트에서 유용하게 사용할 수 있습니다.
 
 ```ts
-// path to a file with schema you want to reset
+// 초기화할 스키마 파일 경로
 import * as schema from "./schema.ts";
 import { reset } from "drizzle-seed";
 
@@ -103,12 +118,11 @@ async function main() {
 main();
 ```
 
-Different dialects will have different strategies for database resetting
+데이터베이스 초기화는 각각의 데이터베이스 방언(dialect)에 따라 다른 전략을 사용합니다.
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
 <Tab>
-For PostgreSQL, the `drizzle-seed` package will generate `TRUNCATE` statements with the `CASCADE` option to 
-ensure that all tables are empty after running the reset function
+PostgreSQL의 경우, `drizzle-seed` 패키지는 `CASCADE` 옵션을 포함한 `TRUNCATE` 문을 생성하여 초기화 함수 실행 후 모든 테이블이 비어 있도록 보장합니다.
 
 ```sql
 TRUNCATE tableName1, tableName2, ... CASCADE;
@@ -116,8 +130,7 @@ TRUNCATE tableName1, tableName2, ... CASCADE;
 
 </Tab>
 <Tab>
-For MySQL, the `drizzle-seed` package will first disable `FOREIGN_KEY_CHECKS` to ensure the next step won't fail, and then 
-generate `TRUNCATE` statements to empty the content of all tables
+MySQL의 경우, `drizzle-seed` 패키지는 먼저 `FOREIGN_KEY_CHECKS`를 비활성화하여 다음 단계가 실패하지 않도록 한 후, 모든 테이블의 내용을 비우기 위해 `TRUNCATE` 문을 생성합니다.
 
 ```sql
 SET FOREIGN_KEY_CHECKS = 0;
@@ -129,8 +142,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 </Tab>
 <Tab>
-For SQLite, the `drizzle-seed` package will first disable the `foreign_keys` pragma to ensure the next step won't fail, 
-and then generate `DELETE FROM` statements to empty the content of all tables
+SQLite의 경우, `drizzle-seed` 패키지는 먼저 `foreign_keys` 프라그마를 비활성화하여 다음 단계가 실패하지 않도록 한 후, 모든 테이블의 내용을 비우기 위해 `DELETE FROM` 문을 생성합니다.
 
 ```sql
 PRAGMA foreign_keys = OFF;
@@ -143,21 +155,21 @@ PRAGMA foreign_keys = ON;
 </Tab>
 </Tabs>
 
-## Refinements
 
-In case you need to change the behavior of the seed generator functions that `drizzle-seed` uses by default, you can specify your own implementation and even use your own list of values for the seeding process
+## 세부 조정
 
-`.refine` is a callback that receives a list of all available generator functions from `drizzle-seed`. It should return an object with keys representing the tables you want to refine, defining their behavior as needed. 
-Each table can specify several properties to simplify seeding your database:
+`drizzle-seed`가 기본적으로 사용하는 시드 생성 함수의 동작을 변경해야 한다면, 여러분만의 구현을 지정할 수 있고, 심지어 시딩 과정에서 사용할 값 목록도 직접 정의할 수 있습니다.
+
+`.refine`은 `drizzle-seed`에서 제공하는 모든 생성 함수 목록을 받는 콜백입니다. 이 콜백은 조정하려는 테이블을 키로 가지는 객체를 반환해야 하며, 각 테이블의 동작을 필요에 따라 정의할 수 있습니다. 각 테이블은 데이터베이스 시딩을 단순화하기 위해 여러 속성을 지정할 수 있습니다:
 
 <rem025 />
 
-- `columns`: Refine the default behavior of each column by specifying the required generator function.
-- `count`: Specify the number of rows to insert into the database. By default, it's 10. If a global count is defined in the `seed()` options, the count defined here will override it for this specific table.
-- `with`: Define how many referenced entities to create for each parent table if you want to generate associated entities.
+- `columns`: 각 컬럼의 기본 동작을 조정하기 위해 필요한 생성 함수를 지정합니다.
+- `count`: 데이터베이스에 삽입할 행의 수를 지정합니다. 기본값은 10입니다. `seed()` 옵션에서 전역 카운트가 정의된 경우, 여기서 정의한 카운트가 해당 테이블에 대해 이를 덮어씁니다.
+- `with`: 연관된 엔티티를 생성하려는 경우, 각 부모 테이블에 대해 생성할 참조 엔티티의 수를 정의합니다.
 
 <Callout title='info'>
-You can also specify a weighted random distribution for the number of referenced values you want to create. For details on this API, you can refer to [Weighted Random docs](#weighted-random) docs section
+참조 값의 수를 생성할 때 가중치를 적용한 랜덤 분포를 지정할 수도 있습니다. 이 API에 대한 자세한 내용은 [가중치 랜덤 문서](#weighted-random)를 참조하세요.
 </Callout>
 
 **API**
@@ -173,7 +185,7 @@ await seed(db, schema).refine((f) => ({
 }));
 ```
 
-Let's check a few examples with an explanation of what will happen:
+다음은 몇 가지 예제와 함께 어떤 일이 발생하는지 설명합니다:
 
 ```ts filename='schema.ts'
 import { pgTable, integer, text } from "drizzle-orm/pg-core";
@@ -190,7 +202,7 @@ export const posts = pgTable("posts", {
 });
 ```
 
-**Example 1**: Seed only the `users` table with 20 entities and with refined seed logic for the `name` column
+**예제 1**: `users` 테이블에 20개의 엔티티를 시드하고, `name` 컬럼에 대한 시드 로직을 조정합니다.
 ```ts filename='index.ts'
 import { drizzle } from "drizzle-orm/node-postgres";
 import { seed } from "drizzle-seed";
@@ -212,7 +224,7 @@ async function main() {
 main();
 ```
 
-**Example 2**: Seed the `users` table with 20 entities and add 10 `posts` for each `user` by seeding the `posts` table and creating a reference from `posts` to `users`
+**예제 2**: `users` 테이블에 20개의 엔티티를 시드하고, 각 `user`에 대해 10개의 `posts`를 추가합니다. 이때 `posts` 테이블을 시드하고 `posts`에서 `users`로의 참조를 생성합니다.
 ```ts filename='index.ts'
 import { drizzle } from "drizzle-orm/node-postgres";
 import { seed } from "drizzle-seed";
@@ -234,8 +246,7 @@ async function main() {
 main();
 ```
 
-**Example 3**: Seed the `users` table with 5 entities and populate the database with 100 `posts` without connecting them to the `users` entities. Refine `id` generation for `users` so 
-that it will give any int from `10000` to `20000` and remains unique, and refine `posts` to retrieve values from a self-defined array
+**예제 3**: `users` 테이블에 5개의 엔티티를 시드하고, 데이터베이스에 100개의 `posts`를 추가하되 `users` 엔티티와 연결하지 않습니다. `users`의 `id` 생성을 조정하여 `10000`에서 `20000` 사이의 고유한 정수를 생성하도록 하고, `posts`의 값을 직접 정의한 배열에서 가져오도록 조정합니다.
 ```ts filename='index.ts'
 import { drizzle } from "drizzle-orm/node-postgres";
 import { seed } from "drizzle-seed";
@@ -277,24 +288,24 @@ main();
 ```
 
 <Callout type='warning'>
-There are many more possibilities that we will define in these docs, but for now, you can explore a few sections in this documentation. Check the [Generators](#generators) section to get familiar with all the available generator functions you can use.
+이 문서에서 더 많은 가능성을 정의할 예정이지만, 지금은 이 문서의 몇 가지 섹션을 탐색할 수 있습니다. 사용 가능한 모든 생성 함수에 익숙해지려면 [생성자](#generators) 섹션을 확인하세요.
 
-A particularly great feature is the ability to use weighted randomization, both for generator values created for a column and for determining the number of related entities that can be generated by `drizzle-seed`.
+특히 유용한 기능은 컬럼에 대해 생성된 값과 `drizzle-seed`가 생성할 수 있는 관련 엔티티의 수를 결정할 때 가중치를 적용한 랜덤화를 사용할 수 있다는 점입니다.
 
-Please check [Weighted Random docs](#weighted-random) for more info.
+자세한 내용은 [가중치 랜덤 문서](#weighted-random)를 확인하세요.
 </Callout>
 
 
-## Weighted Random
+## 가중치 랜덤(Weighted Random)
 
-There may be cases where you need to use multiple datasets with a different priority that should be inserted into your database during the seed stage. For such cases, drizzle-seed provides an API called weighted random
+시드(seed) 단계에서 데이터베이스에 삽입할 여러 데이터셋에 서로 다른 우선순위를 적용해야 하는 경우가 있습니다. 이런 경우를 위해 Drizzle Seed는 **가중치 랜덤(weighted random)**이라는 API를 제공합니다.
 
-The Drizzle Seed package has a few places where weighted random can be used:
+Drizzle Seed 패키지에서 가중치 랜덤을 사용할 수 있는 몇 가지 경우는 다음과 같습니다:
 
-- Columns inside each table refinements
-- The `with` property, determining the amount of related entities to be created
+- 각 테이블 내 컬럼의 세부 설정
+- 생성할 관련 엔티티의 수를 결정하는 `with` 속성
 
-Let's check an example for both:
+두 가지 예제를 살펴보겠습니다.
 
 ```ts filename="schema.ts"
 import { pgTable, integer, text, varchar, doublePrecision } from "drizzle-orm/pg-core";
@@ -327,7 +338,7 @@ export const details = pgTable(
 );
 ```
 
-**Example 1**: Refine the `unitPrice` generation logic to generate `5000` random prices, with a 30% chance of prices between 10-100 and a 70% chance of prices between 100-300
+**예제 1**: `unitPrice` 생성 로직을 세부 설정하여 5000개의 랜덤 가격을 생성합니다. 이때, 10-100 사이의 가격이 30% 확률로, 100-300 사이의 가격이 70% 확률로 생성되도록 설정합니다.
 
 ```ts filename="index.ts"
 import { drizzle } from "drizzle-orm/node-postgres";
@@ -361,7 +372,7 @@ async function main() {
 main();
 ```
 
-**Example 2**: For each order, generate 1 to 3 details with a 60% chance, 5 to 7 details with a 30% chance, and 8 to 10 details with a 10% chance
+**예제 2**: 각 주문에 대해 1~3개의 상세 정보를 60% 확률로, 5~7개의 상세 정보를 30% 확률로, 8~10개의 상세 정보를 10% 확률로 생성합니다.
 
 ```ts filename="index.ts"
 import { drizzle } from "drizzle-orm/node-postgres";
@@ -388,7 +399,8 @@ async function main() {
 main();
 ```
 
-## Complex example
+
+## 복잡한 예제
 
 <CodeTabs items={["main.ts", "schema.ts"]}>
 <Section>
@@ -620,18 +632,26 @@ export const details = pgTable('order_detail', {
 </Section>
 </CodeTabs>
 
+
 ## Limitations
 
-#### Types limitations for `with`
 
-Due to certain TypeScript limitations and the current API in Drizzle, it is not possible to properly infer references between tables, especially when circular dependencies between tables exist.
 
-This means the `with` option will display all tables in the schema, and you will need to manually select the one that has a one-to-many relationship
 
-<Callout title='warning'>
-The `with` option works for one-to-many relationships. For example, if you have one `user` and many `posts`, you can use users `with` posts, but you cannot use posts `with` users
+
+#### `with` 옵션의 타입 제한 사항
+
+Drizzle의 현재 API와 TypeScript의 몇 가지 제한 사항 때문에, 특히 테이블 간 순환 참조가 존재할 때 테이블 간의 참조를 올바르게 추론하는 것이 불가능합니다.
+
+이로 인해 `with` 옵션은 스키마 내의 모든 테이블을 표시하며, 여러분이 일대다 관계를 가진 테이블을 직접 선택해야 합니다.
+
+<Callout title='경고'>
+`with` 옵션은 일대다 관계에서만 작동합니다. 예를 들어, 하나의 `user`와 여러 개의 `posts`가 있는 경우, `user`와 함께 `posts`를 사용할 수 있지만, `posts`와 함께 `user`를 사용할 수는 없습니다.
 </Callout>
 
-#### Type limitations for the third parameter in Drizzle tables:
 
-Currently, we do not have type support for the third parameter in Drizzle tables. While it will work at runtime, it will not function correctly at the type level
+#### Drizzle 테이블의 세 번째 매개변수 타입 제한 사항:
+
+현재 Drizzle 테이블에서 세 번째 매개변수에 대한 타입 지원이 없습니다. 런타임에서는 동작하지만, 타입 레벨에서는 정상적으로 작동하지 않습니다.
+
+

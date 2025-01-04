@@ -9,26 +9,26 @@ import Npx from "@mdx/Npx.astro";
 import SchemaFilePaths from "@mdx/SchemaFilePaths.mdx"
 import Dialects from "@mdx/Dialects.mdx"
 
-# `drizzle-kit generate` 
+# `drizzle-kit generate`
 
 <Prerequisites>
-- Get started with Drizzle and `drizzle-kit` - [read here](/docs/get-started)
-- Drizzle schema foundamentals - [read here](/docs/sql-schema-declaration)
-- Database connection basics - [read here](/docs/connect-overview)
-- Drizzle migrations foundamentals - [read here](/docs/migrations)
-- Drizzle Kit [overview](/docs/kit-overview) and [config file](/docs/drizzle-config-file)
+- Drizzle과 `drizzle-kit` 시작하기 - [여기서 읽기](/docs/get-started)
+- Drizzle 스키마 기본 개념 - [여기서 읽기](/docs/sql-schema-declaration)
+- 데이터베이스 연결 기본 - [여기서 읽기](/docs/connect-overview)
+- Drizzle 마이그레이션 기본 - [여기서 읽기](/docs/migrations)
+- Drizzle Kit [개요](/docs/kit-overview) 및 [설정 파일](/docs/drizzle-config-file)
 </Prerequisites>
-
 
 <br/>
 
-`drizzle-kit generate` lets you generate SQL migrations based on you Drizzle schema upon declaration or on subsequent schema changes.
-<Callout collapsed="How it works under the hood?">
-Drizzle Kit `generate` command triggers a sequence of events:
-1. It will read through your Drizzle schema file(s) and compose a json snapshot of your schema
-2. It will read through your previous migrations folders and compare current json snapshot to the most recent one
-3. Based on json differences it will generate SQL migrations
-4. Save `migration.sql` and `snapshot.json` in migration folder under current timestamp
+`drizzle-kit generate`는 여러분의 Drizzle 스키마 선언이나 스키마 변경에 따라 SQL 마이그레이션을 생성할 수 있게 해줍니다.
+
+<Callout collapsed="내부 동작 원리">
+Drizzle Kit의 `generate` 커맨드는 다음과 같은 일련의 과정을 거칩니다:
+1. Drizzle 스키마 파일을 읽고 스키마의 JSON 스냅샷을 생성합니다.
+2. 이전 마이그레이션 폴더를 읽고 현재 JSON 스냅샷과 가장 최근 스냅샷을 비교합니다.
+3. JSON 차이점을 기반으로 SQL 마이그레이션을 생성합니다.
+4. 현재 타임스탬프 아래의 마이그레이션 폴더에 `migration.sql`과 `snapshot.json`을 저장합니다.
 
 <Section>
 ```typescript filename="src/schema.ts"
@@ -45,10 +45,10 @@ export const users = p.pgTable("users", {
 │ $ drizzle-kit generate │                  
 └─┬──────────────────────┘                  
   │                                           
-  └ 1. read previous migration folders
-    2. find diff between current and previous scheama
-    3. prompt developer for renames if necessary
-  ┌ 4. generate SQL migration and persist to file
+  └ 1. 이전 마이그레이션 폴더 읽기
+    2. 현재와 이전 스키마 간 차이점 찾기
+    3. 필요한 경우 개발자에게 이름 변경 요청
+  ┌ 4. SQL 마이그레이션 생성 및 파일로 저장
   │    ┌─┴───────────────────────────────────────┐  
   │      📂 drizzle       
   │      ├ 📂 _meta
@@ -67,13 +67,14 @@ CREATE TABLE "users" (
 </Section>
 </Callout>
 
-It's designed to cover [code first](/docs/migrations) approach of managing Drizzle migrations. 
-You can apply generated migrations using [`drizzle-kit migrate`](/docs/drizzle-kit-migrate), using drizzle-orm's `migrate()`, 
-using external migration tools like bytebase or running migrations yourself directly on the database. 
+이 기능은 Drizzle 마이그레이션을 관리하는 [코드 우선](/docs/migrations) 접근 방식을 다루기 위해 설계되었습니다. 
+생성된 마이그레이션은 [`drizzle-kit migrate`](/docs/drizzle-kit-migrate)를 사용하거나, drizzle-orm의 `migrate()`를 사용하거나, 
+bytebase와 같은 외부 마이그레이션 도구를 사용하거나, 직접 데이터베이스에서 실행할 수 있습니다.
 
-`drizzle-kit generate` command requires you to provide both `dialect` and `schema` path options, 
-you can set them either via [drizzle.config.ts](/docs/drizzle-config-file) config file or via CLI options
-<CodeTabs items={["With config file", "As CLI options"]}>
+`drizzle-kit generate` 커맨드는 `dialect`와 `schema` 경로 옵션을 제공해야 합니다. 
+이 옵션들은 [drizzle.config.ts](/docs/drizzle-config-file) 설정 파일을 통해 설정하거나 CLI 옵션으로 설정할 수 있습니다.
+
+<CodeTabs items={["설정 파일 사용", "CLI 옵션 사용"]}>
 <Section>
 ```ts
 // drizzle.config.ts
@@ -94,18 +95,24 @@ npx drizzle-kit generate --dialect=postgresql --schema=./src/schema.ts
 ```
 </CodeTabs>
 
-### Schema files path
-You can have a single `schema.ts` file or as many schema files as you want spread out across the project. 
-Drizzle Kit requires you to specify path(s) to them as a [glob](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs) via `schema` configuration option.
+
+### 스키마 파일 경로
+
+여러분은 하나의 `schema.ts` 파일을 사용하거나, 프로젝트 전체에 걸쳐 원하는 만큼 많은 스키마 파일을 분산시킬 수 있습니다. Drizzle Kit은 이러한 스키마 파일의 경로를 [glob](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs) 형식으로 `schema` 설정 옵션을 통해 지정하도록 요구합니다.
 
 <SchemaFilePaths/>
 
 
-### Custom migration file name
-You can set custom migration file names by providing `--name` CLI option
+### 커스텀 마이그레이션 파일 이름 설정하기
+
+`--name` CLI 옵션을 사용하여 마이그레이션 파일 이름을 커스텀하게 설정할 수 있습니다.
+
 ```shell
 npx drizzle-kit generate --name=init
 ```
+
+위 명령어를 실행하면 다음과 같은 파일 구조가 생성됩니다.
+
 ```plaintext {4}
 📦 <project root>
  ├ 📂 drizzle
@@ -115,12 +122,18 @@ npx drizzle-kit generate --name=init
  └ …
 ```
 
-### Multiple configuration files in one project
-You can have multiple config files in the project, it's very useful when you have multiple database stages or multiple databases or different databases on the same project:
+이렇게 하면 마이그레이션 파일 이름이 `0000_init.sql`로 지정됩니다.
+
+
+### 하나의 프로젝트에 여러 설정 파일 사용하기
+
+프로젝트에서 여러 개의 설정 파일을 가질 수 있습니다. 이는 여러 데이터베이스 단계나 여러 데이터베이스, 또는 동일한 프로젝트 내에서 다른 데이터베이스를 사용할 때 매우 유용합니다.
+
 <Npx>
   drizzle-kit generate --config=drizzle-dev.config.ts
   drizzle-kit generate --config=drizzle-prod.config.ts
 </Npx>
+
 ```plaintext {5-6}
 📦 <project root>
  ├ 📂 drizzle
@@ -132,13 +145,17 @@ You can have multiple config files in the project, it's very useful when you hav
  └ 📜 tsconfig.json
 ```
 
-### Custom migrations
-You can generate empty migration files to write your own custom SQL migrations 
-for DDL alternations currently not supported by Drizzle Kit or data seeding. Extended docs on custom migrations - [see here](/docs/kit-custom-migrations)
+이 구조를 통해 개발 환경과 프로덕션 환경에 각각 다른 설정 파일을 사용할 수 있습니다. 예를 들어, `drizzle-dev.config.ts`는 개발용 데이터베이스 설정을, `drizzle-prod.config.ts`는 프로덕션용 데이터베이스 설정을 담고 있을 수 있습니다. 이렇게 하면 환경에 따라 적절한 설정을 쉽게 적용할 수 있습니다.
+
+
+### 커스텀 마이그레이션
+
+Drizzle Kit에서 아직 지원하지 않는 DDL 변경이나 데이터 시딩을 위해, 여러분은 빈 마이그레이션 파일을 생성하여 직접 SQL 마이그레이션을 작성할 수 있습니다. 커스텀 마이그레이션에 대한 자세한 문서는 [여기](/docs/kit-custom-migrations)에서 확인할 수 있습니다.
 
 ```shell
 drizzle-kit generate --custom --name=seed-users
 ```
+
 <Section>
 ```plaintext {5}
 📦 <project root>
@@ -158,15 +175,17 @@ INSERT INTO "users" ("name") VALUES('Dandrew');
 ```
 </Section>
 
-### Extended list of available configurations
-`drizzle-kit generate` has a list of cli-only options
+
+### 확장 가능한 설정 목록
+
+`drizzle-kit generate` 명령어는 CLI 전용 옵션을 제공합니다.
 
 <rem025/>
 
 |               |                                                      |
 | :--------     | :--------------------------------------------------- |
-| `custom`      | generate empty SQL for custom migration              |
-| `name`        | generate migration with custom name                  |
+| `custom`      | 커스텀 마이그레이션을 위한 빈 SQL 생성               |
+| `name`        | 커스텀 이름으로 마이그레이션 생성                    |
 
 <rem025/>
 
@@ -178,25 +197,24 @@ drizzle-kit push --name=seed_users --custom
 <br/>
 <hr/>
 <br/>
-We recommend configuring `drizzle-kit` through [drizzle.config.ts](/docs/drizzle-config-file) file, 
-yet you can provide all configuration options through CLI if necessary, e.g. in CI/CD pipelines, etc.
+`drizzle-kit` 설정은 [drizzle.config.ts](/docs/drizzle-config-file) 파일을 통해 구성하는 것을 권장합니다. 하지만 CI/CD 파이프라인 등에서 필요할 경우 모든 설정 옵션을 CLI를 통해 제공할 수도 있습니다.
 
 |               |            |                                                                            |
 | :------------ | :-------   | :----------------------------------------------------------------------    |
-| `dialect`     | `required` | Database dialect, one of <Dialects/>                                       |
-| `schema`      | `required` | Path to typescript schema file(s) or folder(s) with multiple schema files  |
-| `out`         |            | Migrations output folder, default is `./drizzle`                           |
-| `config`      |            | Configuration file path, default is `drizzle.config.ts`                    |
-| `breakpoints` |            | SQL statements breakpoints, default is `true`                              |
+| `dialect`     | `required` | 데이터베이스 방언, <Dialects/> 중 하나 선택                                |
+| `schema`      | `required` | 타입스크립트 스키마 파일 또는 여러 스키마 파일이 있는 폴더 경로            |
+| `out`         |            | 마이그레이션 출력 폴더, 기본값은 `./drizzle`                               |
+| `config`      |            | 설정 파일 경로, 기본값은 `drizzle.config.ts`                               |
+| `breakpoints` |            | SQL 문장의 중단점, 기본값은 `true`                                         |
 
 
-### Extended example
-Example of how to create a custom postgresql migration file named `0001_seed-users.sql` 
-with Drizzle schema located in `./src/schema.ts` and migrations folder named `./migrations` instead of default `./drizzle`.
+### 확장 예제
 
-We will also place drizzle config file in the `configs` folder.
+Drizzle 스키마가 `./src/schema.ts`에 위치하고, 기본값인 `./drizzle` 대신 `./migrations`라는 이름의 마이그레이션 폴더를 사용하여 `0001_seed-users.sql`이라는 커스텀 PostgreSQL 마이그레이션 파일을 만드는 방법을 살펴보겠습니다.
 
-Let's create config file:
+또한, Drizzle 설정 파일을 `configs` 폴더에 위치시킬 것입니다.
+
+먼저 설정 파일을 만들어 보겠습니다:
 
 ```plaintext {4}
 📦 <project root>
@@ -206,6 +224,7 @@ Let's create config file:
  ├ 📂 src
  └ …
 ```
+
 ```ts filename='drizzle.config.ts'
 import { defineConfig } from "drizzle-kit";
 
@@ -216,11 +235,12 @@ export default defineConfig({
 });
 ```
 
-Now let's run
+이제 다음 명령어를 실행합니다:
 ```shell
 npx drizzle-kit generate --config=./configs/drizzle.config.ts --name=seed-users --custom
 ```
-And it will successfully generate
+
+이 명령어를 실행하면 다음과 같이 파일이 생성됩니다:
 <Section>
 ```plaintext {6}
 📦 <project root>
@@ -231,6 +251,7 @@ And it will successfully generate
  │ └ 📜 0001_seed-users.sql 
  └ …
 ```
+
 ```sql
 -- ./drizzle/0001_seed-users.sql
 
@@ -239,3 +260,4 @@ INSERT INTO "users" ("name") VALUES('Andrew');
 INSERT INTO "users" ("name") VALUES('Dandrew');
 ```
 </Section>
+

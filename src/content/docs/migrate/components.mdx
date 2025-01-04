@@ -1,3 +1,4 @@
+
 import Npm from "@mdx/Npm.astro";
 import AnchorCards from "@mdx/AnchorCards.astro";
 import Callout from "@mdx/Callout.astro";
@@ -17,7 +18,10 @@ import YoutubeCards from "@mdx/YoutubeCards.astro";
 
 <Npm>drizzle-orm -D drizzle-kit</Npm>
 
+
+
 ## AnchorCards
+
 
 <AnchorCards
   cards={{
@@ -28,51 +32,58 @@ import YoutubeCards from "@mdx/YoutubeCards.astro";
   }}
 />
 
-## Callout
 
-<Callout emoji={"😀"}>Callout example</Callout>
+`AnchorCards` 컴포넌트는 여러 개의 앵커 링크를 카드 형태로 보여줍니다. `cards` 속성은 객체 형태로 전달되며, 각 키는 카드의 이름을 나타내고 값은 해당 앵커의 ID를 가리킵니다. 이 컴포넌트를 사용하면 페이지 내 특정 섹션으로 쉽게 이동할 수 있습니다.
 
-<Callout>Callout example</Callout>
 
-<Callout type={"info"}>Callout example</Callout>
+## 콜아웃
 
-<Callout type={"warning"}>Callout example</Callout>
 
-<Callout type={"error"}>Callout example</Callout>
+<Callout emoji={"😀"}>콜아웃 예제</Callout>
 
-## CodeTabs with CodeTab
+<Callout>콜아웃 예제</Callout>
+
+<Callout type={"info"}>콜아웃 예제</Callout>
+
+<Callout type={"warning"}>콜아웃 예제</Callout>
+
+<Callout type={"error"}>콜아웃 예제</Callout>
+
+
+
+## CodeTabs와 CodeTab 사용하기
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
-	<CodeTab>
-	```typescript copy /schema/3
-	import * as schema from './schema';
-	import { drizzle } from 'drizzle-orm/...';
+    <CodeTab>
+    ```typescript copy /schema/3
+    import * as schema from './schema';
+    import { drizzle } from 'drizzle-orm/...';
 
     const db = drizzle(client, { schema });
 
     const result = await db.query.users.findMany({
-    	with: {
-    		posts: true
-    	},
+        with: {
+            posts: true
+        },
     });
     ```
 
     ```ts
     [{
-    	id: 10,
-    	name: "Dan",
-    	posts: [
-    		{
-    			id: 1,
-    			content: "SQL is awesome",
-    			authorId: 10,
-    		},
-    		{
-    			id: 2,
-    			content: "But check relational queries",
-    			authorId: 10,
-    		}
-    	]
+        id: 10,
+        name: "Dan",
+        posts: [
+            {
+                id: 1,
+                content: "SQL is awesome",
+                authorId: 10,
+            },
+            {
+                id: 2,
+                content: "But check relational queries",
+                authorId: 10,
+            }
+        ]
     }]
     ```
     </CodeTab>
@@ -82,36 +93,37 @@ import YoutubeCards from "@mdx/YoutubeCards.astro";
     import { relations } from 'drizzle-orm';
 
     export const users = pgTable('users', {
-    	id: serial('id').primaryKey(),
-    	name: text('name').notNull(),
+        id: serial('id').primaryKey(),
+        name: text('name').notNull(),
     });
 
     export const usersRelations = relations(users, ({ many }) => ({
-    	posts: many(posts),
+        posts: many(posts),
     }));
 
     export const posts = pgTable('posts', {
-    	id: serial('id').primaryKey(),
-    	content: text('content').notNull(),
-    	authorId: integer('author_id').notNull(),
+        id: serial('id').primaryKey(),
+        content: text('content').notNull(),
+        authorId: integer('author_id').notNull(),
     });
 
     export const postsRelations = relations(posts, ({ one }) => ({
-    	author: one(users, { fields: [posts.authorId], references: [users.id] }),
+        author: one(users, { fields: [posts.authorId], references: [users.id] }),
     }));
     ```
 
 </CodeTabs>
 
-## IsSupportedChipGroup
+
 
 <IsSupportedChipGroup
   chips={{ PostgreSQL: true, SQLite: true, MySQL: false }}
 />
 
-## Section
 
-For codeblocks connection
+## 섹션
+
+코드 블록 연결을 위한 예제
 
 <Section>
 ```typescript
@@ -119,21 +131,22 @@ import { sql } from "drizzle-orm";
 import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
 
 const table = sqliteTable('table', {
-int1: integer('int1').default(42),
-int2: integer('int2').default(sql`(abs(42))`)
+    int1: integer('int1').default(42),
+    int2: integer('int2').default(sql`(abs(42))`)
 });
-
 ```
+
 ```sql
 CREATE TABLE `table` (
-  `int1` integer DEFAULT 42
-  `int2` integer DEFAULT (abs(42))
+    `int1` integer DEFAULT 42,
+    `int2` integer DEFAULT (abs(42))
 );
 ```
 
 </Section>
 
-## Tabs with Tab and Section
+
+## 탭과 섹션을 사용한 탭 예제
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
@@ -159,7 +172,6 @@ CREATE TABLE `table` (
     );
     ```
     </Section>
-
   </Tab> 
   <Tab>
     <Section>
@@ -190,11 +202,10 @@ CREATE TABLE `table` (
       int1: integer('int1').default(42),
       int2: integer('int2').default(sql`(abs(42))`)
     });
-
     ```
     ```sql
     CREATE TABLE `table` (
-      `int1` integer DEFAULT 42
+      `int1` integer DEFAULT 42,
       `int2` integer DEFAULT (abs(42))
     );
     ```
@@ -202,33 +213,38 @@ CREATE TABLE `table` (
   </Tab>
 </Tabs>
 
+
 ## SimpleLinkCards
+
 
 <SimpleLinkCards
   cards={{
-    "PostgreSQL column types": "/docs/column-types/pg",
-    "MySQL column types": "/docs/column-types/mysql",
-    "SQLite column types": "/docs/column-types/sqlite",
+    "PostgreSQL 컬럼 타입": "/docs/column-types/pg",
+    "MySQL 컬럼 타입": "/docs/column-types/mysql",
+    "SQLite 컬럼 타입": "/docs/column-types/sqlite",
   }}
 />
 
-## Steps
 
-With h4 headers
+## 단계
+
+### h4 헤더 사용하기
 
 <Steps>
 
-#### Install babel plugin
 
-It's necessary to bundle SQL migration files as string directly to your bundle.
+#### 바벨 플러그인 설치하기
+
+SQL 마이그레이션 파일을 번들에 직접 문자열로 포함시키려면 바벨 플러그인을 설치해야 합니다.
 
 ```shell
 npm install babel-plugin-inline-import
 ```
 
-#### Update config files.
 
-You will need to update `babel.config.js`, `metro.config.js` and `drizzle.config.ts` files
+#### 설정 파일 업데이트
+
+`babel.config.js`, `metro.config.js`, `drizzle.config.ts` 파일을 업데이트해야 합니다.
 
 ```js filename='babel.config.js'
 module.exports = function (api) {
@@ -236,37 +252,39 @@ module.exports = function (api) {
 
   return {
     presets: ["babel-preset-expo"],
-    plugins: [["inline-import", { extensions: [".sql"] }]], // <-- add this
+    plugins: [["inline-import", { extensions: [".sql"] }]], // <-- 이 부분을 추가
   };
 };
 ```
+
 </Steps>
 
-## YoutubeCards
+## 유튜브 카드
+
 
 <YoutubeCards cards={[
-	{
-		id: "4ZhtoOFKFP8",
-		title: "Easiest Database Setup in Next.js&nbsp;14 with Turso&nbsp;&&nbsp;Drizzle",
-		description: "Sam Meech-Ward",
-		time: '38:08'
-	}, 
-	{
-		id: "NfVELsEZFsA",
-		title: "Next.js Project with Vercel, Neon, Drizzle, TailwindCSS, FlowBite and more!",
-		description: "CodingEntrepreneurs",
-		time: '5:46:28'
-	}, 
-	{
-		id: "_SLxGYzv6jo",
-		title: "I Have A New Favorite Database&nbsp;Tool",
-		description: "Theo - t3.gg",
-		time: '5:46'
-	}
+    {
+        id: "4ZhtoOFKFP8",
+        title: "Next.js 14에서 Turso와 Drizzle로 가장 쉬운 데이터베이스 설정",
+        description: "Sam Meech-Ward",
+        time: '38:08'
+    }, 
+    {
+        id: "NfVELsEZFsA",
+        title: "Vercel, Neon, Drizzle, TailwindCSS, FlowBite 등을 사용한 Next.js 프로젝트",
+        description: "CodingEntrepreneurs",
+        time: '5:46:28'
+    }, 
+    {
+        id: "_SLxGYzv6jo",
+        title: "새로 찾은 최애 데이터베이스 도구",
+        description: "Theo - t3.gg",
+        time: '5:46'
+    }
 ]}/>
 
 
-## Collapsable code block
+## 접을 수 있는 코드 블록
 
 ```prisma  copy filename="prisma/schema.prisma" collapsable
 generator client {
@@ -277,7 +295,6 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
 
 model Product {
   id              Int           @id @default(autoincrement())
@@ -328,3 +345,5 @@ model Order {
   @@map("orders")
 }
 ```
+
+

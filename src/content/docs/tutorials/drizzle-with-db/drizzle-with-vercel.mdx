@@ -1,7 +1,7 @@
 ---
-title: "Drizzle with Vercel Postgres"
+title: "Drizzle와 Vercel Postgres 사용하기"
 date: "2024-06-09"
-svgs: ['<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 43.4805 67.3037)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 76.9395 46.5342)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 128.424 46.5352)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 94.957 67.3037)" fill="currentColor"></rect></svg>', <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 5L4 19H20L12 5Z" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>]
+svgs: ['<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 43.4805 67.3037)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 76.9395 46.5342)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 128.424 46.5352)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 94.957 67.3037)" fill="currentColor"></rect></svg>', <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 5L4 19H20L12 5Z" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>']
 ---
 
 import Prerequisites from "@mdx/Prerequisites.astro";
@@ -10,130 +10,146 @@ import Steps from '@mdx/Steps.astro';
 import Section from "@mdx/Section.astro";
 import Callout from '@mdx/Callout.astro';
 
-This tutorial demonstrates how to use Drizzle ORM with [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres). Vercel Postgres is a serverless SQL database designed to integrate with Vercel Functions and your frontend framework.
+## Vercel Postgres와 Drizzle ORM 설정하기
+
+이 튜토리얼은 [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres)와 Drizzle ORM을 함께 사용하는 방법을 보여줍니다. Vercel Postgres는 Vercel Functions와 여러분의 프론트엔드 프레임워크와 통합되도록 설계된 서버리스 SQL 데이터베이스입니다.
 
 <Prerequisites>
-- You should have installed Drizzle ORM and [Drizzle kit](/docs/kit-overview). You can do this by running the following command:
+- Drizzle ORM과 [Drizzle kit](/docs/kit-overview)을 설치해야 합니다. 다음 명령어를 실행하여 설치할 수 있습니다:
 <Npm>
 drizzle-orm
 -D drizzle-kit
 </Npm>
 
-- You should have installed `dotenv` package for managing environment variables. Read more about this package [here](https://www.npmjs.com/package/dotenv)
+- 환경 변수를 관리하기 위해 `dotenv` 패키지를 설치해야 합니다. 이 패키지에 대한 자세한 내용은 [여기](https://www.npmjs.com/package/dotenv)에서 확인할 수 있습니다.
 <Npm>
   dotenv
 </Npm>
 
-- You should have installed `@vercel/postgres` package. Read more about this package [here](https://www.npmjs.com/package/@vercel/postgres)
+- `@vercel/postgres` 패키지를 설치해야 합니다. 이 패키지에 대한 자세한 내용은 [여기](https://www.npmjs.com/package/@vercel/postgres)에서 확인할 수 있습니다.
 <Npm>
   @vercel/postgres
 </Npm>  
 </Prerequisites>
 
-Check [Vercel documentation](https://vercel.com/docs/storage/vercel-postgres/using-an-orm#drizzle) to learn how to connect to the database with Drizzle ORM.
-
-## Setup Vercel Postgres and Drizzle ORM
+Drizzle ORM을 사용하여 데이터베이스에 연결하는 방법은 [Vercel 문서](https://vercel.com/docs/storage/vercel-postgres/using-an-orm#drizzle)를 참고하세요.
 
 <Steps>
-#### Create a new Vercel Postgres database
 
-You can create new Vercel Postgres database in the [dashboard](https://vercel.com/dashboard).
 
-Read Vercel Postgres [documentation](https://vercel.com/docs/storage/vercel-postgres/quickstart) to learn how to create a new database.
+#### 새로운 Vercel Postgres 데이터베이스 생성하기
 
-#### Setup connection string variable
+[Vercel 대시보드](https://vercel.com/dashboard)에서 새로운 Vercel Postgres 데이터베이스를 생성할 수 있습니다.
 
-Navigate to your Vercel Postgres database and copy `POSTGRES_URL` from `.env.local` section.
+새로운 데이터베이스를 만드는 방법은 Vercel Postgres [공식 문서](https://vercel.com/docs/storage/vercel-postgres/quickstart)를 참고하세요.
 
-Add `POSTGRES_URL` to your `.env.local` or `.env` file.
 
-```plaintext copy
-POSTGRES_URL=<YOUR_DATABASE_URL>
+#### 연결 문자열 변수 설정하기
+
+1. Vercel Postgres 데이터베이스로 이동합니다.
+2. `.env.local` 섹션에서 `POSTGRES_URL`을 복사합니다.
+3. `.env.local` 또는 `.env` 파일에 `POSTGRES_URL`을 추가합니다.
+
+```plaintext
+POSTGRES_URL=
 ```
 
-#### Connect Drizzle ORM to your database
+이제 여러분의 프로젝트에서 데이터베이스 연결을 설정할 준비가 되었습니다.
 
-Create a `index.ts` file in the `src/db` directory and set up your database configuration:
 
-```typescript copy filename="src/db/index.ts"
+#### Drizzle ORM을 데이터베이스에 연결하기
+
+`src/db` 디렉토리에 `index.ts` 파일을 생성하고 데이터베이스 설정을 구성합니다:
+
+```typescript
+// src/db/index.ts
 import { drizzle } from 'drizzle-orm/vercel-postgres';
 import { config } from 'dotenv';
 
-config({ path: '.env.local' }); // or .env
+// .env.local 또는 .env 파일에서 환경 변수 로드
+config({ path: '.env.local' });
 
+// Drizzle ORM 인스턴스 생성
 export const db = drizzle();
-
 ```
 
-#### Create tables
+이 코드는 Drizzle ORM을 사용하여 데이터베이스에 연결하는 기본 설정을 보여줍니다. 환경 변수 파일(`.env.local` 또는 `.env`)에서 설정을 읽어와 데이터베이스 연결을 초기화합니다.
 
-Create a `schema.ts` file in the `src/db` directory and declare your tables:
 
-```typescript copy filename="src/db/schema.ts"
+#### 테이블 생성하기
+
+`src/db` 디렉토리에 `schema.ts` 파일을 생성하고 테이블을 선언합니다:
+
+```typescript
 import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const usersTable = pgTable('users_table', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
-  age: integer('age').notNull(),
-  email: text('email').notNull().unique(),
+  id: serial('id').primaryKey(), // 기본 키로 설정된 자동 증가 ID
+  name: text('name').notNull(), // 이름 필드 (널 값 허용 안 함)
+  age: integer('age').notNull(), // 나이 필드 (널 값 허용 안 함)
+  email: text('email').notNull().unique(), // 이메일 필드 (널 값 허용 안 함, 고유 값)
 });
 
 export const postsTable = pgTable('posts_table', {
-  id: serial('id').primaryKey(),
-  title: text('title').notNull(),
-  content: text('content').notNull(),
-  userId: integer('user_id')
-    .notNull()
-    .references(() => usersTable.id, { onDelete: 'cascade' }),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at')
-    .notNull()
-    .$onUpdate(() => new Date()),
+  id: serial('id').primaryKey(), // 기본 키로 설정된 자동 증가 ID
+  title: text('title').notNull(), // 제목 필드 (널 값 허용 안 함)
+  content: text('content').notNull(), // 내용 필드 (널 값 허용 안 함)
+  userId: integer('user_id') // 사용자 ID 필드
+    .notNull() // 널 값 허용 안 함
+    .references(() => usersTable.id, { onDelete: 'cascade' }), // usersTable의 id를 참조, 삭제 시 연쇄 삭제
+  createdAt: timestamp('created_at').notNull().defaultNow(), // 생성 시간 필드 (현재 시간으로 기본값 설정)
+  updatedAt: timestamp('updated_at') // 업데이트 시간 필드
+    .notNull() // 널 값 허용 안 함
+    .$onUpdate(() => new Date()), // 업데이트 시 현재 시간으로 자동 설정
 });
 
-export type InsertUser = typeof usersTable.$inferInsert;
-export type SelectUser = typeof usersTable.$inferSelect;
+export type InsertUser = typeof usersTable.$inferInsert; // 사용자 삽입 타입
+export type SelectUser = typeof usersTable.$inferSelect; // 사용자 선택 타입
 
-export type InsertPost = typeof postsTable.$inferInsert;
-export type SelectPost = typeof postsTable.$inferSelect;
+export type InsertPost = typeof postsTable.$inferInsert; // 게시물 삽입 타입
+export type SelectPost = typeof postsTable.$inferSelect; // 게시물 선택 타입
 ```
 
-#### Setup Drizzle config file
 
-**Drizzle config** - a configuration file that is used by [Drizzle Kit](/docs/kit-overview) and contains all the information about your database connection, migration folder and schema files.
+#### Drizzle 설정 파일 설정하기
 
-Create a `drizzle.config.ts` file in the root of your project and add the following content:
+**Drizzle 설정 파일**은 [Drizzle Kit](/docs/kit-overview)에서 사용하는 구성 파일로, 데이터베이스 연결 정보, 마이그레이션 폴더, 스키마 파일 등에 대한 모든 정보를 담고 있습니다.
+
+프로젝트 루트에 `drizzle.config.ts` 파일을 생성하고 다음 내용을 추가하세요:
 
 ```typescript copy filename="drizzle.config.ts"
 import { config } from 'dotenv';
 import { defineConfig } from 'drizzle-kit';
 
+// .env.local 파일에서 환경 변수 로드
 config({ path: '.env.local' });
 
 export default defineConfig({
-  schema: './src/db/schema.ts',
-  out: './migrations',
-  dialect: 'postgresql',
+  schema: './src/db/schema.ts', // 스키마 파일 경로
+  out: './migrations',          // 마이그레이션 파일이 생성될 경로
+  dialect: 'postgresql',        // 데이터베이스 종류
   dbCredentials: {
-    url: process.env.POSTGRES_URL!,
+    url: process.env.POSTGRES_URL!, // 데이터베이스 연결 URL
   },
 });
 ```
 
-#### Applying changes to the database
+이 설정 파일은 Drizzle Kit이 데이터베이스 스키마를 관리하고 마이그레이션을 생성하는 데 필요한 정보를 제공합니다.
 
-You can generate migrations using `drizzle-kit generate` command and then run them using the `drizzle-kit migrate` command.
 
-Generate migrations:
+#### 데이터베이스에 변경사항 적용하기
 
-```bash copy
+`drizzle-kit generate` 커맨드를 사용해 마이그레이션을 생성하고, `drizzle-kit migrate` 커맨드로 실행할 수 있습니다.
+
+마이그레이션 생성:
+
+```bash
 npx drizzle-kit generate
 ```
 
-These migrations are stored in the `drizzle/migrations`  directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
+생성된 마이그레이션은 `drizzle.config.ts`에 지정된 `drizzle/migrations` 디렉토리에 저장됩니다. 이 디렉토리에는 데이터베이스 스키마를 업데이트하는 데 필요한 SQL 파일과, 다양한 마이그레이션 단계에서의 스키마 스냅샷을 저장하는 `meta` 폴더가 포함됩니다.
 
-Example of a generated migration:
+생성된 마이그레이션 예제:
 
 ```sql
 CREATE TABLE IF NOT EXISTS "posts_table" (
@@ -160,25 +176,28 @@ EXCEPTION
 END $$;
 ```
 
-Run migrations:
+마이그레이션 실행:
 
-```bash copy
+```bash
 npx drizzle-kit migrate
 ```
 
-Alternatively, you can push changes directly to the database using [Drizzle kit push command](/docs/kit-overview#prototyping-with-db-push):
+또는, [Drizzle kit push 커맨드](/docs/kit-overview#prototyping-with-db-push)를 사용해 데이터베이스에 직접 변경사항을 적용할 수도 있습니다:
 
-```bash copy
+```bash
 npx drizzle-kit push
 ```
 
-<Callout type="warning">Push command is good for situations where you need to quickly test new schema designs or changes in a local development environment, allowing for fast iterations without the overhead of managing migration files.</Callout>
+<Callout type="warning">
+push 커맨드는 로컬 개발 환경에서 새로운 스키마 디자인이나 변경사항을 빠르게 테스트해야 할 때 유용합니다. 마이그레이션 파일을 관리하는 오버헤드 없이 빠르게 반복 작업을 할 수 있습니다.
+</Callout>
 
 </Steps>
 
-## Basic file structure
 
-This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `index.ts` and schema definitions in `schema.ts`.
+## 기본 파일 구조
+
+이 프로젝트의 기본 파일 구조입니다. `src/db` 디렉토리에는 데이터베이스 관련 파일이 포함되어 있습니다. `index.ts` 파일에는 데이터베이스 연결 코드가 있고, `schema.ts` 파일에는 스키마 정의가 있습니다.
 
 ```plaintext
 📦 <project root>
@@ -197,13 +216,15 @@ This is the basic file structure of the project. In the `src/db` directory, we h
  └ 📜 tsconfig.json
 ```
 
-## Query examples
 
-For instance, we create `src/db/queries` folder and separate files for each operation: insert, select, update, delete.
+## 쿼리 예제
 
-#### Insert data
+예를 들어, `src/db/queries` 폴더를 만들고 각 작업(insert, select, update, delete)별로 파일을 분리합니다.
 
-Read more about insert query in the [documentation](/docs/insert).
+
+#### 데이터 삽입
+
+데이터 삽입 쿼리에 대한 자세한 내용은 [문서](/docs/insert)를 참고하세요.
 
 ```typescript copy filename="src/db/queries/insert.ts" {4, 8}
 import { db } from '../index';
@@ -218,9 +239,10 @@ export async function createPost(data: InsertPost) {
 }
 ```
 
-#### Select data
 
-Read more about select query in the [documentation](/docs/select).
+#### 데이터 선택
+
+[문서](/docs/select)에서 select 쿼리에 대해 더 알아보세요.
 
 ```typescript copy filename="src/db/queries/select.ts" {5, 16, 41}
 import { asc, between, count, eq, getTableColumns, sql } from 'drizzle-orm';
@@ -285,25 +307,27 @@ export async function getPostsForLast24Hours(
 }
 ```
 
-Alternatively, you can use [relational query syntax](/docs/rqb).
+또는 [관계형 쿼리 구문](/docs/rqb)을 사용할 수도 있습니다.
 
-#### Update data
 
-Read more about update query in the [documentation](/docs/update).
+#### 데이터 업데이트
+
+데이터 업데이트 쿼리에 대한 자세한 내용은 [문서](/docs/update)를 참고하세요.
 
 ```typescript copy filename="src/db/queries/update.ts" {5}
 import { eq } from 'drizzle-orm';
 import { db } from '../index';
 import { SelectPost, postsTable } from '../schema';
 
-export async function updatePost(id: SelectPost['id'], data: Partial<Omit<SelectPost, 'id'>>) {
+export async function updatePost(id: SelectPost['id'], data: Partial<SelectPost>) {
   await db.update(postsTable).set(data).where(eq(postsTable.id, id));
 }
 ```
 
-#### Delete data
 
-Read more about delete query in the [documentation](/docs/delete).
+#### 데이터 삭제
+
+삭제 쿼리에 대해 더 자세히 알아보려면 [문서](/docs/delete)를 참고하세요.
 
 ```typescript copy filename="src/db/queries/delete.ts" {5}
 import { eq } from 'drizzle-orm';
@@ -314,3 +338,5 @@ export async function deleteUser(id: SelectUser['id']) {
   await db.delete(usersTable).where(eq(usersTable.id, id));
 }
 ```
+
+

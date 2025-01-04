@@ -4,11 +4,14 @@ import Callout from '@mdx/Callout.astro';
 import Tab from '@mdx/Tab.astro';
 import Tabs from '@mdx/Tabs.astro';
 
-# SQL Insert
-Drizzle ORM provides you the most SQL-like way to insert rows into the database tables.
+# SQL 삽입(Insert)
 
-## Insert one row
-Inserting data with Drizzle is extremely straightforward and sql-like. See for yourself:
+Drizzle ORM은 데이터베이스 테이블에 행을 삽입하는 가장 SQL스러운 방법을 제공합니다.
+
+
+## 행 하나 삽입하기
+
+Drizzle을 사용해 데이터를 삽입하는 것은 매우 직관적이며 SQL과 유사합니다. 직접 확인해 보세요:
 
 <Section>
 ```typescript copy 
@@ -19,7 +22,7 @@ insert into "users" ("name") values ("Andrew");
 ```
 </Section>
 
-If you need insert type for a particular table you can use `typeof usersTable.$inferInsert` syntax. 
+특정 테이블에 대한 삽입 타입이 필요하다면 `typeof usersTable.$inferInsert` 구문을 사용할 수 있습니다.
 ```typescript copy 
 type NewUser = typeof users.$inferInsert;
 
@@ -31,20 +34,25 @@ const newUser: NewUser = { name: "Alef" };
 await insertUser(newUser);
 ```
 
+
 ## Insert returning
+
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false, 'SingleStore': false}} />
-You can insert a row and get it back in PostgreSQL and SQLite like such:
+PostgreSQL과 SQLite에서는 행을 삽입하고 해당 행을 반환받을 수 있습니다. 다음과 같이 사용할 수 있습니다:
+
 ```typescript copy
 await db.insert(users).values({ name: "Dan" }).returning();
 
-// partial return
+// 부분 반환
 await db.insert(users).values({ name: "Partial Dan" }).returning({ insertedId: users.id });
 ```
 
-## Insert $returningId
+
+## $returningId 삽입
+
 <IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'SQLite': false, 'MySQL': true, 'SingleStore': true }} />
 
-MySQL itself doesn't have native support for `RETURNING` after using `INSERT`. There is only one way to do it for `primary keys` with `autoincrement` (or `serial`) types, where you can access `insertId` and `affectedRows` fields. We've prepared an automatic way for you to handle such cases with Drizzle and automatically receive all inserted IDs as separate objects
+MySQL은 `INSERT` 이후에 `RETURNING`을 기본적으로 지원하지 않습니다. `autoincrement`(또는 `serial`) 타입의 `primary key`에 대해서만 `insertId`와 `affectedRows` 필드를 통해 접근할 수 있습니다. Drizzle에서는 이러한 경우를 자동으로 처리하고, 삽입된 모든 ID를 별도의 객체로 반환하는 방법을 제공합니다.
 
 ```ts
 import { boolean, int, text, mysqlTable } from 'drizzle-orm/mysql-core';
@@ -55,12 +63,11 @@ const usersTable = mysqlTable('users', {
   verified: boolean('verified').notNull().default(false),
 });
 
-
 const result = await db.insert(usersTable).values([{ name: 'John' }, { name: 'John1' }]).$returningId();
 //    ^? { id: number }[]
 ```
 
-Also with Drizzle, you can specify a `primary key` with `$default` function that will generate custom primary keys at runtime. We will also return those generated keys for you in the `$returningId()` call
+또한 Drizzle에서는 `$default` 함수를 사용해 런타임에 커스텀 `primary key`를 생성할 수 있습니다. 이렇게 생성된 키도 `$returningId()` 호출 시 반환됩니다.
 
 ```ts
 import { varchar, text, mysqlTable } from 'drizzle-orm/mysql-core';
@@ -71,68 +78,82 @@ const usersTableDefFn = mysqlTable('users_default_fn', {
   name: text('name').notNull(),
 });
 
-
 const result = await db.insert(usersTableDefFn).values([{ name: 'John' }, { name: 'John1' }]).$returningId();
 //  ^? { customId: string }[]
 ```
 
-> If there is no primary keys -> type will be `{}[]` for such queries
+> 만약 `primary key`가 없다면, 해당 쿼리의 타입은 `{}[]`가 됩니다.
 
-## Insert multiple rows
-```typescript copy
-await db.insert(users).values([{ name: 'Andrew' }, { name: 'Dan' }]);
+
+## 여러 행 삽입하기
+
+```typescript
+await db.insert(users).values([
+  { name: 'Andrew' },
+  { name: 'Dan' }
+]);
 ```
 
-## Upserts and conflicts
-Drizzle ORM provides simple interfaces for handling upserts and conflicts.
+위 코드는 데이터베이스에 여러 행을 한 번에 삽입하는 예제입니다. `users` 테이블에 `name`이 'Andrew'와 'Dan'인 두 개의 행을 추가합니다. `values` 메서드에 배열을 전달하여 여러 행을 동시에 삽입할 수 있습니다.
 
-### On conflict do nothing
+
+## Upserts와 충돌 처리
+
+Drizzle ORM은 Upserts와 충돌 처리를 위한 간단한 인터페이스를 제공합니다.
+
+
+### 충돌 시 아무 작업도 하지 않음
+
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false, 'SingleStore': false }} />
 
-`onConflictDoNothing` will cancel the insert if there's a conflict:
+`onConflictDoNothing`은 충돌이 발생할 경우 삽입 작업을 취소합니다:
 
 ```typescript copy
 await db.insert(users)
   .values({ id: 1, name: 'John' })
   .onConflictDoNothing();
 
-// explicitly specify conflict target
+// 명시적으로 충돌 대상을 지정
 await db.insert(users)
   .values({ id: 1, name: 'John' })
   .onConflictDoNothing({ target: users.id });
 ```
 
-### On conflict do update
+
+### 충돌 시 업데이트하기
 
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
 
-`onConflictDoUpdate` will update the row if there's a conflict:
+`onConflictDoUpdate`는 충돌이 발생할 경우 해당 행을 업데이트합니다:
 ```typescript
 await db.insert(users)
   .values({ id: 1, name: 'Dan' })
   .onConflictDoUpdate({ target: users.id, set: { name: 'John' } });
 ```
 
-#### `where` clauses
 
-`on conflict do update` can have a `where` clause in two different places -
-as part of the conflict target (i.e. for partial indexes) or as part of the `update` clause:
+#### `where` 절
+
+`on conflict do update` 구문은 두 가지 위치에 `where` 절을 사용할 수 있습니다. 하나는 충돌 대상(예: 부분 인덱스)에 포함되는 경우이고, 다른 하나는 `update` 절에 포함되는 경우입니다.
 
 ```sql
+-- 충돌 대상에 where 절 사용
 insert into employees (employee_id, name)
 values (123, 'John Doe')
 on conflict (employee_id) where name <> 'John Doe'
-do update set name = excluded.name
+do update set name = excluded.name;
 
+-- update 절에 where 절 사용
 insert into employees (employee_id, name)
 values (123, 'John Doe')
 on conflict (employee_id) do update set name = excluded.name
 where name <> 'John Doe';
 ```
 
-To specify these conditions in Drizzle, you can use `setWhere` and `targetWhere` clauses:
+Drizzle에서 이러한 조건을 지정하려면 `setWhere`와 `targetWhere` 절을 사용할 수 있습니다.
 
 ```typescript
+// 충돌 대상에 where 절 사용
 await db.insert(employees)
   .values({ employeeId: 123, name: 'John Doe' })
   .onConflictDoUpdate({
@@ -141,6 +162,7 @@ await db.insert(employees)
     set: { name: sql`excluded.name` }
   });
 
+// update 절에 where 절 사용
 await db.insert(employees)
   .values({ employeeId: 123, name: 'John Doe' })
   .onConflictDoUpdate({
@@ -152,7 +174,7 @@ await db.insert(employees)
 
 <hr />
 
-Upsert with composite indexes, or composite primary keys for `onConflictDoUpdate`:
+복합 인덱스 또는 복합 기본 키를 사용한 `onConflictDoUpdate` 업서트 예제입니다.
 
 ```typescript
 await db.insert(users)
@@ -163,21 +185,23 @@ await db.insert(users)
   });
 ```
 
-### On duplicate key update
+
+### 중복 키 업데이트
+
 <IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'SQLite': false, 'MySQL': true, 'SingleStore': true }} />
 
-MySQL supports [`ON DUPLICATE KEY UPDATE`](https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html) instead of `ON CONFLICT` clauses. MySQL will automatically determine the conflict target based on the primary key and unique indexes, and will update the row if *any* unique index conflicts.
+MySQL은 `ON CONFLICT` 절 대신 [`ON DUPLICATE KEY UPDATE`](https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html)를 지원합니다. MySQL은 기본 키와 고유 인덱스를 기반으로 충돌 대상을 자동으로 결정하며, **어떤** 고유 인덱스가 충돌하더라도 해당 행을 업데이트합니다.
 
-Drizzle supports this through the `onDuplicateKeyUpdate` method:
+Drizzle는 `onDuplicateKeyUpdate` 메서드를 통해 이를 지원합니다:
 
 ```typescript
-// Note that MySQL automatically determines targets based on the primary key and unique indexes
+// MySQL은 기본 키와 고유 인덱스를 기반으로 대상을 자동으로 결정합니다.
 await db.insert(users)
   .values({ id: 1, name: 'John' })
   .onDuplicateKeyUpdate({ set: { name: 'John' } });
 ```
 
-While MySQL does not directly support doing nothing on conflict, you can perform a no-op by setting any column's value to itself and achieve the same effect:
+MySQL은 충돌 시 아무 작업도 수행하지 않는 기능을 직접 지원하지 않지만, 특정 컬럼의 값을 자기 자신으로 설정하여 동일한 효과를 얻을 수 있습니다:
 
 ```typescript
 import { sql } from 'drizzle-orm';
@@ -187,74 +211,86 @@ await db.insert(users)
   .onDuplicateKeyUpdate({ set: { id: sql`id` } });
 ```
 
-## `with insert` clause
+
+## `with insert` 절 사용하기
 
 <Callout>
-  Check how to use WITH statement with [select](/docs/select#with-clause), [update](/docs/update#with-update-clause), [delete](/docs/delete#with-delete-clause)
+  [select](/docs/select#with-clause), [update](/docs/update#with-update-clause), [delete](/docs/delete#with-delete-clause)와 함께 `WITH` 구문을 사용하는 방법을 확인해 보세요.
 </Callout>
 
-Using the `with` clause can help you simplify complex queries by splitting them into smaller subqueries called common table expressions (CTEs):
+`with` 절을 사용하면 복잡한 쿼리를 더 작은 하위 쿼리로 나눌 수 있습니다. 이를 공통 테이블 표현식(CTE)이라고 합니다:
+
 <Section>
 ```typescript copy
+// user_count라는 CTE를 정의
 const userCount = db.$with('user_count').as(
-	db.select({ value: sql`count(*)`.as('value') }).from(users)
+    db.select({ value: sql`count(*)`.as('value') }).from(users)
 );
 
+// user_count CTE를 사용하여 데이터 삽입
 const result = await db.with(userCount)
-	.insert(users)
-	.values([
-		{ username: 'user1', admin: sql`((select * from ${userCount}) = 0)` }
-	])
-	.returning({
-		admin: users.admin
-	});
+    .insert(users)
+    .values([
+        { username: 'user1', admin: sql`((select * from ${userCount}) = 0)` }
+    ])
+    .returning({
+        admin: users.admin
+    });
 ```
 ```sql
+-- user_count CTE 정의
 with "user_count" as (select count(*) as "value" from "users") 
+
+-- user_count를 참조하여 데이터 삽입
 insert into "users" ("username", "admin") 
 values ($1, ((select * from "user_count") = 0)) 
+
+-- 삽입된 데이터의 admin 컬럼 반환
 returning "admin"
 ```
 </Section>
 
+이 예제에서는 `user_count`라는 CTE를 정의하고, 이를 사용하여 `users` 테이블에 데이터를 삽입합니다. 삽입 시 `admin` 컬럼의 값은 `user_count`의 결과에 따라 결정됩니다. 마지막으로 삽입된 데이터의 `admin` 컬럼 값을 반환합니다.
 
-## Insert into ... select
 
-As the SQLite documentation mentions:
+## INSERT INTO ... SELECT
+
+SQLite 문서에 따르면:
 
 <Callout>
-The second form of the INSERT statement contains a SELECT statement instead of a VALUES clause. 
-A new entry is inserted into the table for each row of data returned by executing the SELECT statement. 
-If a column-list is specified, the number of columns in the result of the SELECT must be the same as 
-the number of items in the column-list. Otherwise, if no column-list is specified, the number of 
-columns in the result of the SELECT must be the same as the number of columns in the table. 
-Any SELECT statement, including compound SELECTs and SELECT statements with ORDER BY and/or LIMIT clauses, 
-may be used in an INSERT statement of this form.
+INSERT 문의 두 번째 형태는 VALUES 절 대신 SELECT 문을 포함합니다. 
+SELECT 문을 실행하여 반환된 각 행에 대해 테이블에 새로운 항목이 삽입됩니다. 
+열 목록이 지정된 경우, SELECT 결과의 열 수는 열 목록의 항목 수와 동일해야 합니다. 
+그렇지 않으면, 열 목록이 지정되지 않은 경우 SELECT 결과의 열 수는 테이블의 열 수와 동일해야 합니다. 
+ORDER BY 및/또는 LIMIT 절을 포함한 복합 SELECT 문을 포함한 모든 SELECT 문은 이 형태의 INSERT 문에서 사용할 수 있습니다.
 </Callout>
 <Callout type='warning'>
-To avoid a parsing ambiguity, the SELECT statement should always contain a WHERE clause, even if that clause is simply "WHERE true", if the upsert-clause is present. Without the WHERE clause, the parser does not know if the token "ON" is part of a join constraint on the SELECT, or the beginning of the upsert-clause.
+파싱 모호성을 피하기 위해, SELECT 문은 WHERE 절을 항상 포함해야 합니다. 
+upsert-clause가 있는 경우, WHERE 절이 단순히 "WHERE true"라도 포함되어야 합니다. 
+WHERE 절이 없으면 파서가 "ON" 토큰이 SELECT의 조인 제약 조건인지, 아니면 upsert-clause의 시작인지 알 수 없습니다.
 </Callout>
 
-As the PostgreSQL documentation mentions:
+PostgreSQL 문서에 따르면:
 <Callout>
-A query (SELECT statement) that supplies the rows to be inserted
+삽입할 행을 제공하는 쿼리(SELECT 문)
 </Callout>
 
-And as the MySQL documentation mentions:
+MySQL 문서에 따르면:
 
 <Callout>
-With INSERT ... SELECT, you can quickly insert many rows into a table from the result of a SELECT statement, which can select from one or many tables
+INSERT ... SELECT를 사용하면 SELECT 문의 결과로부터 테이블에 많은 행을 빠르게 삽입할 수 있습니다. 
+SELECT 문은 하나 이상의 테이블에서 선택할 수 있습니다.
 </Callout>
 
-Drizzle supports the current syntax for all dialects, and all of them share the same syntax. Let's review some common scenarios and API usage. 
-There are several ways to use select inside insert statements, allowing you to choose your preferred approach:
+Drizzle는 모든 SQL 방언에 대해 현재 구문을 지원하며, 모든 방언이 동일한 구문을 공유합니다. 
+일반적인 시나리오와 API 사용법을 살펴보겠습니다. 
+INSERT 문 내부에서 SELECT를 사용하는 여러 방법이 있으며, 여러분이 선호하는 방식을 선택할 수 있습니다:
 
-- You can pass a query builder inside the select function.
-- You can use a query builder inside a callback.
-- You can pass an SQL template tag with any custom select query you want to use
+- `select` 함수 내부에 쿼리 빌더를 전달할 수 있습니다.
+- 콜백 내부에 쿼리 빌더를 사용할 수 있습니다.
+- 원하는 커스텀 SELECT 쿼리를 포함한 SQL 템플릿 태그를 전달할 수 있습니다.
 
-
-<Tabs items={["Query Builder", "Callback", "SQL template tag"]}>
+<Tabs items={["쿼리 빌더", "콜백", "SQL 템플릿 태그"]}>
 <Tab>
 <Section>
 ```ts
@@ -305,3 +341,5 @@ await db.insert(employees).select(
 </Section>
 </Tab>
 </Tabs>
+
+
